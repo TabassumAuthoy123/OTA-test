@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" width="320" height="100">
+  <defs>
+    <linearGradient id="birdGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0a3d6b;stop-opacity:1" />
+      <stop offset="35%" style="stop-color:#1a7fce;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#3db8eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7cd4f5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="birdGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1565a8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5ec4e8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Bird / Swift in flight -->
+  <g transform="translate(85, -2) scale(0.55)">
+    <!-- Upper wing -->
+    <path d="M120,45 C105,30 85,18 60,12 C80,22 90,35 95,42 C75,32 50,28 20,30 C55,38 80,48 95,52 Z" fill="url(#birdGrad)"/>
+    <!-- Lower wing / body -->
+    <path d="M95,52 C100,55 108,52 120,45 C115,50 112,56 115,65 C110,58 105,55 95,52 Z" fill="url(#birdGrad2)"/>
+    <!-- Tail -->
+    <path d="M115,65 C118,72 125,85 130,95 C120,82 112,70 95,52 C105,55 110,58 115,65 Z" fill="#0d4a7a"/>
+    <!-- Wing detail -->
+    <path d="M95,52 C80,48 55,38 20,30 C60,40 85,50 100,58 C98,55 96,53 95,52 Z" fill="url(#birdGrad2)" opacity="0.6"/>
+  </g>
+  
+  <!-- OTA text -->
+  <text x="15" y="82" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="46" font-weight="800" fill="#0a2e4a" letter-spacing="-1">OTA</text>
+  
+  <!-- platform text -->
+  <text x="138" y="82" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="38" font-weight="400" fill="#1a4a6e" letter-spacing="0">platform</text>
+</svg>

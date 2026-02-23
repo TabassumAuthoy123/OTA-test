@@ -1,0 +1,89 @@
+<?php $__env->startSection('content'); ?>
+    <div class="left_section w-100">
+        <div class="mb-3">
+            <?php
+                $companyProfile = DB::table('company_profiles')->where('id', 1)->first();
+            ?>
+
+            <?php if($companyProfile && file_exists(public_path($companyProfile->logo))): ?>
+            <img class="brand_logo" src="<?php echo e(url($companyProfile->logo)); ?>" alt="" style="width: 40%" />
+            <?php endif; ?>
+
+            <h3 class="fs-24 fw-bold heading mt-2">Welcome back</h3>
+            <p class="sub_heading mb-0">
+                Nice to see you! please log in with your account
+            </p>
+        </div>
+        <form action="<?php echo e(url('login')); ?>" class="register-form" method="POST">
+            <?php echo csrf_field(); ?>
+
+            <div class="mb-3">
+                <input type="email" class="form-control input-py <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" <?php if(env('APP_NAME') == 'OTA'): ?> value="admin@gmail.com" <?php else: ?> value="<?php echo e(old('email')); ?>" <?php endif; ?> id="email" name="email" placeholder="Enter email" required autocomplete="on" />
+                <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <span class="invalid-feedback text-start d-block">
+                        <?php echo e($message); ?>
+
+                    </span>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+            </div>
+
+            <div class="form-input mb-3 position-relative">
+                <input class="form-control input-py <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" <?php if(env('APP_NAME') == 'OTA'): ?> value="12345678" <?php endif; ?> type="password" autocomplete="on" name="password" placeholder="Password" required />
+
+                <div class="password-showHide">
+                    <svg class="icon show-password" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 3.375C5.25 3.375 2.0475 5.7075 0.75 9C2.0475 12.2925 5.25 14.625 9 14.625C12.75 14.625 15.9525 12.2925 17.25 9C15.9525 5.7075 12.75 3.375 9 3.375ZM9 12.75C6.93 12.75 5.25 11.07 5.25 9C5.25 6.93 6.93 5.25 9 5.25C11.07 5.25 12.75 6.93 12.75 9C12.75 11.07 11.07 12.75 9 12.75ZM9 6.75C7.755 6.75 6.75 7.755 6.75 9C6.75 10.245 7.755 11.25 9 11.25C10.245 11.25 11.25 10.245 11.25 9C11.25 7.755 10.245 6.75 9 6.75Z" fill="black" />
+                    </svg>
+                    <svg class="icon hide-password" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.1387 14.526L10.323 12.7091C9.62082 12.9602 8.86179 13.0067 8.13422 12.8432C7.40665 12.6797 6.74047 12.313 6.21317 11.7857C5.68588 11.2584 5.31916 10.5922 5.15568 9.86465C4.99221 9.13708 5.0387 8.37805 5.28975 7.67587L2.97225 5.35838C1.05525 7.06275 0 9 0 9C0 9 3.375 15.1875 9 15.1875C10.0805 15.1837 11.1487 14.9586 12.1387 14.526V14.526ZM5.86125 3.474C6.85131 3.04135 7.91954 2.81622 9 2.8125C14.625 2.8125 18 9 18 9C18 9 16.9436 10.9361 15.0289 12.6427L12.7091 10.323C12.9602 9.62082 13.0067 8.86179 12.8432 8.13422C12.6797 7.40665 12.313 6.74047 11.7857 6.21317C11.2584 5.68588 10.5922 5.31916 9.86465 5.15568C9.13708 4.99221 8.37805 5.0387 7.67587 5.28975L5.86125 3.47512V3.474Z" fill="black" />
+                        <path d="M6.21544 8.60156C6.15355 9.03391 6.19321 9.47473 6.33127 9.88909C6.46933 10.3035 6.70199 10.68 7.01083 10.9888C7.31966 11.2976 7.69617 11.5303 8.11053 11.6684C8.52489 11.8064 8.96571 11.8461 9.39806 11.7842L6.21431 8.60156H6.21544ZM11.7842 9.39806L8.60156 6.21431C9.03391 6.15243 9.47473 6.19209 9.88909 6.33015C10.3035 6.4682 10.68 6.70087 10.9888 7.0097C11.2976 7.31853 11.5303 7.69505 11.6684 8.10941C11.8064 8.52377 11.8461 8.96459 11.7842 9.39694V9.39806ZM15.3516 16.1481L1.85156 2.64806L2.64806 1.85156L16.1481 15.3516L15.3516 16.1481Z" fill="black" />
+                    </svg>
+                </div>
+
+                <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <span class="invalid-feedback text-start d-block">
+                        <?php echo e($message); ?>
+
+                    </span>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+            </div>
+
+            
+            <button type="submit" class="btn btn_warning text-white w-100"><?php echo e(__('Login')); ?></button>
+
+        </form>
+    </div>
+    <div class="right_section">
+        <img src="<?php echo e(url('assets')); ?>/img/biman.png" alt="Login image" />
+    </div>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH I:\Softifybd Devs\OTA-Platform\resources\views/auth/login.blade.php ENDPATH**/ ?>

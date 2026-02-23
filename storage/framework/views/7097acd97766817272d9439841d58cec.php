@@ -1,0 +1,134 @@
+<?php $__env->startSection('header_css'); ?>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <style>
+        .sabre_gds_info label{
+            font-weight: 600;
+        }
+
+        .sabre_gds_info small{
+            color: gray;
+            font-size: 12px;
+            padding-left: 3px;
+        }
+    </style>
+<?php $__env->stopSection(); ?>
+
+
+<?php $__env->startSection('content'); ?>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <img src="<?php echo e(url($sabreGdsInfo->logo)); ?>" style="height: 18px;">
+                </div>
+                <div class="card-body sabre_gds_info">
+
+                    <form action="<?php echo e(url('update/sabre/gds/info')); ?>" method="POST" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="user_id">User ID (Sandbox)</label>
+                                    <input type="text" id="user_id" name="user_id" value="<?php echo e($sabreGdsInfo->user_id); ?>" class="form-control" placeholder="V1:user:group:domain (V1:hxp6cy145bjv3hy7:DEVCENTER:EXT)">
+                                    <small>This will be converted into Base64 during API Interaction</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="password">Password (Sandbox)</label>
+                                    <input type="text" id="password" name="password" value="<?php echo e($sabreGdsInfo->password); ?>" class="form-control" placeholder="Hp1tT2iM">
+                                    <small>This will be converted into Base64  during API Interaction</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="production_user_id">User ID (Production)</label>
+                                    <input type="text" id="production_user_id" name="production_user_id" value="<?php echo e($sabreGdsInfo->production_user_id); ?>" class="form-control" placeholder="V1:user:group:domain (V1:hxp6cy145bjv3hy7:DEVCENTER:EXT)">
+                                    <small>This will be converted into Base64 during API Interaction</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="production_password">Password (Production)</label>
+                                    <input type="text" id="production_password" name="production_password" value="<?php echo e($sabreGdsInfo->production_password); ?>" class="form-control" placeholder="Hp1tT2iM">
+                                    <small>This will be converted into Base64  during API Interaction</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6 mt-3 mb-2">
+                                <div class="form-group">
+                                    <label for="pcc">PCC (TargetCity)</label>
+                                    <input type="text" id="pcc" name="pcc" value="<?php echo e($sabreGdsInfo->pcc); ?>" class="form-control" placeholder="ex. X87C" required>
+                                    <small>Remain same in Sandbox & Procution environment</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mt-3 mb-2">
+                                <div class="form-group" style="padding-top: 25px;">
+                                    <label for="is_production" style="font-size: 16px; color: #d00000; cursor: pointer;">
+                                        <input type="checkbox" name="is_production" <?php if($sabreGdsInfo->is_production == 1): ?> checked <?php endif; ?> value="1" id="is_production">
+                                        Enable Production Mode
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12 pt-3">
+                                <div class="form-group">
+                                    <label for="description">Notes for Development Purpose</label>
+                                    <textarea id="description" name="description" class="form-control"><?php echo $sabreGdsInfo->description; ?></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12 pt-3">
+                                <button type="submit" class="btn btn-success rounded">Save Info</button>
+                            </div>
+                        </div>
+
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+<?php $__env->stopSection(); ?>
+
+
+<?php $__env->startSection('footer_js'); ?>
+
+    <?php if($errors->any()): ?>
+        <script>
+            toastr.success("Sabre Gds Info Updated");
+        </script>
+    <?php endif; ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script>
+        $('#description').summernote({
+            placeholder: 'Type Here',
+            tabsize: 2,
+            height: 300,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    </script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('master', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH I:\Softifybd Devs\OTA-Platform\resources\views/gds/sabre.blade.php ENDPATH**/ ?>

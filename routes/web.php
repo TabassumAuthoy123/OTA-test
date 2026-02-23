@@ -1,0 +1,236 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\FlightSearchController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\GdsController;
+use App\Http\Controllers\CkeditorController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\FlightBookingController;
+use App\Http\Controllers\OfficeAddressController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\DashboardController;
+use App\Models\SabreFlightBooking;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+Route::get('/', function () {
+    return redirect('/login');
+});
+
+
+// cron job to auto cancel flight booking start
+// Route::get('/check/last/ticketing/datetime', function () {
+
+//     ini_set('max_execution_time', 300); // 5 minutes
+//     ini_set('memory_limit', '4096M');   // 4 GB
+
+//     $data = DB::table('flight_bookings')->select('booking_no', 'pnr_id', 'last_ticket_datetime')->where('status', 1)->where('departure_date', '>=', date("Y-m-d"))->whereNotNull('last_ticket_datetime')->get();
+//     foreach($data as $item){
+
+//         $lastTicketTime = strtotime($item->last_ticket_datetime);
+//         $now = time();
+//         $twoHoursLater = $now + (2 * 60 * 60); // 2 hours in seconds
+
+//         if($lastTicketTime > $now && $lastTicketTime <= $twoHoursLater){
+//             $cancelResponse = json_decode(SabreFlightBooking::cancelBooking($item->booking_no), true);
+//             if(isset($cancelResponse['booking']['bookingId']) && $cancelResponse['booking']['bookingId'] == $item->pnr_id){
+//                 DB::table('flight_bookings')->where('pnr_id', $item->pnr_id)->update([
+//                     'status' => 3,
+//                     'booking_cancelled_at' => Carbon::now(),
+//                     'updated_at' => Carbon::now(),
+//                 ]);
+//             }
+//         }
+//     }
+//     return response(null, 204);
+// });
+// cron job to auto cancel flight booking end
+
+
+Auth::routes([
+    'login' => true,
+    'register' => false, // Registration Routes...
+    'reset' => false, // Password Reset Routes...
+    'verify' => false, // Email Verification Routes...
+]);
+
+Route::get('ckeditor', [CkeditorController::class, 'index']);
+Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');
+
+
+// ssl commerz payment routes
+Route::get('sslcommerz/order', [PaymentController::class, 'order'])->name('payment.order');
+Route::post('sslcommerz/success', [PaymentController::class, 'success'])->name('payment.success');
+Route::post('sslcommerz/failure', [PaymentController::class, 'failure'])->name('sslc.failure');
+Route::post('sslcommerz/cancel', [PaymentController::class, 'cancel'])->name('sslc.cancel');
+Route::post('sslcommerz/ipn', [PaymentController::class, 'ipn'])->name('payment.ipn');
+
+
+Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
+
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/live/city/airport/search', [HomeController::class, 'liveCityAirportSearch'])->name('LiveCityAirportSearch');
+    Route::get('/live/airline/search', [HomeController::class, 'liveAirlineSearch'])->name('LiveAirlineSearch');
+    Route::post('/passenger/live/search', [HomeController::class, 'passengerLiveSearch'])->name('PassengerLiveSearch');
+
+    // Payment Methods
+    Route::get('/payment-methods', [HomeController::class, 'paymentMethods'])->name('payment.methods');
+
+    // search flights
+    Route::post('/search/flights', [FlightSearchController::class, 'searchFlights'])->name('SearchFlights');
+    Route::post('/search/multi-city/flights', [FlightSearchController::class, 'searchMultiCityFlights'])->name('SearchMultiCityFlights');
+    Route::get('/flight/search-results', [FlightSearchController::class, 'showFlightSearchResults'])->name('ShowFlightSearchResults');
+    Route::get('select/flight/{session_index}', [FlightSearchController::class, 'revalidateFlight'])->name('RevalidateFlight');
+
+    // search next and previous
+    Route::get('/search/next/day', [FlightSearchController::class, 'searchNextDay'])->name('SearchNextDay');
+    Route::get('/search/prev/day', [FlightSearchController::class, 'searchPreviousDay'])->name('SearchPreviousDay');
+
+    // filter routes
+    Route::post('/price/range/filter', [FlightSearchController::class, 'priceRangeFilter'])->name('PriceRangeFilter');
+    Route::get('/clear/price/range/filter', [FlightSearchController::class, 'clearPriceRangeFilter'])->name('ClearPriceRangeFilter');
+    Route::post('/airline/carrier/filter', [FlightSearchController::class, 'airlineCarrierFilter'])->name('AirlineCarrierFilter');
+    Route::get('/clear/airline/carrier/filter', [FlightSearchController::class, 'clearAirlineCarrierFilter'])->name('ClearAirlineCarrierFilter');
+
+    // company profile routes
+    Route::get('/company/profile', [ProfileController::class, 'companyProfile'])->name('CompanyProfile');
+    Route::post('/update/company/profile', [ProfileController::class, 'updateCompanyProfile'])->name('UpdateCompanyProfile');
+    Route::get('/remove/company/logo', [ProfileController::class, 'removeCompanyLogo'])->name('RemoveCompanyLogo');
+
+    // user profile routes
+    Route::get('/my/profile', [ProfileController::class, 'myProfile'])->name('MyProfile');
+    Route::post('update/user/profile', [ProfileController::class, 'updateProfile'])->name('UpdateProfile');
+    Route::get('/remove/user/image', [ProfileController::class, 'removeUserImage'])->name('RemoveUserImage');
+
+    // flight booking routes
+    Route::post('create/pnr/with/booking/sabre', [FlightBookingController::class, 'bookFlightWithPnrSabre'])->name('BookFlightWithPnrSabre');
+    Route::post('create/pnr/with/booking', [FlightBookingController::class, 'bookFlightWithPnr'])->name('bookFlightWithPnr');
+    Route::get('view/all/booking', [FlightBookingController::class, 'viewAllBooking'])->name('ViewAllBooking');
+    Route::get('view/cancel/booking', [FlightBookingController::class, 'viewCancelBooking'])->name('ViewCancelBooking');
+    Route::get('flight/booking/details/{booking_no}', [FlightBookingController::class, 'flightBookingDetails'])->name('FlightBookingDetails');
+    Route::get('cancel/flight/booking/{booking_no}', [FlightBookingController::class, 'cancelFlightBooking'])->name('CancelFlightBooking');
+    Route::get('cancel/issued/ticket/{booking_no}', [FlightBookingController::class, 'cancelIssuedTicket'])->name('cancelIssuedTicket');
+    Route::get('booking/preview/{pnr_id}', [FlightBookingController::class, 'bookingPreview'])->name('BookingPreview');
+    Route::get('issue/flight/ticket/{booking_no}', [FlightBookingController::class, 'issueFlightTicket'])->name('IssueFlightTicket');
+    Route::get('view/issued/tickets', [FlightBookingController::class, 'viewIssuedTickets'])->name('ViewIssuedTickets');
+    Route::get('archived/issued/tickets', [FlightBookingController::class, 'archivedIssuedTickets'])->name('ArchivedIssuedTickets');
+    Route::get('view/cancelled/tickets', [FlightBookingController::class, 'viewCancelledTickets'])->name('ViewCancelledTickets');
+    Route::post('update/pnr/booking', [FlightBookingController::class, 'updatePnrBooking'])->name('UpdatePnrBooking');
+
+    // recharge
+    Route::get('create/topup/request', [PaymentController::class, 'createTopupRequest'])->name('CreateTopupRequest');
+    Route::post('submit/recharge/request', [PaymentController::class, 'submitRechargeRequest'])->name('SubmitRechargeRequest');
+    Route::get('view/recharge/requests', [PaymentController::class, 'viewRechargeRequests'])->name('ViewRechargeRequests');
+    Route::get('delete/recharge/request/{slug}', [PaymentController::class, 'deleteRechargeRequest'])->name('ViewRechargeRequests');
+
+
+    // report
+    Route::get('flight/booking/report', [ReportController::class, 'flightBookingReport'])->name('FlightBookingReport');
+    Route::post('generate/flight/booking/report', [ReportController::class, 'generateFlightBookingReport'])->name('GenerateFlightBookingReport');
+
+    Route::group(['middleware' => ['CheckUserType']], function () {
+
+        // Dashboard Analytics
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('Dashboard');
+
+        // Activity Logs
+        Route::get('view/activity/logs', [HomeController::class, 'viewActivityLogs'])->name('ViewActivityLogs');
+
+        // office address
+        Route::get('view/office/address', [OfficeAddressController::class, 'viewOfficeAddress'])->name('ViewOfficeAddress');
+        Route::post('save/office/address', [OfficeAddressController::class, 'saveOfficeAddress'])->name('SaveOfficeAddress');
+        Route::get('delete/office/address/{slug}', [OfficeAddressController::class, 'deleteOfficeAddress'])->name('DeleteOfficeAddress');
+        Route::get('get/office/address/{slug}', [OfficeAddressController::class, 'getOfficeAddress'])->name('GetOfficeAddress');
+        Route::post('update/office/address', [OfficeAddressController::class, 'updateOfficeAddress'])->name('UpdateOfficeAddress');
+
+        // banner
+        Route::get('view/all/banners', [BannerController::class, 'viewAllBanners'])->name('ViewAllBanners');
+        Route::get('add/new/banner', [BannerController::class, 'addNewBanner'])->name('AddNewBanner');
+        Route::post('save/banner', [BannerController::class, 'saveBanner'])->name('SaveBanner');
+        Route::get('edit/banner/{slug}', [BannerController::class, 'editBanner'])->name('EditBanner');
+        Route::post('update/banner', [BannerController::class, 'updateBanner'])->name('UpdateBanner');
+        Route::get('delete/banner/{slug}', [BannerController::class, 'deleteBanner'])->name('DeleteBanner');
+
+        // b2b account deductions
+        Route::get('view/account/deductions', [PaymentController::class, 'viewAccountDeductions'])->name('ViewAccountDeductions');
+        Route::get('submit/b2b/account/deduction', [PaymentController::class, 'submitAccountDeduction'])->name('SubmitAccountDeduction');
+        Route::get('get/user/balance/{id}', [PaymentController::class, 'getUserBalance'])->name('GetUserBalance');
+        Route::post('deduct/b2b/account', [PaymentController::class, 'deductB2bAccount'])->name('DeductB2bAccount');
+        Route::get('delete/b2b/account/deduction/{slug}', [PaymentController::class, 'deleteDeductionHistory'])->name('DeleteDeductionHistory');
+
+        // recharge
+        Route::get('approve/recharge/request/{slug}', [PaymentController::class, 'approveRechargeRequest'])->name('ApproveRechargeRequest');
+        Route::get('deny/recharge/request/{slug}', [PaymentController::class, 'denyRechargeRequest'])->name('DenyRechargeRequest');
+
+        // setup gds routes
+        Route::get('setup/gds', [GdsController::class, 'setupGds'])->name('SetupGds');
+        Route::post('gds/status/update', [GdsController::class, 'gdsStatusUpdate'])->name('GdsStatusUpdate');
+        Route::get('edit/gds/{code}', [GdsController::class, 'editGdsInfo'])->name('EditGdsInfo');
+        Route::post('update/sabre/gds/info', [GdsController::class, 'updateSabreGdsInfo'])->name('UpdateSabreGdsInfo');
+        Route::post('update/flyhub/gds/info', [GdsController::class, 'updateFlyhubGdsInfo'])->name('UpdateFlyhubGdsInfo');
+        Route::get('view/excluded/airlines', [GdsController::class, 'viewExcludedAirlines'])->name('ViewExcludedAirlines');
+        Route::post('save/excluded/airline', [GdsController::class, 'saveExcludedAirline'])->name('SaveExcludedAirline');
+        Route::get('delete/excluded/airline/{id}', [GdsController::class, 'deleteExcludedAirline'])->name('DeleteExcludedAirline');
+        Route::get('excluded/airline/info/{id}', [GdsController::class, 'excludedAirlineInfo'])->name('ExcludedAirlineInfo');
+        Route::get('view/airlines/comissions', [GdsController::class, 'viewAirlinesComissions'])->name('ViewAirlinesComissions');
+        Route::get('airline/info/{id}', [GdsController::class, 'airlineInfo'])->name('AirlineInfo');
+        Route::post('update/airline/comission', [GdsController::class, 'updateAirlineComission'])->name('UpdateAirlineComission');
+
+        // system route for sms & email
+        Route::get('/setup/sms/gateways', [SystemController::class, 'viewSmsGateways'])->name('ViewSmsGateways');
+        Route::post('/update/sms/gateway/info', [SystemController::class, 'updateSmsGatewayInfo'])->name('UpdateSmsGatewayInfo');
+        Route::get('/change/gateway/status/{provider}', [SystemController::class, 'changeGatewayStatus'])->name('ChangeGatewayStatus');
+        Route::get('/view/email/config', [SystemController::class, 'viewEmailConfig'])->name('ViewEmailConfig');
+        Route::post('/update/email/config', [SystemController::class, 'updateEmailConfig'])->name('UpdateEmailConfig');
+        Route::get('/search/results/view/config', [SystemController::class, 'searchResultsViewConfig'])->name('SearchResultsViewConfig');
+        Route::get('/change/search/results/view/{value}', [SystemController::class, 'changeSearchResultsView'])->name('ChangeSearchResultsView');
+
+        // bank accounts
+        Route::get('view/bank/accounts', [PaymentController::class, 'viewBankAccounts'])->name('ViewBankAccounts');
+        Route::get('add/bank/account', [PaymentController::class, 'addBankAccount'])->name('AddBankAccount');
+        Route::post('save/bank/account', [PaymentController::class, 'saveBankAccount'])->name('SaveBankAccount');
+        Route::get('delete/bank/account/{slug}', [PaymentController::class, 'deleteBankAccount'])->name('DeleteBankAccount');
+        Route::get('edit/bank/account/{slug}', [PaymentController::class, 'editBankAccount'])->name('EditBankAccount');
+        Route::post('update/bank/account', [PaymentController::class, 'updateBankAccount'])->name('UpdateBankAccount');
+
+        // mfs accounts
+        Route::get('view/mfs/accounts', [PaymentController::class, 'viewMfsAccounts'])->name('ViewMfsAccounts');
+        Route::get('add/mfs/account', [PaymentController::class, 'addMfsAccount'])->name('AddMfsAccount');
+        Route::post('save/mfs/account', [PaymentController::class, 'saveMfsAccount'])->name('SaveMfsAccount');
+        Route::get('delete/mfs/account/{slug}', [PaymentController::class, 'deleteMfsAccount'])->name('DeleteMfsAccount');
+        Route::get('edit/mfs/account/{slug}', [PaymentController::class, 'editMfsAccount'])->name('EditMfsAccount');
+        Route::post('update/mfs/account', [PaymentController::class, 'updateMfsAccount'])->name('UpdateMfsAccount');
+
+        // b2b user management
+        Route::get('create/b2b/users', [UserController::class, 'createB2bUser'])->name('CreateB2bUser');
+        Route::post('save/b2b/user', [UserController::class, 'saveB2bUser'])->name('SaveB2bUser');
+        Route::get('view/b2b/users', [UserController::class, 'viewB2bUser'])->name('ViewB2bUser');
+        Route::get('delete/b2b/user/{id}', [UserController::class, 'deleteB2bUser'])->name('DeleteB2bUser');
+        Route::get('edit/b2b/user/{id}', [UserController::class, 'editB2bUser'])->name('EditB2bUser');
+        Route::post('update/b2b/user', [UserController::class, 'updateB2bUser'])->name('UpdateB2bUser');
+        Route::get('view/saved/passengers', [UserController::class, 'savedPassengers'])->name('SavedPassengers');
+        Route::get('delete/saved/passenger/{id}', [UserController::class, 'deleteSavedPassenger'])->name('DeleteSavedPassenger');
+        Route::get('view/registered/customers', [UserController::class, 'viewRegisteredCustomers'])->name('ViewRegisteredCustomers');
+
+        // Task Board
+        Route::get('tasks', [TaskController::class, 'index'])->name('TaskBoard');
+        Route::post('tasks', [TaskController::class, 'store'])->name('StoreTask');
+        Route::put('tasks/{id}', [TaskController::class, 'update'])->name('UpdateTask');
+        Route::patch('tasks/{id}/status/{status}', [TaskController::class, 'updateStatus'])->name('UpdateTaskStatus');
+        Route::delete('tasks/{id}', [TaskController::class, 'destroy'])->name('DestroyTask');
+        Route::post('tasks/seed-audit', [TaskController::class, 'seedAuditTasks'])->name('SeedAuditTasks');
+
+        // Report
+        Route::get('b2b/financial/report', [ReportController::class, 'b2bFinancialReport'])->name('B2bFinancialReport');
+        Route::post('generate/b2b/financial/report', [ReportController::class, 'generateB2bFinancialReport'])->name('GenerateB2bFinancialReport');
+
+    });
+
+});
