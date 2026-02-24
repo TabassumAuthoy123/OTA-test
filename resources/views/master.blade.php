@@ -23,7 +23,7 @@
 
     <!-- Favicon -->
     @if($companyProfile && $companyProfile->logo && file_exists(public_path($companyProfile->logo)))
-    <link rel="shortcut icon" href="{{ url($companyProfile->logo) }}" />
+        <link rel="shortcut icon" href="{{ url($companyProfile->logo) }}" />
     @endif
 
     <!-- Theme CSS -->
@@ -33,22 +33,29 @@
     <link href="{{ url('assets') }}/nanopkg-assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" />
     <link href="{{ url('assets') }}/admin-assets/vendor/typicons/src/typicons.min.css" rel="stylesheet" />
     <link href="{{ url('assets') }}/admin-assets/vendor/themify-icons/themify-icons.min.css" rel="stylesheet" />
-    <link href="{{ url('assets') }}/admin-assets/vendor/select2/dist/css/select2.css" rel="stylesheet" type="text/css" />
-    <link href="{{ url('assets') }}/nanopkg-assets/vendor/t-datepicker-master/public/theme/css/t-datepicker.min.css" rel="stylesheet" />
-    <link href="{{ url('assets') }}/nanopkg-assets/vendor/t-datepicker-master/public/theme/css/themes/t-datepicker-main.css" rel="stylesheet" />
+    <link href="{{ url('assets') }}/admin-assets/vendor/select2/dist/css/select2.css" rel="stylesheet"
+        type="text/css" />
+    <link href="{{ url('assets') }}/nanopkg-assets/vendor/t-datepicker-master/public/theme/css/t-datepicker.min.css"
+        rel="stylesheet" />
+    <link
+        href="{{ url('assets') }}/nanopkg-assets/vendor/t-datepicker-master/public/theme/css/themes/t-datepicker-main.css"
+        rel="stylesheet" />
     <link href="{{ url('assets') }}/admin-assets//css/search.css?v=1" rel="stylesheet" type="text/css" />
     <link href="{{ url('assets') }}/nanopkg-assets/vendor/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
-    <link href="{{ url('assets') }}/nanopkg-assets/vendor/fontawesome-free-6.3.0-web/css/all.min.css" rel="stylesheet" />
-    <link href="{{ url('assets') }}/nanopkg-assets/vendor/bootstrap-icons/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="{{ url('assets') }}/nanopkg-assets/vendor/fontawesome-free-6.3.0-web/css/all.min.css"
+        rel="stylesheet" />
+    <link href="{{ url('assets') }}/nanopkg-assets/vendor/bootstrap-icons/css/bootstrap-icons.min.css"
+        rel="stylesheet" />
     <link href="{{ url('assets') }}/nanopkg-assets/vendor/toastr/build/toastr.min.css" rel="stylesheet" />
     <link href="{{ url('assets') }}/nanopkg-assets/css/arrow-hidden.min.css" rel="stylesheet" />
-    <link href="{{ url('assets') }}/plugins/swiper/swiper-bundle.min.css" rel="stylesheet"  />
+    <link href="{{ url('assets') }}/plugins/swiper/swiper-bundle.min.css" rel="stylesheet" />
     <link href="{{ url('assets') }}/nanopkg-assets/css/custom.min.css" rel="stylesheet" />
-    <link href="{{ url('assets') }}/admin-assets/css/style-new.css" rel="stylesheet" />
+    <link href="{{ url('assets') }}/admin-assets/css/style-new.css?v=3" rel="stylesheet" />
     <link href="{{ url('assets') }}/admin-assets/css/custom.css" rel="stylesheet" />
-    <link href="{{ url('assets') }}/admin-assets/css/extra.css" rel="stylesheet" />
+    <link href="{{ url('assets') }}/admin-assets/css/extra.css?v=3" rel="stylesheet" />
     <link href="{{ url('assets') }}/module-assets//css/booking/search_box.css?v=8" rel="stylesheet" type="text/css" />
-    <link href="{{ url('assets') }}/module-assets//css/booking/search_box_custom.min.css?v=8" rel="stylesheet" type="text/css" />
+    <link href="{{ url('assets') }}/module-assets//css/booking/search_box_custom.min.css?v=8" rel="stylesheet"
+        type="text/css" />
 
     <style>
         .body-content {
@@ -118,7 +125,7 @@
             <!--</div>-->
             <!--<p>Please wait...</p>-->
 
-            <img src="{{url('assets')}}/img/preloader.gif" alt="preloader"/>
+            <img src="{{url('assets')}}/img/preloader.gif" alt="preloader" />
         </div>
     </div>
 
@@ -202,14 +209,15 @@
     <script src="{{ url('assets') }}/admin-assets/vendor/moment/moment.min.js"></script>
     <script src="{{ url('assets') }}/admin-assets/vendor/daterangepicker/daterangepicker.min.js"></script>
     <script src="{{ url('assets') }}/admin-assets/js/ajax_form_submission.min.js"></script>
-    {{-- <script src="{{ url('assets') }}/module-assets/js/booking/search_box.js"></script> --}}
+    {{--
+    <script src="{{ url('assets') }}/module-assets/js/booking/search_box.js"></script> --}}
     <script src="{{ url('assets') }}/module-assets/js/booking/booking.min.js"></script>
     <script src="{{ url('assets') }}/module-assets/js/setting/setting.min.js"></script>
     <script src="{{ url('assets') }}/nanopkg-assets/js/main.min.js"></script>
     <script src="{{ url('assets') }}/admin-assets/js/sidebar.min.js"></script>
     <script src="{{ url('assets') }}/nanopkg-assets/js/tosterSession.min.js"></script>
     <script defer src="{{ url('assets') }}/nanopkg-assets/vendor/alpine/alpine.min.js"></script>
-     <script defer src="{{ url('assets') }}/nanopkg-assets/vendor/alpine/alpine.min.js"></script>
+    <script defer src="{{ url('assets') }}/nanopkg-assets/vendor/alpine/alpine.min.js"></script>
     @yield('footer_js')
 
     {!! Toastr::message() !!}

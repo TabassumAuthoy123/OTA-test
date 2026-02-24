@@ -47,12 +47,12 @@
                     <ul class="nav-second-level">
                         <li class="<?php if($currentRoute == 'ViewAllBooking'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/all/booking')); ?>">
-                                Booking List
+                                <i class="typcn typcn-th-list-outline"></i> Booking List
                             </a>
                         </li>
                         <li class="<?php if($currentRoute == 'ViewCancelBooking'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/cancel/booking')); ?>">
-                                Cancelled Booking List
+                                <i class="typcn typcn-times-outline"></i> Cancelled Booking List
                             </a>
                         </li>
                     </ul>
@@ -65,12 +65,12 @@
                     <ul class="nav-second-level">
                         <li class="<?php if($currentRoute == 'ViewIssuedTickets'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/issued/tickets')); ?>">
-                                Issued Ticket List
+                                <i class="typcn typcn-tick-outline"></i> Issued Ticket List
                             </a>
                         </li>
                         <li class="<?php if($currentRoute == 'ViewCancelledTickets'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/cancelled/tickets')); ?>">
-                                Cancelled Ticket List
+                                <i class="typcn typcn-delete-outline"></i> Cancelled Ticket List
                             </a>
                         </li>
                     </ul>
@@ -101,28 +101,28 @@
                         <li
                             class="<?php if(in_array($currentRoute, ['ViewBankAccounts', 'AddBankAccount', 'EditBankAccount'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/bank/accounts')); ?>">
-                                Bank Accounts
+                                <i class="typcn typcn-briefcase"></i> Bank Accounts
                             </a>
                         </li>
                         <li
                             class="<?php if(in_array($currentRoute, ['ViewMfsAccounts', 'AddMfsAccount', 'EditMfsAccount'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/mfs/accounts')); ?>">
-                                MFS Accounts
+                                <i class="typcn typcn-phone-outline"></i> MFS Accounts
                             </a>
                         </li>
                         <li class="<?php if(in_array($currentRoute, ['ViewAccountDeductions'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/account/deductions')); ?>">
-                                B2B Account Deductions
+                                <i class="typcn typcn-minus-outline"></i> B2B Account Deductions
                             </a>
                         </li>
                         <li class="<?php if(in_array($currentRoute, ['CreateTopupRequest'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('create/topup/request')); ?>">
-                                Submit Topup Request
+                                <i class="typcn typcn-plus-outline"></i> Submit Topup Request
                             </a>
                         </li>
                         <li class="<?php if(in_array($currentRoute, ['ViewRechargeRequests'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/recharge/requests')); ?>">
-                                View Topup Requests
+                                <i class="typcn typcn-eye-outline"></i> View Topup Requests
                             </a>
                         </li>
                     </ul>
@@ -134,12 +134,12 @@
                     <ul class="nav-second-level">
                         <li class="<?php if($currentRoute == 'FlightBookingReport'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('flight/booking/report')); ?>">
-                                Flight Booking Report
+                                <i class="typcn typcn-chart-area-outline"></i> Flight Booking Report
                             </a>
                         </li>
                         <li class="<?php if($currentRoute == 'B2bFinancialReport'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('b2b/financial/report')); ?>">
-                                B2B Financial Report
+                                <i class="typcn typcn-chart-pie-outline"></i> B2B Financial Report
                             </a>
                         </li>
                     </ul>
@@ -157,12 +157,12 @@
                     <ul class="nav-second-level">
                         <li class="<?php if(in_array($currentRoute, ['CreateB2bUser'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('create/b2b/users')); ?>">
-                                Create B2B User
+                                <i class="typcn typcn-user-add-outline"></i> Create B2B User
                             </a>
                         </li>
                         <li class="<?php if(in_array($currentRoute, ['ViewB2bUser', 'EditB2bUser'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/b2b/users')); ?>">
-                                View B2B Users
+                                <i class="typcn typcn-group-outline"></i> View B2B Users
                             </a>
                         </li>
                     </ul>
@@ -179,47 +179,57 @@
                     <span>Settings</span>
                 </li>
                 <li
-                    class="<?php if(in_array($currentRoute, ['SetupGds', 'EditGdsInfo', 'ViewExcludedAirlines'])): ?> mm-active <?php endif; ?>">
+                    class="<?php if(in_array($currentRoute, ['SetupGds', 'EditGdsInfo', 'ViewExcludedAirlines', 'ArchivedGds'])): ?> mm-active <?php endif; ?>">
                     <a class="has-arrow material-ripple" href="javascript:void(0);">
                         <i class="typcn typcn-plane-outline"></i> Airline Setup
                     </a>
                     <ul class="nav-second-level">
                         <li class="<?php if($currentRoute == 'SetupGds'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('setup/gds')); ?>">
-                                GDS Setting
+                                <i class="typcn typcn-spanner-outline"></i> GDS Setting
+                            </a>
+                        </li>
+                        <li class="<?php if($currentRoute == 'ArchivedGds'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('archived/gds')); ?>">
+                                <i class="typcn typcn-archive"></i> Archived GDS
                             </a>
                         </li>
                         <li class="<?php if($currentRoute == 'ViewExcludedAirlines'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/excluded/airlines')); ?>">
-                                Exclude Airlines
+                                <i class="typcn typcn-cancel-outline"></i> Exclude Airlines
                             </a>
                         </li>
                         <li class="<?php if($currentRoute == 'ViewAirlinesComissions'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/airlines/comissions')); ?>">
-                                Airlines Commissions
+                                <i class="typcn typcn-calculator"></i> Airlines Commissions
                             </a>
                         </li>
                     </ul>
                 </li>
                 <li
-                    class="<?php if(in_array($currentRoute, ['ViewSmsGateways', 'ViewEmailConfig', 'SearchResultsViewConfig'])): ?> mm-active <?php endif; ?>">
+                    class="<?php if(in_array($currentRoute, ['ViewSmsGateways', 'ViewEmailConfig', 'SearchResultsViewConfig', 'PricingConfig'])): ?> mm-active <?php endif; ?>">
                     <a class="has-arrow material-ripple" href="javascript:void(0);">
                         <i class="typcn typcn-cog-outline"></i> Application Setting
                     </a>
                     <ul class="nav-second-level">
+                        <li class="<?php if($currentRoute == 'PricingConfig'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('pricing/config')); ?>">
+                                <i class="typcn typcn-tags"></i> Pricing & Margins
+                            </a>
+                        </li>
                         <li class="<?php if($currentRoute == 'SearchResultsViewConfig'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('search/results/view/config')); ?>">
-                                Search Results View
+                                <i class="typcn typcn-zoom-outline"></i> Search Results View
                             </a>
                         </li>
                         <li class="<?php if($currentRoute == 'ViewEmailConfig'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/email/config')); ?>">
-                                Mail Server
+                                <i class="typcn typcn-mail"></i> Mail Server
                             </a>
                         </li>
                         <li class="<?php if($currentRoute == 'ViewSmsGateways'): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('setup/sms/gateways')); ?>">
-                                SMS Gateway
+                                <i class="typcn typcn-message"></i> SMS Gateway
                             </a>
                         </li>
                     </ul>
@@ -231,12 +241,55 @@
                     <ul class="nav-second-level">
                         <li class="<?php if(in_array($currentRoute, ['ViewAllBanners'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/all/banners')); ?>">
-                                View All Banners
+                                <i class="typcn typcn-image-outline"></i> View All Banners
                             </a>
                         </li>
                         <li class="<?php if(in_array($currentRoute, ['ViewOfficeAddress'])): ?> mm-active <?php endif; ?>">
                             <a class="text-capitalize" href="<?php echo e(url('view/office/address')); ?>">
-                                Office Addresses
+                                <i class="typcn typcn-location-outline"></i> Office Addresses
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li
+                    class="<?php if(in_array($currentRoute, ['CmsBanners', 'CmsPromotions', 'CmsRoutes', 'CmsTestimonials', 'CmsPages', 'CmsEditPage', 'CmsSiteSettings', 'CmsFaqs'])): ?> mm-active <?php endif; ?>">
+                    <a class="has-arrow material-ripple" href="javascript:void(0);">
+                        <i class="typcn typcn-globe-outline"></i> B2C CMS
+                    </a>
+                    <ul class="nav-second-level">
+                        <li class="<?php if($currentRoute == 'CmsBanners'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('cms/banners')); ?>">
+                                <i class="typcn typcn-image-outline"></i> Hero Banners
+                            </a>
+                        </li>
+                        <li class="<?php if($currentRoute == 'CmsPromotions'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('cms/promotions')); ?>">
+                                <i class="typcn typcn-tags"></i> Promotions
+                            </a>
+                        </li>
+                        <li class="<?php if($currentRoute == 'CmsRoutes'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('cms/routes')); ?>">
+                                <i class="typcn typcn-plane-outline"></i> Popular Routes
+                            </a>
+                        </li>
+                        <li class="<?php if($currentRoute == 'CmsTestimonials'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('cms/testimonials')); ?>">
+                                <i class="typcn typcn-star-outline"></i> Testimonials
+                            </a>
+                        </li>
+                        <li class="<?php if(in_array($currentRoute, ['CmsPages', 'CmsEditPage'])): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('cms/pages')); ?>">
+                                <i class="typcn typcn-document-text"></i> Static Pages
+                            </a>
+                        </li>
+                        <li class="<?php if($currentRoute == 'CmsSiteSettings'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('cms/site-settings')); ?>">
+                                <i class="typcn typcn-cog-outline"></i> Site Settings
+                            </a>
+                        </li>
+                        <li class="<?php if($currentRoute == 'CmsFaqs'): ?> mm-active <?php endif; ?>">
+                            <a class="text-capitalize" href="<?php echo e(url('cms/faqs')); ?>">
+                                <i class="typcn typcn-messages"></i> FAQs
                             </a>
                         </li>
                     </ul>

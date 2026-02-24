@@ -18,10 +18,35 @@ use App\Http\Requests\UpdateAirlineCommissionRequest;
 
 class GdsController extends Controller
 {
-    public function setupGds()
+    public function setupGds(Request $request)
     {
-        $gds = Gds::orderBy('serial', 'asc')->get();
+        $gds = Gds::where('is_archived', false)->orderBy('serial', 'asc')->get();
         return view('setup_gds', compact('gds'));
+    }
+
+    public function archivedGds()
+    {
+        $archivedGds = Gds::where('is_archived', true)->orderBy('serial', 'asc')->get();
+        return view('archived_gds', compact('archivedGds'));
+    }
+
+    public function archiveGds($code)
+    {
+        Gds::where('code', $code)->update([
+            'is_archived' => true,
+            'status' => 0,
+            'updated_at' => Carbon::now()
+        ]);
+        return response()->json(['success' => 'GDS archived successfully.']);
+    }
+
+    public function restoreGds($code)
+    {
+        Gds::where('code', $code)->update([
+            'is_archived' => false,
+            'updated_at' => Carbon::now()
+        ]);
+        return response()->json(['success' => 'GDS restored successfully.']);
     }
 
     public function gdsStatusUpdate(UpdateGdsStatusRequest $request)

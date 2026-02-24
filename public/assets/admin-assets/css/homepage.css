@@ -141,7 +141,7 @@ ul#select2-preferred_airlines-container {
     }
 }
 
-button.multicity-btn{
+button.multicity-btn {
     background: transparent;
     color: #084277;
     border-width: 1px;
@@ -154,7 +154,7 @@ button.multicity-btn{
     line-height: 20px;
 }
 
-button.search-row-remove{
+button.search-row-remove {
     position: absolute;
     background: red;
     display: inline-block;
@@ -166,4 +166,262 @@ button.search-row-remove{
     font-size: 14px;
     border-radius: 50%;
     font-weight: 600;
+}
+
+/* ── Pax Dropdown (GoZayaan-style) ── */
+.pax-dropdown-menu {
+    min-width: 320px;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden;
+}
+
+.pax-dropdown-body {
+    padding: 16px 20px;
+}
+
+.pax-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.pax-row:last-of-type {
+    border-bottom: none;
+}
+
+.pax-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.pax-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1a1a2e;
+}
+
+.pax-desc {
+    font-size: 12px;
+    color: #888;
+    margin-top: 1px;
+}
+
+.pax-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pax-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid #ccc;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.pax-btn:hover {
+    border-color: #084277;
+    color: #084277;
+}
+
+.pax-count {
+    width: 28px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.pax-class-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0 8px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.pax-class-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1a1a2e;
+    white-space: nowrap;
+}
+
+.pax-class-options {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pax-class-option {
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 20px;
+    color: #555;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pax-class-option input {
+    display: none;
+}
+
+.pax-class-option:has(input:checked) {
+    background: #084277;
+    color: #fff;
+    border-color: #084277;
+}
+
+.pax-done-row {
+    text-align: right;
+    padding-top: 10px;
+}
+
+.pax-done-btn {
+    background: #f5a623;
+    color: #fff;
+    border: none;
+    padding: 8px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pax-done-btn:hover {
+    background: #e09515;
+}
+
+/* ── Date Picker Overrides (match pax dropdown style) ── */
+.search_box_container .t-datepicker-day {
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden;
+    padding: 12px 0 !important;
+    background: #fff !important;
+}
+
+.search_box_container .t-check-in,
+.search_box_container .t-check-out {
+    border-color: transparent !important;
+}
+
+.search_box_container .t-date-title {
+    color: #084277 !important;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.search_box_container .t-start,
+.search_box_container .t-end,
+.search_box_container .t-end-limit {
+    background: #084277 !important;
+    color: #fff !important;
+}
+
+.search_box_container .t-range {
+    background: #e8f0fe !important;
+    color: #084277 !important;
+}
+
+.search_box_container .t-range-limit {
+    background: #cde0f7 !important;
+}
+
+.search_box_container .t-range-limit.t-start,
+.search_box_container .t-range-limit.t-end {
+    background: #084277 !important;
+    color: #fff !important;
+}
+
+.search_box_container .t-hover-day,
+.search_box_container .t-hover-day-content,
+.search_box_container .t-hover-day:hover {
+    background: #0a5694 !important;
+    color: #fff !important;
+}
+
+.search_box_container .t-hover-day::after {
+    border-top-color: #0a5694 !important;
+}
+
+.search_box_container .t-today {
+    background: transparent !important;
+    color: #084277 !important;
+    font-weight: 700 !important;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: inset 0 0 0 2px #084277;
+}
+
+.search_box_container .t-today .t-hover-day-content {
+    display: none !important;
+}
+
+.search_box_container .t-today::after {
+    content: '' !important;
+    width: 5px !important;
+    height: 5px !important;
+    background: #084277 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    bottom: 4px !important;
+    left: calc(50% - 2.5px) !important;
+    top: auto !important;
+    right: auto !important;
+}
+
+.search_box_container .t-today:hover {
+    background: #084277 !important;
+    color: #fff !important;
+}
+
+.search_box_container .t-today:hover::after {
+    background: #fff !important;
+}
+
+.search_box_container .t-highlighted {
+    color: #084277 !important;
+}
+
+.search_box_container .t-day,
+.search_box_container .t-range,
+.search_box_container .t-start,
+.search_box_container .t-end,
+.search_box_container .t-disabled {
+    border-color: #fff !important;
+}
+
+.search_box_container .t-table-condensed th {
+    color: #888;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.search_box_container .t-next,
+.search_box_container .t-prev {
+    color: #084277;
+    font-weight: 700;
 }

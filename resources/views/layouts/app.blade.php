@@ -34,9 +34,9 @@
     <link href="{{url('assets')}}/nanopkg-assets/vendor/toastr/build/toastr.min.css" rel="stylesheet" />
     <link href="{{url('assets')}}/nanopkg-assets/css/arrow-hidden.min.css" rel="stylesheet" />
     <link href="{{url('assets')}}/nanopkg-assets/css/custom.min.css" rel="stylesheet" />
-    <link href="{{url('assets')}}/admin-assets/css/style-new.css" rel="stylesheet" />
+    <link href="{{url('assets')}}/admin-assets/css/style-new.css?v=3" rel="stylesheet" />
     <link href="{{url('assets')}}/admin-assets/css/custom.css" rel="stylesheet" />
-    <link href="{{url('assets')}}/admin-assets/css/extra.css" rel="stylesheet" />
+    <link href="{{url('assets')}}/admin-assets/css/extra.css?v=3" rel="stylesheet" />
     <link href="{{url('assets')}}/module-assets/css/auth/login.min.css" rel="stylesheet" />
 </head>
 

@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Log;
 use DGvai\SSLCommerz\SSLCommerz;
 use Illuminate\Support\Str;
 use App\Enums\UserType;
+use App\Helpers\EmailHelper;
+use App\Mail\RechargeStatusEmail;
 
 class PaymentController extends Controller
 {
@@ -387,22 +389,50 @@ class PaymentController extends Controller
     {
 
         $rechargeInfo = RechargeRequest::where('slug', $slug)->first();
-        User::where('id', $rechargeInfo->user_id)->increment('balance', $rechargeInfo->recharge_amount);
+        $user = User::where('id', $rechargeInfo->user_id)->first();
+        $user->increment('balance', $rechargeInfo->recharge_amount);
 
         RechargeRequest::where('slug', $slug)->update([
             'status' => 1,
             'updated_at' => Carbon::now(),
         ]);
 
+        // Send recharge approved email
+        if ($user) {
+            EmailHelper::send($user->email, new RechargeStatusEmail([
+                'user_name' => $user->name,
+                'amount' => $rechargeInfo->recharge_amount,
+                'transaction_id' => $rechargeInfo->transaction_id ?? '',
+                'status' => 'Approved',
+                'new_balance' => $user->fresh()->balance,
+            ]));
+        }
+
         return response()->json(['success' => 'Approved Successfully.']);
     }
 
     public function denyRechargeRequest($slug)
     {
+        $rechargeInfo = RechargeRequest::where('slug', $slug)->first();
+
         RechargeRequest::where('slug', $slug)->update([
             'status' => 2,
             'updated_at' => Carbon::now(),
         ]);
+
+        // Send recharge denied email
+        if ($rechargeInfo) {
+            $user = User::where('id', $rechargeInfo->user_id)->first();
+            if ($user) {
+                EmailHelper::send($user->email, new RechargeStatusEmail([
+                    'user_name' => $user->name,
+                    'amount' => $rechargeInfo->recharge_amount,
+                    'transaction_id' => $rechargeInfo->transaction_id ?? '',
+                    'status' => 'Denied',
+                ]));
+            }
+        }
+
         return response()->json(['success' => 'Denied Successfully.']);
     }
 
@@ -449,6 +479,12 @@ class PaymentController extends Controller
 
     public function deductB2bAccount(Request $request)
     {
+        $request->validate([
+            'b2b_user_id' => 'required|integer|exists:users,id',
+            'amount' => 'required|numeric|min:0.01',
+            'details' => 'required|string|max:500',
+        ]);
+
         $userInfo = User::where('id', $request->b2b_user_id)->first();
 
         if ($request->amount > $userInfo->balance) {

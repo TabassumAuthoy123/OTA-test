@@ -181,6 +181,46 @@
     background-color: #f0f2f5;
 }
 
+/* Submenu icons — hide default dot markers, style proper icons */
+.sidebar-nav ul li .nav-second-level li:before,
+.sidebar-nav ul li .nav-second-level li a:before,
+.nav.metismenu li .nav-second-level li a:before,
+.sidebar-aside .nav.metismenu li .nav-second-level li a:before,
+.sidebar-nav .nav.metismenu li .nav-second-level li a:before {
+    display: none !important;
+    content: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Submenu item links — shift left + tighter spacing */
+.sidebar-nav ul li .nav-second-level li a,
+.nav.metismenu li .nav-second-level li a {
+    padding-left: 15px !important;
+    padding-top: 7px !important;
+    padding-bottom: 5px !important;
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Reduce gap between submenu items */
+.sidebar-nav ul li .nav-second-level li,
+.nav.metismenu li .nav-second-level li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Submenu icons — smaller size */
+.sidebar-nav ul li .nav-second-level li a i.typcn,
+.nav.metismenu li .nav-second-level li a i.typcn {
+    font-size: 13px;
+    line-height: 1;
+    opacity: 0.65;
+    min-width: 13px;
+    color: #084277;
+}
+
 .form-control:focus {
     border-color: rgb(238 102 55);
     box-shadow: rgb(235 98 48 / 19%) 0px 1px 1px inset, rgb(237 101 52 / 16%) 0px 0px 20px;

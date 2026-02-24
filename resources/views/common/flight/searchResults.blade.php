@@ -146,7 +146,7 @@
 
                                 @foreach ($searchResults as $index => $data)
                                     @php
-                                        $totalPrice = $data['total_fare'];
+                                        $totalPrice = $data['selling_fare'] ?? $data['total_fare'];
                                         $minPrice = session('filter_min_price');
                                         $maxPrice = session('filter_max_price');
                                         $airlineCarrierFilterArray = session('airline_carrier_code');

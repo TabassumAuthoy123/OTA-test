@@ -3,14 +3,14 @@
 @section('header_css')
     <link href="{{ url('assets') }}/admin-assets/css/switchery.min.css" rel="stylesheet" />
     <style>
-        .box{
+        .box {
             border: 1px #084277;
             border-radius: 4px;
             padding: 15px;
             border-style: solid;
         }
 
-        .box a.settings_btn{
+        .box a.settings_btn {
             display: inline-block;
             background: #084277;
             padding: 4px 12px;
@@ -20,11 +20,26 @@
             text-shadow: 1px 1px 3px black;
         }
 
+        .box .archive_btn {
+            display: inline-block;
+            background: #dc3545;
+            padding: 4px 10px;
+            border-radius: 4px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .box .archive_btn:hover {
+            background: #c82333;
+        }
+
         .gds_logo {
             display: block;
             width: 100%;
             position: relative;
-            height: 50px; /* Adjust this height as needed */
+            height: 50px;
         }
 
         .gds_logo img {
@@ -54,43 +69,54 @@
                     <div class="row">
 
                         @foreach ($gds as $item)
-                        <div class="col-lg-6 mb-3">
-                            <div class="box">
-                                <div class="row">
-                                    <div class="col-lg-2" style="padding-right: 0px;">
-                                        <div class="gds_logo">
-                                            <img src="{{url($item->logo)}}">
+                            <div class="col-lg-6 mb-3">
+                                <div class="box">
+                                    <div class="row">
+                                        <div class="col-lg-2" style="padding-right: 0px;">
+                                            <div class="gds_logo">
+                                                <img src="{{url($item->logo)}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-10">
+                                            <h5 style="margin-bottom: 5px">{{$item->name}}</h5>
+                                            <p class="mb-0" style="font-size: 12px">{{$item->description}}</p>
                                         </div>
                                     </div>
-                                    <div class="col-lg-10">
-                                        <h5 style="margin-bottom: 5px">{{$item->name}}</h5>
-                                        <p class="mb-0" style="font-size: 12px">{{$item->description}}</p>
-                                    </div>
-                                </div>
-                                <hr style="background: #084277;">
-                                <div class="row">
-                                    <div class="col-lg-6">
+                                    <hr style="background: #084277;">
+                                    <div class="row">
+                                        <div class="col-lg-6">
 
-                                        @if($item->code == 'amadeus')
-                                        <a href="javascript:void(0)" onclick="gdsSetupNotice()" class="settings_btn"><i class="fas fa-cog"></i> Settings</a>
-                                        @endif
+                                            @if($item->code == 'amadeus')
+                                                <a href="javascript:void(0)" onclick="gdsSetupNotice()" class="settings_btn"><i
+                                                        class="fas fa-cog"></i> Settings</a>
+                                            @endif
 
-                                        @if($item->code == 'sabre')
-                                        <a href="{{url('edit/gds')}}/{{$item->code}}" class="settings_btn"><i class="fas fa-cog"></i> Settings</a>
-                                        @endif
+                                            @if($item->code == 'sabre')
+                                                <a href="{{url('edit/gds')}}/{{$item->code}}" class="settings_btn"><i
+                                                        class="fas fa-cog"></i> Settings</a>
+                                            @endif
 
-                                        @if($item->code == 'flyhub')
-                                        <a href="{{url('edit/gds')}}/{{$item->code}}" class="settings_btn"><i class="fas fa-cog"></i> Settings</a>
-                                        @endif
+                                            @if($item->code == 'flyhub')
+                                                <a href="{{url('edit/gds')}}/{{$item->code}}" class="settings_btn"><i
+                                                        class="fas fa-cog"></i> Settings</a>
+                                            @endif
 
-                                    </div>
-                                    <div class="col-lg-6 text-end">
-                                        <label for="{{$item->code}}"><b>Status:</b></label>
-                                        <input type="checkbox" id="{{$item->code}}" class="switchery_checkbox" @if($item->status == 1) checked="" @endif value="{{$item->code}}" onchange="changeGdsStatus(this.value)" data-size="small" data-toggle="switchery" data-color="#53c024" data-secondary-color="#df3554">
+                                            <button class="archive_btn ms-2" onclick="archiveGds('{{ $item->code }}')"
+                                                title="Archive this GDS">
+                                                <i class="fas fa-archive"></i> Archive
+                                            </button>
+
+                                        </div>
+                                        <div class="col-lg-6 text-end">
+                                            <label for="{{$item->code}}"><b>Status:</b></label>
+                                            <input type="checkbox" id="{{$item->code}}" class="switchery_checkbox"
+                                                @if($item->status == 1) checked="" @endif value="{{$item->code}}"
+                                                onchange="changeGdsStatus(this.value)" data-size="small" data-toggle="switchery"
+                                                data-color="#53c024" data-secondary-color="#df3554">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         @endforeach
 
                     </div>
@@ -113,17 +139,16 @@
             }
         });
 
-        function gdsSetupNotice(){
+        function gdsSetupNotice() {
             toastr.error("Amadeus is not Configured Yet, Contact with Developer");
             return false;
         }
 
-        function changeGdsStatus(gds_code){
-
+        function changeGdsStatus(gds_code) {
             var formData = new FormData();
             formData.append("gds_code", gds_code);
 
-            if ($('#'+gds_code).prop('checked')) {
+            if ($('#' + gds_code).prop('checked')) {
                 formData.append("gds_status", 1);
             } else {
                 formData.append("gds_status", 0);
@@ -137,20 +162,30 @@
                 contentType: false,
                 processData: false,
                 success: function (data) {
-
-                    if ($('#'+gds_code).prop('checked')) {
+                    if ($('#' + gds_code).prop('checked')) {
                         toastr.success("Gds is Activated");
                     } else {
                         toastr.error("Gds is Inactivated");
                     }
-
                 },
                 error: function (data) {
-                    toastr.error("Someting Went Wrong! Please Try Again");
+                    toastr.error("Something Went Wrong! Please Try Again");
                 }
             });
+        }
 
-
+        function archiveGds(gds_code) {
+            $.ajax({
+                url: "{{ url('gds/archive') }}/" + gds_code,
+                type: "POST",
+                success: function (data) {
+                    toastr.success("GDS Archived Successfully");
+                    setTimeout(function () { location.reload(); }, 800);
+                },
+                error: function (data) {
+                    toastr.error("Something went wrong! Please try again.");
+                }
+            });
         }
     </script>
 @endsection

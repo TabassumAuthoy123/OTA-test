@@ -51,21 +51,32 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3 px-0 position-static">
+                                    <div class="col-lg-2 px-0 position-static" id="departureDateCol">
                                         <div data-t-start data-t-end
                                             class="oneWay-datepicker t-datepicker t-datepicker-modal-oneway d-flex w-100 border-0 h-100 d-block"
                                             id="oneWayDatePicker">
                                             <div class="t-check-in"></div>
                                         </div>
-
+                                    </div>
+                                    <div class="col-lg-2 px-0" id="returnDateCol">
+                                        <!-- Return date placeholder for one-way mode -->
+                                        <div class="return-date-placeholder h-100 d-flex flex-column justify-content-center px-3"
+                                            id="returnDatePlaceholder" onclick="switchToRoundTrip()"
+                                            style="cursor:pointer;">
+                                            <span class="fw-bold text-uppercase"
+                                                style="font-size:12px; color:#1a1a6c;">Return Date</span>
+                                            <span style="font-size:13px; color:#888;">Save more on return flight</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 px-0 position-static d-none" id="roundDateCol">
                                         <div data-t-start data-t-end
-                                            class="oneWay-datepicker t-datepicker t-datepicker-modal-round d-flex w-100 border-0 d-none"
+                                            class="oneWay-datepicker t-datepicker t-datepicker-modal-round d-flex w-100 border-0 h-100 d-block"
                                             id="roundDatePicker">
                                             <div class="t-check-in w-100"></div>
                                             <div class="t-check-out w-100"></div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2 px-0">
+                                    <div class="col-lg-3 px-0">
                                         <div class="dropdown travellers-dropdown" id="dropdown-oneway">
                                             <div class="form-floating" id="dropdownMenuButton" data-bs-toggle="dropdown"
                                                 aria-haspopup="true">
@@ -73,109 +84,99 @@
                                                     id="passengers-oneway" value="1 Travelers, Economy" readonly />
                                                 <label for="passengers">Traveler(s) cabin</label>
                                             </div>
-                                            <div class="dropdown-menu dropdown-menu-right"
+                                            <div class="dropdown-menu pax-dropdown-menu"
                                                 aria-labelledby="dropdownMenuButton">
-                                                <div class="tab-container">
-                                                    <div class="triangle abs"></div>
-                                                    <ul class="m-0 p-0">
-                                                        <li class="noOf d-flex justify-content-between">
-                                                            <span>
-                                                                <input type="text" id="oneway-adult-input" class="all-input"
-                                                                    readonly value="1" />
-                                                                <span
-                                                                    class="fs-16 font-weight-500">Adult<span>s</span></span>
-                                                            </span>
-                                                            <div class="spinner d-flex">
-                                                                <span id="oneway-adult-minus" class="minus">-</span>
-                                                                <span id="oneway-adult-plus" class="plus">+</span>
-                                                            </div>
-                                                            <input hidden name="adult_members" id="adult_input_one"
-                                                                value="1" />
-                                                        </li>
-                                                        <li class="noOf d-flex justify-content-between">
-                                                            <span>
-                                                                <input type="text" id="oneway-child-input" class="all-input"
-                                                                    readonly value="0" />
-                                                                <span class="fs-16 font-weight-500">Child</span>
-                                                                <span class="cat-info fs-13">2 11 years</span>
-                                                            </span>
-                                                            <input hidden name="child_members" id="child_input_one"
-                                                                value="0" />
-                                                            <div class="spinner d-flex">
-                                                                <span id="oneway-child-minus" class="minus"
-                                                                    onclick="oneWayChildDec()">-</span>
-                                                                <span id="oneway-child-plus" class="plus"
-                                                                    onclick="oneWayChildInc()">+</span>
-                                                            </div>
-                                                        </li>
-                                                        <li class="noOf d-flex justify-content-between">
-                                                            <div data-child-total="0" class="_child_age_" id="_child_age_">
-                                                            </div>
-                                                        </li>
-                                                        <li class="noOf d-flex justify-content-between">
-                                                            <span>
-                                                                <input type="text" id="oneway-infant-input"
-                                                                    class="all-input" readonly value="0" />
-                                                                <span class="fs-16 font-weight-500">Infant</span>
-                                                                <span class="cat-info fs-13">Below 2 years</span>
-                                                            </span>
-                                                            <div class="spinner d-flex">
-                                                                <span id="oneway-infant-minus" class="minus">-</span>
-                                                                <span id="oneway-infant-plus" class="plus">+</span>
-                                                            </div>
-                                                            <input hidden name="infant_members" id="infant_input_one"
-                                                                value="0" />
-                                                        </li>
-                                                    </ul>
-                                                    <div class="class-type mt-2">
-                                                        <div class="custom-control custom-radio pl-0">
-                                                            <input type="radio" id="economy1" name="cabin_class_oneway"
-                                                                value="economy"
-                                                                class="cabin_class_oneway custom-control-input economy1"
-                                                                checked />
-                                                            <label class="custom-control-label fs-16 font-weight-500"
-                                                                for="economy1">Economy</label>
+                                                <div class="pax-dropdown-body">
+                                                    {{-- Adults --}}
+                                                    <div class="pax-row">
+                                                        <div class="pax-info">
+                                                            <span class="pax-label">Adults</span>
+                                                            <span class="pax-desc">12 years and above</span>
                                                         </div>
-                                                        <div class="custom-control custom-radio pl-0">
-                                                            <input type="radio" id="premiumEconomy1"
-                                                                name="cabin_class_oneway" value="premium_economy"
-                                                                class="cabin_class_oneway custom-control-input premiumEconomy1" />
-                                                            <label class="custom-control-label fs-16 font-weight-500"
-                                                                for="premiumEconomy1">Premium economy</label>
+                                                        <div class="pax-controls">
+                                                            <button type="button" class="pax-btn pax-minus"
+                                                                id="oneway-adult-minus">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input type="text" id="oneway-adult-input" class="pax-count"
+                                                                readonly value="1" />
+                                                            <button type="button" class="pax-btn pax-plus"
+                                                                id="oneway-adult-plus">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
                                                         </div>
-                                                        <div class="custom-control custom-radio pl-0">
-                                                            <input type="radio" id="business1" name="cabin_class_oneway"
-                                                                value="business"
-                                                                class="cabin_class_oneway custom-control-input business1" />
-                                                            <label class="custom-control-label fs-16 font-weight-500"
-                                                                for="business1">Business</label>
+                                                        <input hidden name="adult_members" id="adult_input_one" value="1" />
+                                                    </div>
+                                                    {{-- Children --}}
+                                                    <div class="pax-row">
+                                                        <div class="pax-info">
+                                                            <span class="pax-label">Children</span>
+                                                            <span class="pax-desc">2–11 years</span>
                                                         </div>
-                                                        <div class="custom-control custom-radio pl-0">
-                                                            <input type="radio" id="first1" name="cabin_class_oneway"
-                                                                value="first_class"
-                                                                class="cabin_class_oneway custom-control-input first1" />
-                                                            <label class="custom-control-label fs-16 font-weight-500"
-                                                                for="first1">First-Class</label>
+                                                        <div class="pax-controls">
+                                                            <button type="button" class="pax-btn pax-minus"
+                                                                id="oneway-child-minus" onclick="oneWayChildDec()">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input type="text" id="oneway-child-input" class="pax-count"
+                                                                readonly value="0" />
+                                                            <button type="button" class="pax-btn pax-plus"
+                                                                id="oneway-child-plus" onclick="oneWayChildInc()">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <input hidden name="child_members" id="child_input_one" value="0" />
+                                                    </div>
+                                                    {{-- Child ages container --}}
+                                                    <div data-child-total="0" class="_child_age_" id="_child_age_"></div>
+                                                    {{-- Infant --}}
+                                                    <div class="pax-row">
+                                                        <div class="pax-info">
+                                                            <span class="pax-label">Infant</span>
+                                                            <span class="pax-desc">Below 2 years</span>
+                                                        </div>
+                                                        <div class="pax-controls">
+                                                            <button type="button" class="pax-btn pax-minus"
+                                                                id="oneway-infant-minus">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input type="text" id="oneway-infant-input" class="pax-count"
+                                                                readonly value="0" />
+                                                            <button type="button" class="pax-btn pax-plus"
+                                                                id="oneway-infant-plus">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <input hidden name="infant_members" id="infant_input_one"
+                                                            value="0" />
+                                                    </div>
+                                                    {{-- Class Selection --}}
+                                                    <div class="pax-class-row">
+                                                        <span class="pax-class-label">Class</span>
+                                                        <div class="pax-class-options">
+                                                            <label class="pax-class-option">
+                                                                <input type="radio" id="economy1" name="cabin_class_oneway"
+                                                                    value="economy" class="cabin_class_oneway" checked />
+                                                                <span>Economy</span>
+                                                            </label>
+                                                            <label class="pax-class-option">
+                                                                <input type="radio" id="business1" name="cabin_class_oneway"
+                                                                    value="business" class="cabin_class_oneway" />
+                                                                <span>Business</span>
+                                                            </label>
                                                         </div>
                                                     </div>
                                                     <input hidden name="classType" id="class_type_one" value="Y" />
-                                                    <div class="cat-sel mt-3 text-right">
-                                                        <input type="button" class="btn btn-danger w-100"
-                                                            onclick="oneWayTotalPassenger()" value="Confirm" />
+                                                    {{-- Done Button --}}
+                                                    <div class="pax-done-row">
+                                                        <button type="button" class="pax-done-btn"
+                                                            onclick="oneWayTotalPassenger()">Done</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2 last-col px-0">
-                                        <div class="input-group custom-input-group rounded">
-                                            <div class="form-floating flight-form">
-                                                <label for="preferred_airlines">Preferred Airlines</label>
-                                                <select class="form-control border-bottom-0 border-right preferred_airlines"
-                                                    id="preferred_airlines" name="preferred_airlines[]" multiple></select>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                 </div>
 
                                 <div class="row">
@@ -459,15 +460,15 @@
             multicityBtn.classList.remove('d-inline-block');
             multicityBtn.classList.add('d-none');
 
-            // hide roundtrip date
-            var roundTripDiv = document.querySelector('.t-datepicker-modal-round');
-            roundTripDiv.classList.remove('d-block');
-            roundTripDiv.classList.add('d-none');
+            // show departure + return placeholder columns
+            document.getElementById('departureDateCol').classList.remove('d-none');
+            document.getElementById('returnDateCol').classList.remove('d-none');
+            // hide round-trip combined column
+            document.getElementById('roundDateCol').classList.add('d-none');
+        }
 
-            // show oneway date
-            var onewayDiv = document.querySelector('.t-datepicker-modal-oneway');
-            onewayDiv.classList.remove('d-none');
-            onewayDiv.classList.add('d-block');
+        function switchToRoundTrip() {
+            document.querySelector('input[name="flight_type"][value="2"]').click();
         }
 
         function showRoundTripDate() {
@@ -484,29 +485,21 @@
             multicityBtn.classList.remove('d-inline-block');
             multicityBtn.classList.add('d-none');
 
-            // hide oneway date
-            var onewayDiv = document.querySelector('.t-datepicker-modal-oneway');
-            onewayDiv.classList.remove('d-block');
-            onewayDiv.classList.add('d-none');
-
-            // show roundtrip date
-            var roundTripDiv = document.querySelector('.t-datepicker-modal-round');
-            roundTripDiv.classList.remove('d-none');
-            roundTripDiv.classList.add('d-block');
+            // hide departure + return placeholder columns
+            document.getElementById('departureDateCol').classList.add('d-none');
+            document.getElementById('returnDateCol').classList.add('d-none');
+            // show round-trip combined column
+            document.getElementById('roundDateCol').classList.remove('d-none');
         }
 
         function showMultiCityDate() {
             $("#flight_type").val(3);
 
-            // hide roundtrip date
-            var roundTripDiv = document.querySelector('.t-datepicker-modal-round');
-            roundTripDiv.classList.remove('d-block');
-            roundTripDiv.classList.add('d-none');
-
-            // show oneway date
-            var onewayDiv = document.querySelector('.t-datepicker-modal-oneway');
-            onewayDiv.classList.remove('d-none');
-            onewayDiv.classList.add('d-block');
+            // show departure + return placeholder columns (multi-city uses one-way dates)
+            document.getElementById('departureDateCol').classList.remove('d-none');
+            document.getElementById('returnDateCol').classList.remove('d-none');
+            // hide round-trip combined column
+            document.getElementById('roundDateCol').classList.add('d-none');
 
             // adding row for multicity search
             const original = document.querySelector(".search-row"); // the first one

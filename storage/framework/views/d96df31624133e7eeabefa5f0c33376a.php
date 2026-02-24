@@ -34,9 +34,9 @@
     <link href="<?php echo e(url('assets')); ?>/nanopkg-assets/vendor/toastr/build/toastr.min.css" rel="stylesheet" />
     <link href="<?php echo e(url('assets')); ?>/nanopkg-assets/css/arrow-hidden.min.css" rel="stylesheet" />
     <link href="<?php echo e(url('assets')); ?>/nanopkg-assets/css/custom.min.css" rel="stylesheet" />
-    <link href="<?php echo e(url('assets')); ?>/admin-assets/css/style-new.css" rel="stylesheet" />
+    <link href="<?php echo e(url('assets')); ?>/admin-assets/css/style-new.css?v=3" rel="stylesheet" />
     <link href="<?php echo e(url('assets')); ?>/admin-assets/css/custom.css" rel="stylesheet" />
-    <link href="<?php echo e(url('assets')); ?>/admin-assets/css/extra.css" rel="stylesheet" />
+    <link href="<?php echo e(url('assets')); ?>/admin-assets/css/extra.css?v=3" rel="stylesheet" />
     <link href="<?php echo e(url('assets')); ?>/module-assets/css/auth/login.min.css" rel="stylesheet" />
 </head>
 
@@ -74,5 +74,4 @@
     <script defer src="<?php echo e(url('assets')); ?>/nanopkg-assets/vendor/alpine/alpine.min.js"></script>
 </body>
 
-</html>
-<?php /**PATH I:\Softifybd Devs\OTA-Platform\resources\views/layouts/app.blade.php ENDPATH**/ ?>
+</html><?php /**PATH I:\Softifybd Devs\OTA-Platform\resources\views/layouts/app.blade.php ENDPATH**/ ?>

@@ -16,12 +16,52 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CmsCrudController;
+use App\Http\Controllers\PricingConfigController;
+use App\Http\Controllers\B2c\HomeController as B2cHomeController;
+use App\Http\Controllers\B2c\AuthController as B2cAuthController;
+use App\Http\Controllers\B2c\FlightSearchController as B2cFlightSearchController;
 use App\Models\SabreFlightBooking;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+/*
+|--------------------------------------------------------------------------
+| B2C Public Routes (No Auth Required)
+|--------------------------------------------------------------------------
+*/
+
+// Root route: B2C landing on faithtrip.net, admin login on app.faithtrip.net
 Route::get('/', function () {
-    return redirect('/login');
+    $host = request()->getHost();
+    if (str_starts_with($host, 'app.')) {
+        return redirect('/login');
+    }
+    return app(B2cHomeController::class)->index();
+})->name('b2c.home');
+
+Route::get('/page/{slug}', [B2cHomeController::class, 'page'])->name('b2c.page');
+
+// B2C Auth
+Route::get('/customer/login', [B2cAuthController::class, 'showLogin'])->name('b2c.login');
+Route::post('/customer/login', [B2cAuthController::class, 'login'])->name('b2c.login.submit');
+Route::get('/customer/register', [B2cAuthController::class, 'showRegister'])->name('b2c.register');
+Route::post('/customer/register', [B2cAuthController::class, 'register'])->name('b2c.register.submit');
+Route::post('/customer/logout', [B2cAuthController::class, 'logout'])->name('b2c.logout');
+
+// B2C Flight Search (Public - no auth required for search)
+Route::post('/flights/search', [B2cFlightSearchController::class, 'search'])->name('b2c.flights.search');
+Route::get('/flights/results', [B2cFlightSearchController::class, 'results'])->name('b2c.flights.results');
+Route::post('/flights/price-filter', [B2cFlightSearchController::class, 'priceFilter'])->name('b2c.flights.priceFilter');
+Route::post('/flights/airline-filter', [B2cFlightSearchController::class, 'airlineFilter'])->name('b2c.flights.airlineFilter');
+Route::get('/flights/select/{index}', [B2cFlightSearchController::class, 'selectFlight'])->name('b2c.flights.select');
+Route::get('/b2c/city-airport-search', [B2cFlightSearchController::class, 'cityAirportSearch'])->name('b2c.cityAirportSearch');
+
+// B2C Protected Routes (Customer must be logged in)
+Route::middleware(['auth', \App\Http\Middleware\CheckCustomer::class])->group(function () {
+    Route::get('/my-account', function () {
+        return view('b2c.account.dashboard');
+    })->name('b2c.account');
 });
 
 
@@ -104,6 +144,10 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
     Route::post('/update/company/profile', [ProfileController::class, 'updateCompanyProfile'])->name('UpdateCompanyProfile');
     Route::get('/remove/company/logo', [ProfileController::class, 'removeCompanyLogo'])->name('RemoveCompanyLogo');
 
+    // Pricing Config
+    Route::get('/pricing/config', [PricingConfigController::class, 'index'])->name('PricingConfig');
+    Route::post('/update/pricing/config', [PricingConfigController::class, 'update'])->name('UpdatePricingConfig');
+
     // user profile routes
     Route::get('/my/profile', [ProfileController::class, 'myProfile'])->name('MyProfile');
     Route::post('update/user/profile', [ProfileController::class, 'updateProfile'])->name('UpdateProfile');
@@ -123,6 +167,7 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
     Route::get('archived/issued/tickets', [FlightBookingController::class, 'archivedIssuedTickets'])->name('ArchivedIssuedTickets');
     Route::get('view/cancelled/tickets', [FlightBookingController::class, 'viewCancelledTickets'])->name('ViewCancelledTickets');
     Route::post('update/pnr/booking', [FlightBookingController::class, 'updatePnrBooking'])->name('UpdatePnrBooking');
+    Route::get('export/bookings/csv', [FlightBookingController::class, 'exportBookingsCsv'])->name('ExportBookingsCsv');
 
     // recharge
     Route::get('create/topup/request', [PaymentController::class, 'createTopupRequest'])->name('CreateTopupRequest');
@@ -171,7 +216,10 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
 
         // setup gds routes
         Route::get('setup/gds', [GdsController::class, 'setupGds'])->name('SetupGds');
+        Route::get('archived/gds', [GdsController::class, 'archivedGds'])->name('ArchivedGds');
         Route::post('gds/status/update', [GdsController::class, 'gdsStatusUpdate'])->name('GdsStatusUpdate');
+        Route::post('gds/archive/{code}', [GdsController::class, 'archiveGds'])->name('ArchiveGds');
+        Route::post('gds/restore/{code}', [GdsController::class, 'restoreGds'])->name('RestoreGds');
         Route::get('edit/gds/{code}', [GdsController::class, 'editGdsInfo'])->name('EditGdsInfo');
         Route::post('update/sabre/gds/info', [GdsController::class, 'updateSabreGdsInfo'])->name('UpdateSabreGdsInfo');
         Route::post('update/flyhub/gds/info', [GdsController::class, 'updateFlyhubGdsInfo'])->name('UpdateFlyhubGdsInfo');
@@ -226,6 +274,44 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         Route::patch('tasks/{id}/status/{status}', [TaskController::class, 'updateStatus'])->name('UpdateTaskStatus');
         Route::delete('tasks/{id}', [TaskController::class, 'destroy'])->name('DestroyTask');
         Route::post('tasks/seed-audit', [TaskController::class, 'seedAuditTasks'])->name('SeedAuditTasks');
+
+        // CMS Management
+        Route::get('cms/banners', [CmsCrudController::class, 'banners'])->name('CmsBanners');
+        Route::post('cms/banners', [CmsCrudController::class, 'storeBanner'])->name('CmsStoreBanner');
+        Route::put('cms/banners/{id}', [CmsCrudController::class, 'updateBanner'])->name('CmsUpdateBanner');
+        Route::delete('cms/banners/{id}', [CmsCrudController::class, 'deleteBanner'])->name('CmsDeleteBanner');
+
+        Route::get('cms/promotions', [CmsCrudController::class, 'promotions'])->name('CmsPromotions');
+        Route::post('cms/promotions', [CmsCrudController::class, 'storePromotion'])->name('CmsStorePromotion');
+        Route::put('cms/promotions/{id}', [CmsCrudController::class, 'updatePromotion'])->name('CmsUpdatePromotion');
+        Route::delete('cms/promotions/{id}', [CmsCrudController::class, 'deletePromotion'])->name('CmsDeletePromotion');
+
+        Route::get('cms/routes', [CmsCrudController::class, 'popularRoutes'])->name('CmsRoutes');
+        Route::post('cms/routes', [CmsCrudController::class, 'storeRoute'])->name('CmsStoreRoute');
+        Route::put('cms/routes/{id}', [CmsCrudController::class, 'updateRoute'])->name('CmsUpdateRoute');
+        Route::delete('cms/routes/{id}', [CmsCrudController::class, 'deleteRoute'])->name('CmsDeleteRoute');
+
+        Route::get('cms/testimonials', [CmsCrudController::class, 'testimonials'])->name('CmsTestimonials');
+        Route::post('cms/testimonials', [CmsCrudController::class, 'storeTestimonial'])->name('CmsStoreTestimonial');
+        Route::put('cms/testimonials/{id}', [CmsCrudController::class, 'updateTestimonial'])->name('CmsUpdateTestimonial');
+        Route::delete('cms/testimonials/{id}', [CmsCrudController::class, 'deleteTestimonial'])->name('CmsDeleteTestimonial');
+
+        Route::get('cms/pages', [CmsCrudController::class, 'pages'])->name('CmsPages');
+        Route::post('cms/pages', [CmsCrudController::class, 'storePage'])->name('CmsStorePage');
+        Route::get('cms/pages/{id}/edit', [CmsCrudController::class, 'editPage'])->name('CmsEditPage');
+        Route::put('cms/pages/{id}', [CmsCrudController::class, 'updatePage'])->name('CmsUpdatePage');
+        Route::delete('cms/pages/{id}', [CmsCrudController::class, 'deletePage'])->name('CmsDeletePage');
+
+        Route::get('cms/site-settings', [CmsCrudController::class, 'siteSettings'])->name('CmsSiteSettings');
+        Route::post('cms/site-settings', [CmsCrudController::class, 'updateSiteSettings'])->name('CmsUpdateSiteSettings');
+        Route::post('cms/payment-methods', [CmsCrudController::class, 'storePaymentMethod'])->name('CmsStorePaymentMethod');
+        Route::delete('cms/payment-methods/{id}', [CmsCrudController::class, 'deletePaymentMethod'])->name('CmsDeletePaymentMethod');
+
+        Route::get('cms/faqs', [CmsCrudController::class, 'faqs'])->name('CmsFaqs');
+        Route::post('cms/faqs', [CmsCrudController::class, 'storeFaq'])->name('CmsStoreFaq');
+        Route::put('cms/faqs/{id}', [CmsCrudController::class, 'updateFaq'])->name('CmsUpdateFaq');
+        Route::delete('cms/faqs/{id}', [CmsCrudController::class, 'deleteFaq'])->name('CmsDeleteFaq');
+
 
         // Report
         Route::get('b2b/financial/report', [ReportController::class, 'b2bFinancialReport'])->name('B2bFinancialReport');

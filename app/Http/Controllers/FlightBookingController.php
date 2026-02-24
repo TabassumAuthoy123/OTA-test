@@ -29,6 +29,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use App\Enums\UserType;
+use App\Helpers\EmailHelper;
+use App\Mail\BookingConfirmationEmail;
+use App\Mail\TicketIssuedEmail;
 
 class FlightBookingController extends Controller
 {
@@ -57,17 +60,50 @@ class FlightBookingController extends Controller
             Toastr::success('Flight Booked Successfully', 'Success');
         }
 
+        // Send booking confirmation email
+        EmailHelper::send(Auth::user()->email, new BookingConfirmationEmail([
+            'agent_name' => Auth::user()->name,
+            'booking_no' => $result['booking_no'] ?? '',
+            'pnr' => $result['pnr'] ?? '',
+            'route' => $request->route_info ?? '',
+            'passenger_count' => count($request->first_name ?? []),
+            'status' => $result['status'] == 0 ? 'Pending' : 'Confirmed',
+        ]));
+
         return redirect('/view/all/booking');
     }
 
     public function bookFlightWithPnr(Request $request)
     {
+        $request->validate([
+            'first_name' => 'required|array|min:1',
+            'first_name.*' => 'required|string|max:100',
+            'last_name' => 'required|array|min:1',
+            'last_name.*' => 'required|string|max:100',
+            'titles' => 'required|array|min:1',
+            'titles.*' => 'required|string|in:Mr,Mrs,Ms,Mstr,Miss',
+            'dob' => 'required|array|min:1',
+            'dob.*' => 'required|date',
+            'traveller_contact' => 'required|string|max:20',
+            'traveller_email' => 'required|email|max:255',
+        ]);
+
         $result = $this->bookingService->createFlyhubBooking($request);
 
         if (!$result['success']) {
             Toastr::error($result['error'] ?? 'Failed to Book this Flight');
             return back();
         }
+
+        // Send booking confirmation email
+        EmailHelper::send(Auth::user()->email, new BookingConfirmationEmail([
+            'agent_name' => Auth::user()->name,
+            'booking_no' => $result['booking_no'] ?? '',
+            'pnr' => $result['pnr'] ?? '',
+            'route' => $request->route_info ?? '',
+            'passenger_count' => count($request->first_name ?? []),
+            'status' => 'Pending',
+        ]));
 
         Toastr::success('Flight Booking Request Sent', 'Success');
         return redirect('/view/all/booking');
@@ -354,6 +390,16 @@ class FlightBookingController extends Controller
             $flightBookingInfo->status = 2;
             $flightBookingInfo->ticket_issued_at = Carbon::now();
             $flightBookingInfo->save();
+
+            // Send ticket issued email
+            EmailHelper::send(Auth::user()->email, new TicketIssuedEmail([
+                'agent_name' => Auth::user()->name,
+                'booking_no' => $flightBookingInfo->booking_no,
+                'pnr' => $flightBookingInfo->pnr_id ?? '',
+                'route' => '',
+                'ticket_number' => $result['ticket_number'] ?? '',
+            ]));
+
             return redirect('view/issued/tickets');
         }
 
@@ -561,6 +607,12 @@ class FlightBookingController extends Controller
 
     public function updatePnrBooking(Request $request)
     {
+        $request->validate([
+            'booking_no' => 'required|string|max:50',
+            'pnr_id' => 'required|string|max:50',
+            'status' => 'required|integer|in:0,1,2,3,4',
+        ]);
+
         FlightBooking::where('booking_no', $request->booking_no)->update([
             'pnr_id' => $request->pnr_id,
             'status' => $request->status,
@@ -569,5 +621,84 @@ class FlightBookingController extends Controller
 
         Toastr::success('Flight Booked Successfully', 'Successful');
         return back();
+    }
+
+    /**
+     * Export booking history as CSV
+     */
+    public function exportBookingsCsv(Request $request)
+    {
+        $query = FlightBooking::query();
+
+        // Filter by user if B2B agent
+        if (Auth::user()->user_type == UserType::B2B->value) {
+            $query->where('user_id', Auth::user()->id);
+        }
+
+        // Optional date range filter
+        if ($request->from_date) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->to_date) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        // Optional status filter
+        if ($request->has('status') && $request->status !== null) {
+            $query->where('status', $request->status);
+        }
+
+        $bookings = $query->orderBy('id', 'desc')->get();
+
+        $filename = 'booking_history_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($bookings) {
+            $file = fopen('php://output', 'w');
+
+            // CSV Header
+            fputcsv($file, [
+                'Booking No',
+                'PNR',
+                'GDS',
+                'Traveller Name',
+                'Traveller Email',
+                'Traveller Contact',
+                'Base Fare',
+                'Tax',
+                'Total Fare',
+                'Status',
+                'Booking Date',
+                'Ticket Issued At',
+            ]);
+
+            // CSV Data
+            foreach ($bookings as $booking) {
+                $statusLabels = [0 => 'Pending', 1 => 'Confirmed', 2 => 'Ticketed', 3 => 'Cancelled', 4 => 'Expired'];
+
+                fputcsv($file, [
+                    $booking->booking_no,
+                    $booking->pnr_id ?? '',
+                    $booking->gds ?? '',
+                    $booking->traveller_name ?? '',
+                    $booking->traveller_email ?? '',
+                    $booking->traveller_contact ?? '',
+                    $booking->base_fare_amount ?? 0,
+                    $booking->tax_amount ?? 0,
+                    $booking->total_fare ?? 0,
+                    $statusLabels[$booking->status] ?? 'Unknown',
+                    $booking->created_at ? $booking->created_at->format('Y-m-d H:i') : '',
+                    $booking->ticket_issued_at ?? '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

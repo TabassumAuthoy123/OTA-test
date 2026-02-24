@@ -18,12 +18,19 @@ class FlightBooking extends Model
         'transaction_id',
         'payment_status',
         'ticketing_response',
+        'gds_base_fare',
+        'markup_amount',
+        'selling_fare',
+        'pricing_channel',
         'updated_at'
     ];
 
     protected $casts = [
         'status' => BookingStatus::class,
         'payment_status' => PaymentStatus::class,
+        'gds_base_fare' => 'decimal:2',
+        'markup_amount' => 'decimal:2',
+        'selling_fare' => 'decimal:2',
     ];
 
     // ─── Relationships ───────────────────────────────────────
