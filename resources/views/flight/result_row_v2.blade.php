@@ -36,6 +36,13 @@
         }
     }
 
+    // ═══ Rules Engine: Blocking Check ═══
+    $_reAirline = $segmentArray[0]['carrier']['operating'] ?? '';
+    $_reRouteFrom = $segmentArray[0]['departure']['airport'] ?? '';
+    $_reRouteTo = end($segmentArray)['arrival']['airport'] ?? '';
+    $_reCabin = session('cabin_class', 'Y');
+    $_isBlocked = \App\Services\RulesEngineService::isBlocked('sabre', $_reAirline, $_reRouteFrom, $_reRouteTo, $_reCabin);
+
     // price related calculation
     $airlineInfo = DB::table('airlines')
                     ->where('iata', $segmentArray[0]['carrier']['operating'])
@@ -44,24 +51,33 @@
 
     $netPrice = $data['pricingInformation'][0]['fare']['totalFare']['totalPrice'];
     $basePrice = $data['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
-    if (Auth::user()->user_type == 2) {
-        if ($airlineInfo && $airlineInfo->comission > 0) {
-            // if airline has comission
-            $b2bUsersComission = Auth::user()->comission;
-            if (!empty($b2bUsersComission) && is_numeric($b2bUsersComission) && $b2bUsersComission > 0) {
-                $comissionAmount = round(($basePrice * $b2bUsersComission) / 100, 2);
-                $netPrice -= $comissionAmount;
+
+    // ═══ Rules Engine Commission ═══
+    $_reAgentId = Auth::user()->user_type == 2 ? Auth::user()->id : null;
+
+    $comissionAmount = \App\Services\RulesEngineService::calculateCommission(
+        'sabre', $_reAirline, $_reRouteFrom, $_reRouteTo, $_reCabin, 'ADT', $_reAgentId, $basePrice
+    );
+
+    // Fallback: legacy commission if no rules engine rule matched
+    if ($comissionAmount <= 0) {
+        if (Auth::user()->user_type == 2) {
+            if ($airlineInfo && $airlineInfo->comission > 0) {
+                $b2bUsersComission = Auth::user()->comission;
+                if (!empty($b2bUsersComission) && is_numeric($b2bUsersComission) && $b2bUsersComission > 0) {
+                    $comissionAmount = round(($basePrice * $b2bUsersComission) / 100, 2);
+                }
+            }
+        } else {
+            if ($airlineInfo && $airlineInfo->comission > 0) {
+                $comissionAmount = round(($basePrice * 7) / 100, 2);
             }
         }
-    } else {
-        if ($airlineInfo && $airlineInfo->comission > 0) {
-            // if airline has comission
-            $comissionAmount = round(($basePrice * 7) / 100, 2);
-            $netPrice -= $comissionAmount;
-        }
     }
+    $netPrice -= $comissionAmount;
 @endphp
 
+@if(!$_isBlocked)
 <div class="row flight_card">
     @if(session('flight_type') == 1)
         @include('flight.result_row_v2_oneway')
@@ -71,3 +87,4 @@
         @include('flight.result_row_v2_multicity')
     @endif
 </div>
+@endif

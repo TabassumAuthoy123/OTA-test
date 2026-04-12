@@ -44,5 +44,14 @@ class HomeController extends Controller
         $page = CmsPage::where('slug', $slug)->where('is_active', true)->firstOrFail();
         return view('b2c.page', compact('page'));
     }
+
+    /**
+     * Deals Page
+     */
+    public function deals()
+    {
+        $promotions = CmsPromotion::active()->get();
+        return view('b2c.deals', compact('promotions'));
+    }
 }
 

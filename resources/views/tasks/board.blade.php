@@ -1,6 +1,7 @@
 @extends('master')
 
 @section('header_css')
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     <style>
         .kanban-wrapper {
             display: flex;
@@ -80,6 +81,15 @@
             margin-bottom: 6px;
             color: #212529;
             line-height: 1.4;
+        }
+
+        .task-card .task-title a {
+            color: #212529;
+            text-decoration: none;
+        }
+
+        .task-card .task-title a:hover {
+            color: #0d6efd;
         }
 
         .task-card .task-desc {
@@ -235,6 +245,26 @@
             padding: 8px 12px !important;
             height: auto !important;
         }
+
+        /* Summernote overrides inside modals */
+        #addTaskModal .note-editor,
+        #editTaskModal .note-editor {
+            border: 1px solid #ced4da !important;
+            border-radius: 6px !important;
+        }
+
+        #addTaskModal .note-toolbar,
+        #editTaskModal .note-toolbar {
+            background: #f8f9fa !important;
+            border-bottom: 1px solid #dee2e6 !important;
+        }
+
+        #addTaskModal .note-editable,
+        #editTaskModal .note-editable {
+            min-height: 200px !important;
+            padding: 12px !important;
+            font-size: 14px !important;
+        }
     </style>
 @endsection
 
@@ -323,9 +353,9 @@
 
     <!-- Add Task Modal -->
     <div class="modal fade" id="addTaskModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form action="{{ url('tasks') }}" method="POST">
+                <form action="{{ url('tasks') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title">Add New Task</h5>
@@ -338,8 +368,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Description</label>
-                            <textarea name="description" class="form-control" rows="3"
-                                placeholder="Describe the task..."></textarea>
+                            <textarea name="description" id="addDescription" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Attachments / Images (Optional)</label>
+                            <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
                         </div>
                         <div class="row">
                             <div class="col-6 mb-3">
@@ -371,9 +404,9 @@
 
     <!-- Edit Task Modal -->
     <div class="modal fade" id="editTaskModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form id="editTaskForm" method="POST">
+                <form id="editTaskForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
@@ -387,7 +420,15 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Description</label>
-                            <textarea name="description" id="editDescription" class="form-control" rows="3"></textarea>
+                            <textarea name="description" id="editDescription" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Attachments / Images (Optional)</label>
+                            <input type="file" name="images[]" id="editImageInput" class="form-control" accept="image/*" multiple>
+                            <div class="mt-2" id="editImagePreviewContainer" style="display: none;">
+                                <label class="form-label text-muted small">Current Images:</label><br>
+                                <div id="editImagePreview" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-6 mb-3">
@@ -420,7 +461,53 @@
 @endsection
 
 @section('footer_js')
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
     <script>
+        // Initialize Summernote on Add modal description
+        $('#addTaskModal').on('shown.bs.modal', function () {
+            if (!$('#addDescription').data('summernote')) {
+                $('#addDescription').summernote({
+                    placeholder: 'Describe the task in detail...',
+                    height: 250,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'strikethrough']],
+                        ['font', ['superscript', 'subscript']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link', 'table', 'hr']],
+                        ['view', ['fullscreen', 'codeview']],
+                        ['misc', ['undo', 'redo']]
+                    ],
+                    callbacks: {
+                        onInit: function () {
+                            $(this).closest('.note-editor').find('.note-editable').css('min-height', '200px');
+                        }
+                    }
+                });
+            }
+        });
+
+        // Initialize Summernote on Edit modal description
+        $('#editTaskModal').on('shown.bs.modal', function () {
+            if (!$('#editDescription').data('summernote')) {
+                $('#editDescription').summernote({
+                    height: 250,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'strikethrough']],
+                        ['font', ['superscript', 'subscript']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link', 'table', 'hr']],
+                        ['view', ['fullscreen', 'codeview']],
+                        ['misc', ['undo', 'redo']]
+                    ],
+                    callbacks: {
+                        onInit: function () {
+                            $(this).closest('.note-editor').find('.note-editable').css('min-height', '200px');
+                        }
+                    }
+                });
+            }
+        });
+
         // Update task status via AJAX
         function updateTaskStatus(taskId, newStatus) {
             $.ajax({
@@ -444,13 +531,47 @@
             });
         }
 
-        // Open edit modal with task data
-        function editTask(id, title, description, category, priority) {
+        // Open edit modal with task data from data attributes (safe from HTML injection)
+        function editTaskFromData(btn) {
+            var $btn = $(btn);
+            var id = $btn.data('task-id');
+            var title = $btn.data('task-title');
+            var description = $btn.data('task-description') || '';
+            var category = $btn.data('task-category');
+            var priority = $btn.data('task-priority');
+            var imagesData = $btn.data('task-images'); // Should be an array or stringified JSON
+
             $('#editTaskForm').attr('action', '{{ url("tasks") }}/' + id);
             $('#editTitle').val(title);
-            $('#editDescription').val(description);
             $('#editCategory').val(category);
             $('#editPriority').val(priority);
+
+            var images = [];
+            if (imagesData) {
+                images = typeof imagesData === 'string' ? JSON.parse(imagesData) : imagesData;
+            }
+
+            var previewHtml = '';
+            if (images && images.length > 0) {
+                images.forEach(function(imgUrl) {
+                    var fullUrl = '{{ asset("") }}' + imgUrl.replace(/^\/+/, '');
+                    previewHtml += '<img src="' + fullUrl + '" class="img-thumbnail" style="max-height: 80px; border-radius: 6px;">';
+                });
+                $('#editImagePreview').html(previewHtml);
+                $('#editImagePreviewContainer').show();
+            } else {
+                $('#editImagePreview').html('');
+                $('#editImagePreviewContainer').hide();
+            }
+
+            // Set description after modal opens and Summernote initializes
+            var checkSN = setInterval(function () {
+                if ($('#editDescription').data('summernote')) {
+                    $('#editDescription').summernote('code', description);
+                    clearInterval(checkSN);
+                }
+            }, 100);
+
             $('#editTaskModal').modal('show');
         }
     </script>

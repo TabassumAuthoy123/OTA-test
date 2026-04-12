@@ -590,6 +590,81 @@
         </div>
     </section>
 
+    {{-- ━━━ AIRLINE PARTNERS LOGO STRIP ━━━ --}}
+    <section class="b2c-airlines">
+        <div class="container">
+            <div class="b2c-airlines-header">
+                <span>✈️ Trusted Airline Partners</span>
+            </div>
+            <div style="overflow: hidden;">
+                <div class="b2c-airlines-track">
+                    {{-- First set --}}
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#006747;">
+                        <span>🇧🇩 Biman Bangladesh</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#00487C;">
+                        <span>US-Bangla Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#D71921;">
+                        <span>Emirates ✈</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#5C0632;">
+                        <span>Qatar Airways</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#E81932;">
+                        <span>Turkish Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#1A3768;">
+                        <span>Singapore Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#00467F;">
+                        <span>Malaysia Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#003876;">
+                        <span>IndiGo</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#00B2A9;">
+                        <span>Air Astra</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#2B3990;">
+                        <span>NovoAir</span>
+                    </div>
+                    {{-- Duplicate set for seamless scrolling --}}
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#006747;">
+                        <span>🇧🇩 Biman Bangladesh</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#00487C;">
+                        <span>US-Bangla Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#D71921;">
+                        <span>Emirates ✈</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#5C0632;">
+                        <span>Qatar Airways</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#E81932;">
+                        <span>Turkish Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#1A3768;">
+                        <span>Singapore Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#00467F;">
+                        <span>Malaysia Airlines</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#003876;">
+                        <span>IndiGo</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#00B2A9;">
+                        <span>Air Astra</span>
+                    </div>
+                    <div class="b2c-airline-logo" style="font-weight:700; font-size:0.8rem; color:#2B3990;">
+                        <span>NovoAir</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- ━━━ DEALS SECTION ━━━ --}}
     @if($promotions->count() > 0)
         <section class="b2c-section" id="deals">
@@ -632,9 +707,57 @@
         </section>
     @endif
 
+    {{-- ━━━ HOW IT WORKS ━━━ --}}
+    <section class="b2c-section" style="background: var(--b2c-bg);">
+        <div class="container">
+            <div class="b2c-section-header">
+                <span class="b2c-section-tag">📋 How It Works</span>
+                <h2 class="b2c-section-title">Book Your Flight in 4 Easy Steps</h2>
+                <p class="b2c-section-subtitle">Simple, fast, and hassle-free booking experience</p>
+            </div>
+
+            <div class="b2c-steps-grid">
+                <div class="b2c-step-card">
+                    <div class="b2c-step-number" data-step="1"
+                        style="background: rgba(14,165,233,0.1); color: var(--b2c-accent);">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="b2c-step-title">Search Flights</h3>
+                    <p class="b2c-step-desc">Enter your origin, destination, and travel dates to find available flights.</p>
+                </div>
+
+                <div class="b2c-step-card">
+                    <div class="b2c-step-number" data-step="2"
+                        style="background: rgba(245,158,11,0.1); color: var(--b2c-cta);">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3 class="b2c-step-title">Compare & Select</h3>
+                    <p class="b2c-step-desc">Compare prices, airlines, and timings to find the perfect flight for you.</p>
+                </div>
+
+                <div class="b2c-step-card">
+                    <div class="b2c-step-number" data-step="3" style="background: rgba(99,102,241,0.1); color: #6366F1;">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3 class="b2c-step-title">Secure Payment</h3>
+                    <p class="b2c-step-desc">Pay securely with bKash, Nagad, credit card, or bank transfer.</p>
+                </div>
+
+                <div class="b2c-step-card">
+                    <div class="b2c-step-number" data-step="4"
+                        style="background: rgba(16,185,129,0.1); color: var(--b2c-success);">
+                        <i class="fas fa-plane-departure"></i>
+                    </div>
+                    <h3 class="b2c-step-title">Fly & Enjoy!</h3>
+                    <p class="b2c-step-desc">Receive instant e-ticket confirmation and enjoy your journey.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- ━━━ POPULAR ROUTES ━━━ --}}
     @if($popularRoutes->count() > 0)
-        <section class="b2c-section" style="background: var(--b2c-bg);">
+        <section class="b2c-section">
             <div class="container">
                 <div class="b2c-section-header">
                     <span class="b2c-section-tag">✈️ Popular Destinations</span>
@@ -665,6 +788,103 @@
             </div>
         </section>
     @endif
+
+    {{-- ━━━ DESTINATION INSPIRATION GALLERY ━━━ --}}
+    <section class="b2c-section" style="background: var(--b2c-bg);">
+        <div class="container">
+            <div class="b2c-section-header">
+                <span class="b2c-section-tag">🗺️ Explore Destinations</span>
+                <h2 class="b2c-section-title">Top Travel Destinations</h2>
+                <p class="b2c-section-subtitle">Get inspired for your next adventure</p>
+            </div>
+
+            <div class="b2c-destinations-grid">
+                {{-- Featured Card --}}
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                    class="b2c-destination-card b2c-dest-featured">
+                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" alt="Dubai">
+                    <div class="b2c-destination-overlay">
+                        <span class="b2c-dest-badge" style="background: var(--b2c-cta);">Popular</span>
+                        <div class="b2c-dest-name">Dubai</div>
+                        <div class="b2c-dest-country">United Arab Emirates</div>
+                        <div class="b2c-dest-price">৳35,000 <small>starting from</small></div>
+                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                    class="b2c-destination-card">
+                    <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&q=80" alt="Bangkok">
+                    <div class="b2c-destination-overlay">
+                        <span class="b2c-dest-badge" style="background: var(--b2c-success);">Trending</span>
+                        <div class="b2c-dest-name">Bangkok</div>
+                        <div class="b2c-dest-country">Thailand</div>
+                        <div class="b2c-dest-price">৳22,500 <small>starting from</small></div>
+                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                    class="b2c-destination-card">
+                    <img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&q=80" alt="Singapore">
+                    <div class="b2c-destination-overlay">
+                        <div class="b2c-dest-name">Singapore</div>
+                        <div class="b2c-dest-country">Singapore</div>
+                        <div class="b2c-dest-price">৳28,000 <small>starting from</small></div>
+                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                    class="b2c-destination-card">
+                    <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80" alt="Kolkata">
+                    <div class="b2c-destination-overlay">
+                        <span class="b2c-dest-badge" style="background: #EF4444;">Hot Deal</span>
+                        <div class="b2c-dest-name">Kolkata</div>
+                        <div class="b2c-dest-country">India</div>
+                        <div class="b2c-dest-price">৳8,500 <small>starting from</small></div>
+                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                    class="b2c-destination-card">
+                    <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=80" alt="Maldives">
+                    <div class="b2c-destination-overlay">
+                        <span class="b2c-dest-badge" style="background: #8B5CF6;">Luxury</span>
+                        <div class="b2c-dest-name">Maldives</div>
+                        <div class="b2c-dest-country">Maldives</div>
+                        <div class="b2c-dest-price">৳45,000 <small>starting from</small></div>
+                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                    class="b2c-destination-card b2c-dest-featured">
+                    <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80" alt="Kuala Lumpur">
+                    <div class="b2c-destination-overlay">
+                        <span class="b2c-dest-badge" style="background: var(--b2c-accent);">Best Value</span>
+                        <div class="b2c-dest-name">Kuala Lumpur</div>
+                        <div class="b2c-dest-country">Malaysia</div>
+                        <div class="b2c-dest-price">৳18,000 <small>starting from</small></div>
+                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                    class="b2c-destination-card">
+                    <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&q=80" alt="Chennai">
+                    <div class="b2c-destination-overlay">
+                        <span class="b2c-dest-badge" style="background: #F97316;">New Route</span>
+                        <div class="b2c-dest-name">Chennai</div>
+                        <div class="b2c-dest-country">India</div>
+                        <div class="b2c-dest-price">৳12,000 <small>starting from</small></div>
+                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
 
     {{-- ━━━ WHY CHOOSE US ━━━ --}}
     <section class="b2c-section">
@@ -711,6 +931,76 @@
         </div>
     </section>
 
+    {{-- ━━━ EMI / PAYMENT OPTIONS ━━━ --}}
+    <section class="b2c-emi-section">
+        <div class="container">
+            <div class="b2c-emi-wrapper">
+                <div class="b2c-emi-content">
+                    <div class="b2c-emi-tag">
+                        <i class="fas fa-wallet"></i> Flexible Payment
+                    </div>
+                    <h2 class="b2c-emi-title">Pay Your Way with <span>0% EMI</span> & More</h2>
+                    <p class="b2c-emi-desc">
+                        Book now, pay later! We offer flexible payment options including 0% EMI on credit cards,
+                        mobile wallets, and bank transfers. Travel without financial stress.
+                    </p>
+                    <div class="b2c-emi-features">
+                        <div class="b2c-emi-feature">
+                            <i class="fas fa-check"></i>
+                            <span>0% EMI available on all major credit cards</span>
+                        </div>
+                        <div class="b2c-emi-feature">
+                            <i class="fas fa-check"></i>
+                            <span>Pay with bKash, Nagad, Rocket & more</span>
+                        </div>
+                        <div class="b2c-emi-feature">
+                            <i class="fas fa-check"></i>
+                            <span>Instant payment confirmation & e-ticket</span>
+                        </div>
+                        <div class="b2c-emi-feature">
+                            <i class="fas fa-check"></i>
+                            <span>100% secure with SSL encryption</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="b2c-emi-cards">
+                    <div class="b2c-emi-card">
+                        <div class="b2c-emi-card-icon" style="background: rgba(245,158,11,0.15);">
+                            <i class="fas fa-credit-card" style="color: var(--b2c-cta);"></i>
+                        </div>
+                        <div class="b2c-emi-card-title">Credit Card EMI</div>
+                        <div class="b2c-emi-card-sub">0% interest up to 12 months</div>
+                    </div>
+
+                    <div class="b2c-emi-card">
+                        <div class="b2c-emi-card-icon" style="background: rgba(233,30,99,0.15);">
+                            <span style="font-weight:800; font-size:1.1rem; color:#E2136E;">b</span>
+                        </div>
+                        <div class="b2c-emi-card-title">bKash</div>
+                        <div class="b2c-emi-card-sub">Instant mobile payment</div>
+                    </div>
+
+                    <div class="b2c-emi-card">
+                        <div class="b2c-emi-card-icon" style="background: rgba(255,107,0,0.15);">
+                            <span style="font-weight:800; font-size:1.1rem; color:#F6921E;">N</span>
+                        </div>
+                        <div class="b2c-emi-card-title">Nagad</div>
+                        <div class="b2c-emi-card-sub">Fast & secure payment</div>
+                    </div>
+
+                    <div class="b2c-emi-card">
+                        <div class="b2c-emi-card-icon" style="background: rgba(14,165,233,0.15);">
+                            <i class="fas fa-university" style="color: var(--b2c-accent);"></i>
+                        </div>
+                        <div class="b2c-emi-card-title">Bank Transfer</div>
+                        <div class="b2c-emi-card-sub">Direct bank deposit</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- ━━━ TESTIMONIALS ━━━ --}}
     @if($testimonials->count() > 0)
         <section class="b2c-section" style="background: var(--b2c-bg);">
@@ -750,6 +1040,51 @@
         </section>
     @endif
 
+    {{-- ━━━ CONTACT & SUPPORT BANNER ━━━ --}}
+    <section class="b2c-support-section">
+        <div class="container">
+            <div class="b2c-section-header">
+                <span class="b2c-section-tag">📞 Need Help?</span>
+                <h2 class="b2c-section-title">We're Here to Help You</h2>
+                <p class="b2c-section-subtitle">Reach out to us anytime — our support team is available 24/7</p>
+            </div>
+
+            <div class="b2c-support-grid">
+                <a href="tel:+8801XXXXXXXXX" class="b2c-support-card b2c-sc-phone">
+                    <div class="b2c-support-icon" style="background: rgba(16,185,129,0.1); color: var(--b2c-success);">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="b2c-support-title">Call Us</div>
+                    <div class="b2c-support-value">+880 1XXX-XXXXXX</div>
+                    <div class="b2c-support-sub">Available 24/7 for your queries</div>
+                </a>
+
+                <a href="https://wa.me/8801XXXXXXXXX" target="_blank" class="b2c-support-card b2c-sc-whatsapp">
+                    <div class="b2c-support-icon" style="background: rgba(37,211,102,0.1); color: #25D366;">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="b2c-support-title">WhatsApp</div>
+                    <div class="b2c-support-value" style="color: #25D366;">Chat with Us</div>
+                    <div class="b2c-support-sub">Quick response on WhatsApp</div>
+                </a>
+
+                <a href="mailto:support@faithtrip.net" class="b2c-support-card b2c-sc-email">
+                    <div class="b2c-support-icon" style="background: rgba(14,165,233,0.1); color: var(--b2c-accent);">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="b2c-support-title">Email Us</div>
+                    <div class="b2c-support-value">support@faithtrip.net</div>
+                    <div class="b2c-support-sub">We reply within 30 minutes</div>
+                </a>
+            </div>
+
+            <div class="b2c-support-response">
+                <p><i class="fas fa-headset" style="color: var(--b2c-accent); margin-right: 8px;"></i>
+                    Average response time: <strong>under 5 minutes</strong> during business hours</p>
+            </div>
+        </div>
+    </section>
+
     {{-- ━━━ CTA BANNER ━━━ --}}
     <section class="b2c-section" style="background: var(--b2c-gradient-hero); padding: 60px 0;">
         <div class="container text-center">
@@ -773,8 +1108,8 @@
             <div class="container">
                 <div style="text-align: center; margin-bottom: 48px;">
                     <span style="background: linear-gradient(135deg, var(--b2c-primary), var(--b2c-secondary));
-                            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                            font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
+                                    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                                    font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
                         FAQ
                     </span>
                     <h2
@@ -786,11 +1121,11 @@
                 <div style="max-width: 800px; margin: 0 auto;">
                     @foreach($faqs as $idx => $faq)
                         <div class="b2c-faq-item" style="background: #fff; border-radius: 12px; margin-bottom: 12px;
-                                border: 1px solid #e9ecef; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04);">
+                                            border: 1px solid #e9ecef; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04);">
                             <button onclick="toggleFaq(this)"
                                 style="width: 100%; padding: 18px 24px; background: none;
-                                    border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between;
-                                    align-items: center; font-size: 15px; font-weight: 600; color: #1a1a2e; font-family: var(--font-heading);">
+                                                border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between;
+                                                align-items: center; font-size: 15px; font-weight: 600; color: #1a1a2e; font-family: var(--font-heading);">
                                 <span>{{ $faq->question }}</span>
                                 <i class="fas fa-chevron-down"
                                     style="transition: transform 0.3s; font-size: 12px; color: #6c757d;"></i>

@@ -207,11 +207,16 @@
                     </ul>
                 </li>
                 <li
-                    class="@if(in_array($currentRoute, ['ViewSmsGateways', 'ViewEmailConfig', 'SearchResultsViewConfig', 'PricingConfig'])) mm-active @endif">
+                    class="@if(in_array($currentRoute, ['ViewSmsGateways', 'ViewEmailConfig', 'SearchResultsViewConfig', 'PricingConfig', 'RulesEngine'])) mm-active @endif">
                     <a class="has-arrow material-ripple" href="javascript:void(0);">
                         <i class="typcn typcn-cog-outline"></i> Application Setting
                     </a>
                     <ul class="nav-second-level">
+                        <li class="@if(in_array($currentRoute, ['RulesEngine'])) mm-active @endif">
+                            <a class="text-capitalize" href="{{route('RulesEngine')}}">
+                                <i class="typcn typcn-map"></i> Rules Engine
+                            </a>
+                        </li>
                         <li class="@if($currentRoute == 'PricingConfig') mm-active @endif">
                             <a class="text-capitalize" href="{{url('pricing/config')}}">
                                 <i class="typcn typcn-tags"></i> Pricing & Margins

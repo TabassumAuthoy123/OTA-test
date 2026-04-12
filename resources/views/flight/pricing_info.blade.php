@@ -52,20 +52,37 @@
                                 ->first();
 
                 $netPrice = $revlidatedData['groupedItineraryResponse']['itineraryGroups'][0]['itineraries'][0]['pricingInformation'][count($revlidatedData['groupedItineraryResponse']['itineraryGroups'][0]['itineraries'][0]['pricingInformation'])-1]['fare']['totalFare']['totalPrice'];
-                if(Auth::user()->user_type == 2) {
-                    if($airlineInfo && $airlineInfo->comission > 0){ // if airline has comission
-                        $b2bUsersComission = Auth::user()->comission;
-                        if(!empty($b2bUsersComission) && is_numeric($b2bUsersComission) && $b2bUsersComission > 0) {
-                            $comissionAmount = round(($basePrice * $b2bUsersComission) / 100, 2);
-                            $netPrice -= $comissionAmount;
+
+                // ═══ Rules Engine Commission ═══
+                $_reRouteFrom = '';
+                $_reRouteTo = '';
+                if (isset($revlidatedData['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0])) {
+                    $_reRouteFrom = $revlidatedData['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0]['departureLocation'] ?? '';
+                    $_reRouteTo = $revlidatedData['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0]['arrivalLocation'] ?? '';
+                }
+                $_reCabin = session('cabin_class', 'Y');
+                $_reAgentId = Auth::user()->user_type == 2 ? Auth::user()->id : null;
+
+                $comissionAmount = \App\Services\RulesEngineService::calculateCommission(
+                    'sabre', $validatingCarrierCode, $_reRouteFrom, $_reRouteTo, $_reCabin, 'ADT', $_reAgentId, $basePrice
+                );
+
+                // Fallback: legacy commission if no rules engine rule matched
+                if ($comissionAmount <= 0) {
+                    if(Auth::user()->user_type == 2) {
+                        if($airlineInfo && $airlineInfo->comission > 0){
+                            $b2bUsersComission = Auth::user()->comission;
+                            if(!empty($b2bUsersComission) && is_numeric($b2bUsersComission) && $b2bUsersComission > 0) {
+                                $comissionAmount = round(($basePrice * $b2bUsersComission) / 100, 2);
+                            }
+                        }
+                    } else {
+                        if($airlineInfo && $airlineInfo->comission > 0){
+                            $comissionAmount = round(($basePrice * 7) / 100, 2);
                         }
                     }
-                } else {
-                    if($airlineInfo && $airlineInfo->comission > 0){ // if airline has comission
-                        $comissionAmount = round(($basePrice * 7) / 100, 2);
-                        $netPrice -= $comissionAmount;
-                    }
                 }
+                $netPrice -= $comissionAmount;
             @endphp
             <span class="ml-2 text-primary" style="font-weight: 600;">
                 ({{ $revlidatedData['groupedItineraryResponse']['itineraryGroups'][0]['itineraries'][0]['pricingInformation'][count($revlidatedData['groupedItineraryResponse']['itineraryGroups'][0]['itineraries'][0]['pricingInformation'])-1]['fare']['totalFare']['currency'] }})

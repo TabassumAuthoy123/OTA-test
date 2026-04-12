@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Integration Guide — SSLCOMMERZ, bKash & KhudeBarta SMS</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #242836;
+            --border: #2e3347;
+            --text: #e4e7f1;
+            --text-muted: #8b90a5;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, .15);
+            --green: #22c55e;
+            --green-bg: rgba(34, 197, 94, .1);
+            --orange: #f59e0b;
+            --orange-bg: rgba(245, 158, 11, .1);
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --pink: #e91e63
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem
+        }
+
+        .header {
+            text-align: center;
+            padding: 4rem 0 2rem;
+            position: relative
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, var(--primary-glow), transparent 70%);
+            pointer-events: none
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative
+        }
+
+        .header .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: .5rem
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 17, 23, .9);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: .75rem 0;
+            margin-bottom: 2rem
+        }
+
+        .nav-inner {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem
+        }
+
+        .nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: .4rem .8rem;
+            border-radius: 6px;
+            font-size: .82rem;
+            font-weight: 500;
+            transition: .2s
+        }
+
+        .nav a:hover {
+            color: var(--text);
+            background: var(--surface)
+        }
+
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem
+        }
+
+        .section h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 .75rem;
+            color: var(--primary)
+        }
+
+        .section h4 {
+            font-size: .95rem;
+            font-weight: 600;
+            margin: 1rem 0 .5rem
+        }
+
+        pre {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            margin: .75rem 0;
+            font-size: .82rem;
+            line-height: 1.6
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .ic {
+            background: var(--surface2);
+            padding: .15rem .4rem;
+            border-radius: 4px;
+            font-size: .82rem;
+            color: var(--cyan)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: .75rem 0;
+            font-size: .85rem
+        }
+
+        th {
+            background: var(--surface2);
+            text-align: left;
+            padding: .6rem .8rem;
+            font-weight: 600;
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border)
+        }
+
+        td {
+            padding: .6rem .8rem;
+            border-bottom: 1px solid var(--border)
+        }
+
+        tr:hover td {
+            background: rgba(99, 102, 241, .03)
+        }
+
+        .req {
+            color: var(--red);
+            font-weight: 600;
+            font-size: .7rem
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: .75rem 0;
+            font-size: .85rem;
+            border-left: 4px solid
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, .08);
+            border-color: var(--blue)
+        }
+
+        .alert-warn {
+            background: rgba(245, 158, 11, .08);
+            border-color: var(--orange)
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, .08);
+            border-color: var(--green)
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: .25rem
+        }
+
+        .m {
+            display: inline-block;
+            padding: .15rem .5rem;
+            border-radius: 4px;
+            font-size: .7rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            margin-right: .5rem
+        }
+
+        .m-get {
+            background: rgba(34, 197, 94, .15);
+            color: var(--green)
+        }
+
+        .m-post {
+            background: rgba(59, 130, 246, .15);
+            color: var(--blue)
+        }
+
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0
+        }
+
+        .flow-step {
+            background: var(--surface2);
+            padding: .5rem 1rem;
+            border-radius: 8px;
+            font-size: .82rem;
+            font-weight: 500;
+            border: 1px solid var(--border)
+        }
+
+        .flow-arrow {
+            color: var(--primary);
+            font-weight: 700
+        }
+
+        .ph {
+            color: var(--orange);
+            font-style: italic
+        }
+
+        /* Hero Cards */
+        .hero-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin: 2rem 0
+        }
+
+        .hero-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: .3s
+        }
+
+        .hero-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, .4)
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px
+        }
+
+        .hero-card.ssl::before {
+            background: linear-gradient(90deg, #22c55e, #16a34a)
+        }
+
+        .hero-card.bkash::before {
+            background: linear-gradient(90deg, #e91e63, #c2185b)
+        }
+
+        .hero-card.sms::before {
+            background: linear-gradient(90deg, #f59e0b, #d97706)
+        }
+
+        .hero-card .icon {
+            font-size: 2rem;
+            margin-bottom: .75rem
+        }
+
+        .hero-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+            color: var(--text)
+        }
+
+        .hero-card p {
+            font-size: .8rem;
+            color: var(--text-muted);
+            margin-bottom: .75rem
+        }
+
+        .hero-card .tag {
+            display: inline-block;
+            padding: .2rem .5rem;
+            border-radius: 4px;
+            font-size: .7rem;
+            font-weight: 600;
+            margin: .15rem .15rem 0 0
+        }
+
+        .tag-method {
+            background: rgba(59, 130, 246, .12);
+            color: var(--blue)
+        }
+
+        .tag-lang {
+            background: rgba(99, 102, 241, .12);
+            color: var(--primary)
+        }
+
+        .hero-card ul {
+            list-style: none;
+            font-size: .78rem;
+            color: var(--text-muted);
+            margin-top: .5rem
+        }
+
+        .hero-card ul li {
+            padding: .15rem 0
+        }
+
+        .hero-card ul li::before {
+            content: '→ ';
+            color: var(--primary)
+        }
+
+        @media(max-width:768px) {
+            .hero-cards {
+                grid-template-columns: 1fr
+            }
+
+            .header h1 {
+                font-size: 1.8rem
+            }
+
+            .section {
+                padding: 1.25rem
+            }
+
+            pre {
+                font-size: .75rem;
+                padding: .75rem
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>🔗 API Integration Guide</h1>
+        <p class="subtitle">SSLCOMMERZ Payment · bKash Payment · KhudeBarta SMS — Language-Agnostic Reference</p>
+        <p style="color:var(--text-muted);font-size:.8rem;margin-top:.75rem">📅 Feb 28, 2026 · 📦 Source: GetCommerce ·
+            🎯 Target: OTT Hub</p>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#cards">Overview</a><a href="#ssl">SSLCOMMERZ</a><a href="#bkash">bKash</a><a
+                href="#sms">KhudeBarta</a><a href="#db">DB Schema</a><a href="#guide">Integration</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ===== HERO CARDS ===== -->
+        <div class="hero-cards" id="cards">
+
+            <div class="hero-card ssl">
+                <div class="icon">💳</div>
+                <h3>SSLCOMMERZ</h3>
+                <p>Bangladesh's leading online payment gateway. Supports cards, bKash, Nagad, Rocket & more via hosted
+                    checkout.</p>
+                <span class="tag tag-method">POST API</span>
+                <span class="tag tag-lang">Any Language</span>
+                <ul>
+                    <li>Hosted Checkout (redirect)</li>
+                    <li>Success / Fail / Cancel callbacks</li>
+                    <li>Refund & Transaction query</li>
+                    <li>Sandbox ↔ Production switch</li>
+                </ul>
+                <table style="margin-top:.75rem;font-size:.75rem">
+                    <tr>
+                        <td style="color:var(--text-muted)">Sandbox URL</td>
+                        <td><code class="ic">sandbox.sslcommerz.com</code></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Live URL</td>
+                        <td><code class="ic">securepay.sslcommerz.com</code></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Auth</td>
+                        <td>Store ID + Password</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Package</td>
+                        <td>Laravel: <code class="ic">dgvai/laravel-sslcommerz</code></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="hero-card bkash">
+                <div class="icon">📲</div>
+                <h3>bKash Tokenized</h3>
+                <p>Bangladesh's largest MFS. Uses Tokenized Checkout v1.2.0-beta with token-based auth & cURL.</p>
+                <span class="tag tag-method">POST + cURL</span>
+                <span class="tag tag-lang">Any Language</span>
+                <ul>
+                    <li>Grant Token → Create → Execute → Query</li>
+                    <li>Token caching (1hr expiry)</li>
+                    <li>Callback (success / cancel / fail)</li>
+                    <li>No external package needed</li>
+                </ul>
+                <table style="margin-top:.75rem;font-size:.75rem">
+                    <tr>
+                        <td style="color:var(--text-muted)">Sandbox</td>
+                        <td><code class="ic">tokenized.sandbox.bka.sh</code></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Live</td>
+                        <td><code class="ic">tokenized.pay.bka.sh</code></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Auth</td>
+                        <td>App Key + Secret + Username + Password</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Version</td>
+                        <td>v1.2.0-beta</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="hero-card sms">
+                <div class="icon">📱</div>
+                <h3>KhudeBarta SMS</h3>
+                <p>Bangladeshi SMS gateway. Simple HTTP GET API with query params. No SDK needed.</p>
+                <span class="tag tag-method">GET API</span>
+                <span class="tag tag-lang">Any Language</span>
+                <ul>
+                    <li>Single & bulk SMS</li>
+                    <li>Simple HTTP GET request</li>
+                    <li>API Key + Secret Key auth</li>
+                    <li>Caller ID masking</li>
+                </ul>
+                <table style="margin-top:.75rem;font-size:.75rem">
+                    <tr>
+                        <td style="color:var(--text-muted)">Endpoint</td>
+                        <td><code class="ic">portal.khudebarta.com:3775</code></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Method</td>
+                        <td>HTTP GET</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Auth</td>
+                        <td>API Key + Secret Key</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--text-muted)">Phone Format</td>
+                        <td>88XXXXXXXXXXX</td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- ============================= -->
+        <!-- SSLCOMMERZ SECTION -->
+        <!-- ============================= -->
+        <div class="section" id="ssl">
+            <h2>💳 SSLCOMMERZ Payment Gateway</h2>
+
+            <div class="alert alert-warn">
+                <strong>⚠️ Credentials Placeholder</strong>
+                All credentials below are <span class="ph">PLACEHOLDERS</span>. You must obtain your own Store ID &
+                Password from <a href="https://developer.sslcommerz.com/" style="color:var(--cyan)">SSLCOMMERZ Merchant
+                    Panel</a>.
+            </div>
+
+            <h3>Credentials You Need</h3>
+            <table>
+                <tr>
+                    <th>Credential</th>
+                    <th>Where to Get</th>
+                    <th>Placeholder</th>
+                </tr>
+                <tr>
+                    <td>Store ID</td>
+                    <td>SSLCOMMERZ Merchant Panel → API Credentials</td>
+                    <td><code class="ic ph">YOUR_SSLC_STORE_ID</code></td>
+                </tr>
+                <tr>
+                    <td>Store Password</td>
+                    <td>SSLCOMMERZ Merchant Panel → API Credentials</td>
+                    <td><code class="ic ph">YOUR_SSLC_STORE_PASSWORD</code></td>
+                </tr>
+                <tr>
+                    <td>Sandbox Store ID</td>
+                    <td>Register at sandbox.sslcommerz.com</td>
+                    <td><code class="ic ph">YOUR_SANDBOX_STORE_ID</code></td>
+                </tr>
+                <tr>
+                    <td>Sandbox Password</td>
+                    <td>Register at sandbox.sslcommerz.com</td>
+                    <td><code class="ic ph">YOUR_SANDBOX_STORE_PASSWORD</code></td>
+                </tr>
+            </table>
+
+            <h3>API URLs</h3>
+            <table>
+                <tr>
+                    <th>Environment</th>
+                    <th>Base URL</th>
+                </tr>
+                <tr>
+                    <td>🔧 Sandbox</td>
+                    <td><code class="ic">https://sandbox.sslcommerz.com</code></td>
+                </tr>
+                <tr>
+                    <td>🚀 Production</td>
+                    <td><code class="ic">https://securepay.sslcommerz.com</code></td>
+                </tr>
+            </table>
+
+            <h3>API Endpoints</h3>
+            <table>
+                <tr>
+                    <th>Purpose</th>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                </tr>
+                <tr>
+                    <td>Initiate Payment</td>
+                    <td><span class="m m-post">POST</span></td>
+                    <td><code class="ic">/gwprocess/v4/api.php</code></td>
+                </tr>
+                <tr>
+                    <td>Validate Order</td>
+                    <td><span class="m m-get">GET</span></td>
+                    <td><code class="ic">/validator/api/validationserverAPI.php</code></td>
+                </tr>
+                <tr>
+                    <td>Transaction Status</td>
+                    <td><span class="m m-get">GET</span></td>
+                    <td><code class="ic">/validator/api/merchantTransIDvalidationAPI.php</code></td>
+                </tr>
+                <tr>
+                    <td>Refund</td>
+                    <td><span class="m m-get">GET</span></td>
+                    <td><code class="ic">/validator/api/merchantTransIDvalidationAPI.php</code></td>
+                </tr>
+            </table>
+
+            <h3>Payment Flow</h3>
+            <div class="flow">
+                <div class="flow-step">1️⃣ POST to /gwprocess</div><span class="flow-arrow">→</span>
+                <div class="flow-step">2️⃣ Get GatewayPageURL</div><span class="flow-arrow">→</span>
+                <div class="flow-step">3️⃣ Redirect user</div><span class="flow-arrow">→</span>
+                <div class="flow-step">4️⃣ User pays</div><span class="flow-arrow">→</span>
+                <div class="flow-step">5️⃣ Callback (success/fail/cancel)</div><span class="flow-arrow">→</span>
+                <div class="flow-step">6️⃣ Validate & save</div>
+            </div>
+
+            <h3>Initiate Payment — Generic HTTP Request</h3>
+            <pre><code>POST https://sandbox.sslcommerz.com/gwprocess/v4/api.php
+Content-Type: application/x-www-form-urlencoded
+
+store_id=<span class="ph">YOUR_SSLC_STORE_ID</span>
+&store_passwd=<span class="ph">YOUR_SSLC_STORE_PASSWORD</span>
+&total_amount=1500.00
+&currency=BDT
+&tran_id=TRX_UNIQUE_123
+&success_url=https://yoursite.com/payment/success
+&fail_url=https://yoursite.com/payment/fail
+&cancel_url=https://yoursite.com/payment/cancel
+&ipn_url=https://yoursite.com/payment/ipn
+&cus_name=Customer Name
+&cus_email=customer@email.com
+&cus_phone=01712345678
+&product_name=OTT Subscription
+&product_category=Digital Service
+&product_profile=general
+&shipping_method=NO</code></pre>
+
+            <h4>cURL Example (Any Language)</h4>
+            <pre><code>curl -X POST "https://sandbox.sslcommerz.com/gwprocess/v4/api.php" \
+  -d "store_id=<span class="ph">YOUR_SSLC_STORE_ID</span>" \
+  -d "store_passwd=<span class="ph">YOUR_SSLC_STORE_PASSWORD</span>" \
+  -d "total_amount=1500.00" \
+  -d "currency=BDT" \
+  -d "tran_id=TRX_$(date +%s)" \
+  -d "success_url=https://yoursite.com/payment/success" \
+  -d "fail_url=https://yoursite.com/payment/fail" \
+  -d "cancel_url=https://yoursite.com/payment/cancel" \
+  -d "cus_name=Test Customer" \
+  -d "cus_email=test@test.com" \
+  -d "cus_phone=01712345678" \
+  -d "product_name=OTT Subscription" \
+  -d "product_category=Digital" \
+  -d "product_profile=general" \
+  -d "shipping_method=NO"</code></pre>
+
+            <h4>Success Response</h4>
+            <pre><code>{
+  "status": "SUCCESS",
+  "GatewayPageURL": "https://sandbox.sslcommerz.com/EasyCheckOut/testcde...",
+  "sessionkey": "A1B2C3...",
+  "redirectGatewayURL": "...",
+  "faession": "..."
+}
+// → Redirect user to GatewayPageURL</code></pre>
+
+            <h3>Callback Response Fields (POST to your success/fail/cancel URL)</h3>
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td><code class="ic">tran_id</code></td>
+                    <td>Your transaction ID</td>
+                    <td>TRX_12345</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">val_id</code></td>
+                    <td>Validation ID (for verification)</td>
+                    <td>2302...</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">amount</code></td>
+                    <td>Total amount</td>
+                    <td>1500.00</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">store_amount</code></td>
+                    <td>After gateway fee</td>
+                    <td>1470.00</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">card_type</code></td>
+                    <td>Payment method</td>
+                    <td>VISA, BKash-BKash</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">bank_tran_id</code></td>
+                    <td>Bank transaction ID (for refund)</td>
+                    <td>230212...</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">status</code></td>
+                    <td>Result</td>
+                    <td>VALID / FAILED / CANCELLED</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">tran_date</code></td>
+                    <td>Transaction date</td>
+                    <td>2026-02-28 18:30:00</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">currency</code></td>
+                    <td>Currency</td>
+                    <td>BDT</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">card_issuer</code></td>
+                    <td>Issuing bank</td>
+                    <td>Dutch Bangla Bank</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">card_brand</code></td>
+                    <td>Card brand</td>
+                    <td>VISA, MASTERCARD</td>
+                </tr>
+            </table>
+
+            <h3>Validate Payment (Server-side verification)</h3>
+            <pre><code>GET https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php
+  ?val_id={val_id_from_callback}
+  &store_id=<span class="ph">YOUR_SSLC_STORE_ID</span>
+  &store_passwd=<span class="ph">YOUR_SSLC_STORE_PASSWORD</span>
+  &format=json</code></pre>
+
+            <div class="alert alert-info">
+                <strong>📌 CSRF Exception</strong>
+                Your callback URLs must be excluded from CSRF protection since SSLCOMMERZ posts to them directly.
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- BKASH SECTION -->
+        <!-- ============================= -->
+        <div class="section" id="bkash">
+            <h2>📲 bKash Tokenized Checkout</h2>
+
+            <div class="alert alert-warn">
+                <strong>⚠️ Credentials Placeholder</strong>
+                Get your credentials from <a href="https://developer.bka.sh/" style="color:var(--cyan)">bKash Developer
+                    Portal</a>. Sandbox credentials for testing are provided upon registration.
+            </div>
+
+            <h3>Credentials You Need</h3>
+            <table>
+                <tr>
+                    <th>Credential</th>
+                    <th>Where to Get</th>
+                    <th>Placeholder</th>
+                </tr>
+                <tr>
+                    <td>App Key</td>
+                    <td>bKash Merchant Dashboard → API Keys</td>
+                    <td><code class="ic ph">YOUR_BKASH_APP_KEY</code></td>
+                </tr>
+                <tr>
+                    <td>App Secret</td>
+                    <td>bKash Merchant Dashboard → API Keys</td>
+                    <td><code class="ic ph">YOUR_BKASH_APP_SECRET</code></td>
+                </tr>
+                <tr>
+                    <td>Username</td>
+                    <td>bKash Merchant Dashboard → API Credentials</td>
+                    <td><code class="ic ph">YOUR_BKASH_USERNAME</code></td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td>bKash Merchant Dashboard → API Credentials</td>
+                    <td><code class="ic ph">YOUR_BKASH_PASSWORD</code></td>
+                </tr>
+            </table>
+
+            <h3>API URLs</h3>
+            <table>
+                <tr>
+                    <th>Environment</th>
+                    <th>Base URL</th>
+                </tr>
+                <tr>
+                    <td>🔧 Sandbox</td>
+                    <td><code class="ic">https://tokenized.sandbox.bka.sh/v1.2.0-beta</code></td>
+                </tr>
+                <tr>
+                    <td>🚀 Production</td>
+                    <td><code class="ic">https://tokenized.pay.bka.sh/v1.2.0-beta</code></td>
+                </tr>
+            </table>
+
+            <h3>API Endpoints</h3>
+            <table>
+                <tr>
+                    <th>Purpose</th>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                </tr>
+                <tr>
+                    <td>Grant Token</td>
+                    <td><span class="m m-post">POST</span></td>
+                    <td><code class="ic">/tokenized/checkout/token/grant</code></td>
+                </tr>
+                <tr>
+                    <td>Create Payment</td>
+                    <td><span class="m m-post">POST</span></td>
+                    <td><code class="ic">/tokenized/checkout/create</code></td>
+                </tr>
+                <tr>
+                    <td>Execute Payment</td>
+                    <td><span class="m m-post">POST</span></td>
+                    <td><code class="ic">/tokenized/checkout/execute</code></td>
+                </tr>
+                <tr>
+                    <td>Query Status</td>
+                    <td><span class="m m-post">POST</span></td>
+                    <td><code class="ic">/tokenized/checkout/payment/status</code></td>
+                </tr>
+            </table>
+
+            <h3>Payment Flow</h3>
+            <div class="flow">
+                <div class="flow-step">1️⃣ Grant Token</div><span class="flow-arrow">→</span>
+                <div class="flow-step">2️⃣ Create Payment</div><span class="flow-arrow">→</span>
+                <div class="flow-step">3️⃣ Redirect to bKash</div><span class="flow-arrow">→</span>
+                <div class="flow-step">4️⃣ User authorizes</div><span class="flow-arrow">→</span>
+                <div class="flow-step">5️⃣ Callback</div><span class="flow-arrow">→</span>
+                <div class="flow-step">6️⃣ Execute</div><span class="flow-arrow">→</span>
+                <div class="flow-step">7️⃣ Verify & Store</div>
+            </div>
+
+            <h3>Step 1: Grant Token</h3>
+            <pre><code>curl -X POST "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/token/grant" \
+  -H "Content-Type: application/json" \
+  -H "username: <span class="ph">YOUR_BKASH_USERNAME</span>" \
+  -H "password: <span class="ph">YOUR_BKASH_PASSWORD</span>" \
+  -d '{
+    "app_key": "<span class="ph">YOUR_BKASH_APP_KEY</span>",
+    "app_secret": "<span class="ph">YOUR_BKASH_APP_SECRET</span>"
+  }'
+
+// Response:
+{
+  "id_token": "eyJraWQiOi...",  ← Use this for Authorization header
+  "token_type": "Bearer",
+  "expires_in": 3600             ← Cache for ~55 minutes
+}</code></pre>
+
+            <h3>Step 2: Create Payment</h3>
+            <pre><code>curl -X POST "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: {id_token}" \
+  -H "X-APP-Key: <span class="ph">YOUR_BKASH_APP_KEY</span>" \
+  -d '{
+    "mode": "0011",
+    "payerReference": "Customer_ref_123",
+    "callbackURL": "https://yoursite.com/api/bkash/callback",
+    "amount": "500.00",
+    "currency": "BDT",
+    "intent": "sale",
+    "merchantInvoiceNumber": "INV_20260228_001"
+  }'
+
+// Response:
+{
+  "bkashURL": "https://sandbox.payment.bka.sh/redirect/...",  ← Redirect user here
+  "paymentID": "TR00...",
+  "statusCode": "0000",
+  "statusMessage": "Successful"
+}</code></pre>
+
+            <h3>Step 3: Handle Callback</h3>
+            <pre><code>// bKash redirects to your callbackURL with query params:
+GET https://yoursite.com/api/bkash/callback?paymentID=TR00...&status=success
+
+// If status == "success" → Execute Payment
+// If status == "cancel"  → Show cancel message
+// If status == "failure" → Show error message</code></pre>
+
+            <h3>Step 4: Execute Payment</h3>
+            <pre><code>curl -X POST "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/execute" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: {id_token}" \
+  -H "X-APP-Key: <span class="ph">YOUR_BKASH_APP_KEY</span>" \
+  -d '{ "paymentID": "TR00..." }'
+
+// Success Response (statusCode "0000"):
+{
+  "statusCode": "0000",
+  "statusMessage": "Successful",
+  "paymentID": "TR00...",
+  "trxID": "AAH0EXXXXX",           ← bKash transaction ID
+  "amount": "500.00",
+  "transactionStatus": "Completed",
+  "customerMsisdn": "01770XXXXXX",
+  "paymentExecuteTime": "2026-02-28T18:31:00:000 GMT+0600",
+  "merchantInvoiceNumber": "INV_20260228_001"
+}</code></pre>
+
+            <h3>Query Payment Status (Optional)</h3>
+            <pre><code>curl -X POST ".../tokenized/checkout/payment/status" \
+  -H "Authorization: {id_token}" \
+  -H "X-APP-Key: <span class="ph">YOUR_BKASH_APP_KEY</span>" \
+  -d '{ "paymentID": "TR00..." }'</code></pre>
+
+            <div class="alert alert-info">
+                <strong>💡 Tips</strong>
+                • Cache token for 55 min (expires in 60). • If Execute fails, retry with Query after 1 sec. •
+                Auto-detect success: <code class="ic">statusCode == "0000" && transactionStatus == "Completed"</code>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- KHUDEBARTA SMS SECTION -->
+        <!-- ============================= -->
+        <div class="section" id="sms">
+            <h2>📱 KhudeBarta SMS Gateway</h2>
+
+            <div class="alert alert-warn">
+                <strong>⚠️ Credentials Placeholder</strong>
+                Get API keys from your <a href="http://portal.khudebarta.com" style="color:var(--cyan)">KhudeBarta
+                    Portal</a>. Contact their support for Sender ID (masking) approval.
+            </div>
+
+            <h3>Credentials You Need</h3>
+            <table>
+                <tr>
+                    <th>Credential</th>
+                    <th>Where to Get</th>
+                    <th>Placeholder</th>
+                </tr>
+                <tr>
+                    <td>API Key</td>
+                    <td>KhudeBarta Portal → API Settings</td>
+                    <td><code class="ic ph">YOUR_KB_API_KEY</code></td>
+                </tr>
+                <tr>
+                    <td>Secret Key</td>
+                    <td>KhudeBarta Portal → API Settings</td>
+                    <td><code class="ic ph">YOUR_KB_SECRET_KEY</code></td>
+                </tr>
+                <tr>
+                    <td>Sender ID (Caller ID)</td>
+                    <td>Apply for masking via KhudeBarta</td>
+                    <td><code class="ic ph">YOUR_SENDER_ID</code></td>
+                </tr>
+            </table>
+
+            <h3>API Reference</h3>
+            <p><span class="m m-get">GET</span> <code class="ic">http://portal.khudebarta.com:3775/sendtext</code></p>
+            <table>
+                <tr>
+                    <th>Param</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code class="ic">apikey</code></td>
+                    <td>String</td>
+                    <td><span class="req">REQUIRED</span></td>
+                    <td>Your API Key</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">secretkey</code></td>
+                    <td>String</td>
+                    <td><span class="req">REQUIRED</span></td>
+                    <td>Your Secret Key</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">callerID</code></td>
+                    <td>String</td>
+                    <td><span class="req">REQUIRED</span></td>
+                    <td>Sender ID / masking name</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">toUser</code></td>
+                    <td>String</td>
+                    <td><span class="req">REQUIRED</span></td>
+                    <td>Phone with 88 prefix (e.g. 8801712345678)</td>
+                </tr>
+                <tr>
+                    <td><code class="ic">messageContent</code></td>
+                    <td>String</td>
+                    <td><span class="req">REQUIRED</span></td>
+                    <td>SMS message body</td>
+                </tr>
+            </table>
+
+            <h3>cURL Example</h3>
+            <pre><code>curl -G "http://portal.khudebarta.com:3775/sendtext" \
+  --data-urlencode "apikey=<span class="ph">YOUR_KB_API_KEY</span>" \
+  --data-urlencode "secretkey=<span class="ph">YOUR_KB_SECRET_KEY</span>" \
+  --data-urlencode "callerID=<span class="ph">YOUR_SENDER_ID</span>" \
+  --data-urlencode "toUser=8801712345678" \
+  --data-urlencode "messageContent=Your OTP is 123456"</code></pre>
+
+            <h3>JavaScript (fetch/axios)</h3>
+            <pre><code>// Using fetch (Node.js / Browser)
+const params = new URLSearchParams({
+  apikey: '<span class="ph">YOUR_KB_API_KEY</span>',
+  secretkey: '<span class="ph">YOUR_KB_SECRET_KEY</span>',
+  callerID: '<span class="ph">YOUR_SENDER_ID</span>',
+  toUser: '8801712345678',
+  messageContent: 'Your OTP is 123456'
+});
+const res = await fetch(`http://portal.khudebarta.com:3775/sendtext?${params}`);
+
+// Using axios
+const res = await axios.get('http://portal.khudebarta.com:3775/sendtext', {
+  params: {
+    apikey: '<span class="ph">YOUR_KB_API_KEY</span>',
+    secretkey: '<span class="ph">YOUR_KB_SECRET_KEY</span>',
+    callerID: '<span class="ph">YOUR_SENDER_ID</span>',
+    toUser: '8801712345678',
+    messageContent: 'Your OTP is 123456'
+  }
+});</code></pre>
+
+            <h3>Python Example</h3>
+            <pre><code>import requests
+
+response = requests.get('http://portal.khudebarta.com:3775/sendtext', params={
+    'apikey': '<span class="ph">YOUR_KB_API_KEY</span>',
+    'secretkey': '<span class="ph">YOUR_KB_SECRET_KEY</span>',
+    'callerID': '<span class="ph">YOUR_SENDER_ID</span>',
+    'toUser': '8801712345678',
+    'messageContent': 'Your OTP is 123456'
+})</code></pre>
+
+            <h3>PHP (Laravel HTTP Client)</h3>
+            <pre><code>$response = Http::get('http://portal.khudebarta.com:3775/sendtext', [
+    'apikey'         => '<span class="ph">YOUR_KB_API_KEY</span>',
+    'secretkey'      => '<span class="ph">YOUR_KB_SECRET_KEY</span>',
+    'callerID'       => '<span class="ph">YOUR_SENDER_ID</span>',
+    'toUser'         => '8801712345678',
+    'messageContent' => 'Your OTP is 123456',
+]);</code></pre>
+
+            <h3>Phone Number Formatting (Bangladesh)</h3>
+            <pre><code>// Always ensure phone starts with "88"
+function formatBDPhone(phone) {
+  phone = phone.replace(/\D/g, '');          // Remove non-digits
+  if (!phone.startsWith('88')) phone = '88' + phone;
+  return phone;  // "01712345678" → "8801712345678"
+}</code></pre>
+        </div>
+
+        <!-- ============================= -->
+        <!-- DB SCHEMA -->
+        <!-- ============================= -->
+        <div class="section" id="db">
+            <h2>🗄️ Database Schema</h2>
+
+            <h3>payment_gateways (for SSLCOMMERZ & bKash)</h3>
+            <pre><code>CREATE TABLE payment_gateways (
+  id             BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  provider_name  VARCHAR(255) NOT NULL,  -- 'ssl_commerz' | 'bkash'
+  api_key        VARCHAR(255),           -- SSLC: Store ID | bKash: App Key
+  secret_key     VARCHAR(255),           -- SSLC: Store Pass | bKash: App Secret
+  username       VARCHAR(255),           -- bKash only: username
+  password       VARCHAR(255),           -- bKash only: password
+  live           TINYINT DEFAULT 0,      -- 0=Sandbox, 1=Live
+  status         TINYINT DEFAULT 1,      -- 0=Inactive, 1=Active
+  created_at     TIMESTAMP NULL,
+  updated_at     TIMESTAMP NULL
+);</code></pre>
+
+            <h3>sms_gateways (for KhudeBarta)</h3>
+            <pre><code>CREATE TABLE sms_gateways (
+  id             BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  provider_name  VARCHAR(255) NOT NULL,  -- 'KhudeBarta'
+  api_endpoint   VARCHAR(255) NOT NULL,  -- 'http://portal.khudebarta.com:3775/sendtext'
+  api_key        VARCHAR(255) NOT NULL,
+  secret_key     VARCHAR(255),
+  sender_id      VARCHAR(255) NOT NULL,  -- Caller ID / masking
+  status         TINYINT DEFAULT 0,      -- 0=Inactive, 1=Active
+  created_at     TIMESTAMP NULL,
+  updated_at     TIMESTAMP NULL
+);</code></pre>
+        </div>
+
+        <!-- ============================= -->
+        <!-- INTEGRATION GUIDE -->
+        <!-- ============================= -->
+        <div class="section" id="guide">
+            <h2>🚀 Integration Checklist for OTT Hub</h2>
+
+            <div class="alert alert-success">
+                <strong>✅ This guide is language-agnostic</strong>
+                All API calls are shown as raw HTTP/cURL — implement in any backend: Node.js, Python, PHP, .NET, Go,
+                etc.
+            </div>
+
+            <h3>Step 1: SSLCOMMERZ</h3>
+            <ol>
+                <li>Register at <a href="https://developer.sslcommerz.com"
+                        style="color:var(--cyan)">developer.sslcommerz.com</a> (sandbox) or contact for live</li>
+                <li>Get <code class="ic ph">YOUR_SSLC_STORE_ID</code> & <code
+                        class="ic ph">YOUR_SSLC_STORE_PASSWORD</code></li>
+                <li>Create payment_gateways table (schema above)</li>
+                <li>Implement POST to <code class="ic">/gwprocess/v4/api.php</code></li>
+                <li>Handle success/fail/cancel callback URLs (exclude from CSRF)</li>
+                <li>Validate payment server-side via <code class="ic">val_id</code></li>
+            </ol>
+
+            <h3>Step 2: bKash</h3>
+            <ol>
+                <li>Register at <a href="https://developer.bka.sh" style="color:var(--cyan)">developer.bka.sh</a> for
+                    sandbox</li>
+                <li>Get <code class="ic ph">YOUR_BKASH_APP_KEY</code>, <code class="ic ph">YOUR_BKASH_APP_SECRET</code>,
+                    <code class="ic ph">YOUR_BKASH_USERNAME</code>, <code class="ic ph">YOUR_BKASH_PASSWORD</code></li>
+                <li>Implement token grant → cache for 55 min</li>
+                <li>Implement create → redirect to bkashURL → callback → execute</li>
+                <li>Verify: <code class="ic">statusCode == "0000"</code> && <code
+                        class="ic">transactionStatus == "Completed"</code></li>
+            </ol>
+
+            <h3>Step 3: KhudeBarta SMS</h3>
+            <ol>
+                <li>Contact <a href="http://portal.khudebarta.com" style="color:var(--cyan)">KhudeBarta</a> for API
+                    credentials</li>
+                <li>Get <code class="ic ph">YOUR_KB_API_KEY</code>, <code class="ic ph">YOUR_KB_SECRET_KEY</code>, <code
+                        class="ic ph">YOUR_SENDER_ID</code></li>
+                <li>Create sms_gateways table (schema above)</li>
+                <li>Send SMS via HTTP GET to <code class="ic">portal.khudebarta.com:3775/sendtext</code></li>
+                <li>Ensure phone numbers start with <code class="ic">88</code></li>
+            </ol>
+
+            <h3>Environment Variables Template (.env)</h3>
+            <pre><code># SSLCOMMERZ
+SSLC_STORE_ID=<span class="ph">YOUR_SSLC_STORE_ID</span>
+SSLC_STORE_PASSWORD=<span class="ph">YOUR_SSLC_STORE_PASSWORD</span>
+SSLC_IS_SANDBOX=true
+
+# bKash
+BKASH_APP_KEY=<span class="ph">YOUR_BKASH_APP_KEY</span>
+BKASH_APP_SECRET=<span class="ph">YOUR_BKASH_APP_SECRET</span>
+BKASH_USERNAME=<span class="ph">YOUR_BKASH_USERNAME</span>
+BKASH_PASSWORD=<span class="ph">YOUR_BKASH_PASSWORD</span>
+BKASH_IS_SANDBOX=true
+
+# KhudeBarta SMS
+KB_API_KEY=<span class="ph">YOUR_KB_API_KEY</span>
+KB_SECRET_KEY=<span class="ph">YOUR_KB_SECRET_KEY</span>
+KB_SENDER_ID=<span class="ph">YOUR_SENDER_ID</span>
+KB_ENDPOINT=http://portal.khudebarta.com:3775/sendtext</code></pre>
+        </div>
+
+        <div style="text-align:center;padding:3rem 0 2rem;color:var(--text-muted);font-size:.8rem">
+            <p>📅 February 28, 2026 · Source: GetCommerce Black Shark · Target: OTT Hub</p>
+        </div>
+    </div>
+</body>
+
+</html>

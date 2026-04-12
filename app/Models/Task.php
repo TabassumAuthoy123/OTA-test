@@ -21,6 +21,11 @@ class Task extends Model
         'status',
         'sort_order',
         'created_by',
+        'images',
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
 
     public function creator()

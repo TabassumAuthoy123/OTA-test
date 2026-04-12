@@ -261,12 +261,15 @@ class FlightBookingController extends Controller
         $bookingResSegs = null;
         if ($flightBookingDetails->booking_response) {
             $bookingRes = json_decode($flightBookingDetails->booking_response, true);
-            $bookingResSegs = $bookingRes['CreatePassengerNameRecordRS']['TravelItineraryRead']['TravelItinerary']['ItineraryInfo']['ReservationItems']['Item'];
+            if (isset($bookingRes['CreatePassengerNameRecordRS']['TravelItineraryRead']['TravelItinerary']['ItineraryInfo']['ReservationItems']['Item'])) {
+                $bookingResSegs = $bookingRes['CreatePassengerNameRecordRS']['TravelItineraryRead']['TravelItinerary']['ItineraryInfo']['ReservationItems']['Item'];
+            }
         }
 
         $flightSegments = FlightSegment::where('flight_booking_id', $flightBookingDetails->id)->get();
-        $flightPassengers = FlightPassenger::where('flight_booking_id', $flightBookingDetails->id)->get();
-        return view('booking.details', compact('flightBookingDetails', 'flightSegments', 'flightPassengers', 'bookingResSegs'));
+        $flightpassengers = FlightPassenger::where('flight_booking_id', $flightBookingDetails->id)->get();
+        $auditLogs = \App\Models\BookingAuditLog::where('flight_booking_id', $flightBookingDetails->id)->orderBy('id', 'desc')->get();
+        return view('booking.details', compact('flightBookingDetails', 'flightSegments', 'flightpassengers', 'bookingResSegs', 'auditLogs'));
     }
 
     public function cancelFlightBooking($booking_no)
@@ -287,6 +290,8 @@ class FlightBookingController extends Controller
             $flightBookingInfo->status = 3;
             $flightBookingInfo->booking_cancelled_at = Carbon::now();
             $flightBookingInfo->save();
+
+            \App\Models\BookingAuditLog::logAction($flightBookingInfo->id, 'CANCEL_BOOKING', 'Booking cancelled successfully via API');
 
             Toastr::success('Flight Booking Cancelled Successfully', 'Cancelled');
         } else {
@@ -323,6 +328,8 @@ class FlightBookingController extends Controller
             $flightBookingInfo->status = 4; // ticket cancelled
             $flightBookingInfo->ticket_cancelled_at = Carbon::now();
             $flightBookingInfo->save();
+            
+            \App\Models\BookingAuditLog::logAction($flightBookingInfo->id, 'VOID', 'Tickets successfully voided/cancelled via ' . $flightBookingInfo->gds);
             Toastr::success('All ticket numbers were successfully voided', 'Voided');
         } else {
             $flightBookingInfo->save();
@@ -336,16 +343,18 @@ class FlightBookingController extends Controller
     {
         $flightBookingDetails = FlightBooking::where('booking_no', $bookingNo)->first();
         $flightSegments = FlightSegment::where('flight_booking_id', $flightBookingDetails->id)->get();
-        $flightPassengers = FlightPassenger::where('flight_booking_id', $flightBookingDetails->id)->get();
+        $flightpassengers = FlightPassenger::where('flight_booking_id', $flightBookingDetails->id)->get();
         $companyProfile = CompanyProfile::where('user_id', Auth::user()->id)->first();
 
         $bookingResSegs = null;
         if ($flightBookingDetails->booking_response) {
             $bookingRes = json_decode($flightBookingDetails->booking_response, true);
-            $bookingResSegs = $bookingRes['CreatePassengerNameRecordRS']['TravelItineraryRead']['TravelItinerary']['ItineraryInfo']['ReservationItems']['Item'];
+            if (isset($bookingRes['CreatePassengerNameRecordRS']['TravelItineraryRead']['TravelItinerary']['ItineraryInfo']['ReservationItems']['Item'])) {
+                $bookingResSegs = $bookingRes['CreatePassengerNameRecordRS']['TravelItineraryRead']['TravelItinerary']['ItineraryInfo']['ReservationItems']['Item'];
+            }
         }
 
-        $pdf = Pdf::loadView('booking.preview', compact('flightBookingDetails', 'flightSegments', 'flightPassengers', 'companyProfile', 'bookingResSegs'));
+        $pdf = Pdf::loadView('booking.preview', compact('flightBookingDetails', 'flightSegments', 'flightpassengers', 'companyProfile', 'bookingResSegs'));
         return $pdf->stream($flightBookingDetails->booking_no . '.pdf');
     }
 
@@ -387,9 +396,20 @@ class FlightBookingController extends Controller
                 $user->save();
             }
 
+            // Append FH to ticket numbers
+            $passengers = FlightPassenger::where('flight_booking_id', $flightBookingInfo->id)->get();
+            foreach($passengers as $pax) {
+                if ($pax->ticket_no && !Str::startsWith($pax->ticket_no, 'FH')) {
+                    $pax->ticket_no = 'FH' . $pax->ticket_no;
+                    $pax->save();
+                }
+            }
+
             $flightBookingInfo->status = 2;
             $flightBookingInfo->ticket_issued_at = Carbon::now();
             $flightBookingInfo->save();
+
+            \App\Models\BookingAuditLog::logAction($flightBookingInfo->id, 'ISSUE', 'Ticket auto-issued successfully via ' . $flightBookingInfo->gds);
 
             // Send ticket issued email
             EmailHelper::send(Auth::user()->email, new TicketIssuedEmail([

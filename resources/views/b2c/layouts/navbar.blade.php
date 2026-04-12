@@ -13,7 +13,7 @@
                 <a href="{{ url('/') }}" class="b2c-nav-link {{ request()->is('/') ? 'active' : '' }}">
                     <i class="fas fa-plane"></i> Flights
                 </a>
-                <a href="#deals" class="b2c-nav-link">
+                <a href="{{ route('b2c.deals') }}" class="b2c-nav-link {{ request()->is('deals') ? 'active' : '' }}">
                     <i class="fas fa-tags"></i> Deals
                 </a>
                 <a href="#" class="b2c-nav-link">
@@ -49,7 +49,7 @@
             <a href="{{ url('/') }}" class="b2c-mobile-link">
                 <i class="fas fa-plane"></i> Flights
             </a>
-            <a href="#deals" class="b2c-mobile-link">
+            <a href="{{ route('b2c.deals') }}" class="b2c-mobile-link">
                 <i class="fas fa-tags"></i> Deals
             </a>
             <a href="#" class="b2c-mobile-link">

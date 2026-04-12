@@ -41,6 +41,7 @@ Route::get('/', function () {
 })->name('b2c.home');
 
 Route::get('/page/{slug}', [B2cHomeController::class, 'page'])->name('b2c.page');
+Route::get('/deals', [B2cHomeController::class, 'deals'])->name('b2c.deals');
 
 // B2C Auth
 Route::get('/customer/login', [B2cAuthController::class, 'showLogin'])->name('b2c.login');
@@ -270,6 +271,7 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         // Task Board
         Route::get('tasks', [TaskController::class, 'index'])->name('TaskBoard');
         Route::post('tasks', [TaskController::class, 'store'])->name('StoreTask');
+        Route::get('tasks/{id}', [TaskController::class, 'show'])->name('ShowTask');
         Route::put('tasks/{id}', [TaskController::class, 'update'])->name('UpdateTask');
         Route::patch('tasks/{id}/status/{status}', [TaskController::class, 'updateStatus'])->name('UpdateTaskStatus');
         Route::delete('tasks/{id}', [TaskController::class, 'destroy'])->name('DestroyTask');
@@ -313,9 +315,31 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         Route::delete('cms/faqs/{id}', [CmsCrudController::class, 'deleteFaq'])->name('CmsDeleteFaq');
 
 
+
         // Report
         Route::get('b2b/financial/report', [ReportController::class, 'b2bFinancialReport'])->name('B2bFinancialReport');
         Route::post('generate/b2b/financial/report', [ReportController::class, 'generateB2bFinancialReport'])->name('GenerateB2bFinancialReport');
+
+        // ─── Rules Engine ───
+        Route::get('rules/engine', [\App\Http\Controllers\RulesEngineController::class, 'index'])->name('RulesEngine');
+
+        // Commission Rules
+        Route::get('rules/commission/list', [\App\Http\Controllers\RulesEngineController::class, 'commissionRules'])->name('CommissionRulesList');
+        Route::post('rules/commission/store', [\App\Http\Controllers\RulesEngineController::class, 'storeCommission'])->name('CommissionRuleStore');
+        Route::get('rules/commission/{id}', [\App\Http\Controllers\RulesEngineController::class, 'getCommission'])->name('CommissionRuleGet');
+        Route::delete('rules/commission/{id}', [\App\Http\Controllers\RulesEngineController::class, 'deleteCommission'])->name('CommissionRuleDelete');
+
+        // Markup Rules
+        Route::get('rules/markup/list', [\App\Http\Controllers\RulesEngineController::class, 'markupRules'])->name('MarkupRulesList');
+        Route::post('rules/markup/store', [\App\Http\Controllers\RulesEngineController::class, 'storeMarkup'])->name('MarkupRuleStore');
+        Route::get('rules/markup/{id}', [\App\Http\Controllers\RulesEngineController::class, 'getMarkup'])->name('MarkupRuleGet');
+        Route::delete('rules/markup/{id}', [\App\Http\Controllers\RulesEngineController::class, 'deleteMarkup'])->name('MarkupRuleDelete');
+
+        // Blocking Rules
+        Route::get('rules/blocking/list', [\App\Http\Controllers\RulesEngineController::class, 'blockingRules'])->name('BlockingRulesList');
+        Route::post('rules/blocking/store', [\App\Http\Controllers\RulesEngineController::class, 'storeBlocking'])->name('BlockingRuleStore');
+        Route::get('rules/blocking/{id}', [\App\Http\Controllers\RulesEngineController::class, 'getBlocking'])->name('BlockingRuleGet');
+        Route::delete('rules/blocking/{id}', [\App\Http\Controllers\RulesEngineController::class, 'deleteBlocking'])->name('BlockingRuleDelete');
 
     });
 

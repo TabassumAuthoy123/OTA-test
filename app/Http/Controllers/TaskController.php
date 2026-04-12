@@ -35,7 +35,17 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'category' => 'required|in:bug,improvement,feature,idea',
             'priority' => 'required|in:low,medium,high,critical',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
+
+        $imagesPaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $fileName = time() . '-' . uniqid() . '.' . $file->extension();
+                $file->move(public_path('uploads/tasks'), $fileName);
+                $imagesPaths[] = 'uploads/tasks/' . $fileName;
+            }
+        }
 
         Task::create([
             'title' => $request->title,
@@ -44,6 +54,7 @@ class TaskController extends Controller
             'priority' => $request->priority,
             'status' => Task::STATUS_TODO,
             'created_by' => Auth::id(),
+            'images' => empty($imagesPaths) ? null : $imagesPaths,
         ]);
 
         Toastr::success('Task created successfully');
@@ -57,18 +68,46 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'category' => 'required|in:bug,improvement,feature,idea',
             'priority' => 'required|in:low,medium,high,critical',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $task = Task::findOrFail($id);
+
+        $imagesPaths = $task->images ?? [];
+        if ($request->hasFile('images')) {
+            // Delete old images
+            if (!empty($imagesPaths) && is_array($imagesPaths)) {
+                foreach ($imagesPaths as $oldPath) {
+                    if (file_exists(public_path($oldPath))) {
+                        @unlink(public_path($oldPath));
+                    }
+                }
+            }
+            
+            $imagesPaths = [];
+            foreach ($request->file('images') as $file) {
+                $fileName = time() . '-' . uniqid() . '.' . $file->extension();
+                $file->move(public_path('uploads/tasks'), $fileName);
+                $imagesPaths[] = 'uploads/tasks/' . $fileName;
+            }
+        }
+
         $task->update([
             'title' => $request->title,
             'description' => $request->description,
             'category' => $request->category,
             'priority' => $request->priority,
+            'images' => empty($imagesPaths) ? null : $imagesPaths,
         ]);
 
         Toastr::success('Task updated successfully');
         return back();
+    }
+
+    public function show($id)
+    {
+        $task = Task::with('creator')->findOrFail($id);
+        return view('tasks.show', compact('task'));
     }
 
     public function updateStatus($id, $status)
@@ -76,11 +115,21 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
 
         if (!in_array((int) $status, [Task::STATUS_TODO, Task::STATUS_IN_PROGRESS, Task::STATUS_DONE])) {
-            return response()->json(['error' => 'Invalid status'], 400);
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'Invalid status'], 400);
+            }
+            Toastr::error('Invalid status');
+            return back();
         }
 
         $task->update(['status' => (int) $status]);
-        return response()->json(['success' => 'Status updated']);
+
+        if (request()->expectsJson()) {
+            return response()->json(['success' => 'Status updated']);
+        }
+
+        Toastr::success('Status updated');
+        return back();
     }
 
     public function destroy($id)

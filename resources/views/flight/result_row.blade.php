@@ -1,3 +1,17 @@
+@php
+    // ═══ Rules Engine: Blocking Check ═══
+    $_blkAirline = $data['pricingInformation'][0]['fare']['validatingCarrierCode'] ?? '';
+    $_blkRouteFrom = '';
+    $_blkRouteTo = '';
+    if (isset($searchResults['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0])) {
+        $_blkRouteFrom = $searchResults['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0]['departureLocation'] ?? '';
+        $_blkRouteTo = $searchResults['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0]['arrivalLocation'] ?? '';
+    }
+    $_blkCabin = session('cabin_class', 'Y');
+    $_isBlocked = \App\Services\RulesEngineService::isBlocked('sabre', $_blkAirline, $_blkRouteFrom, $_blkRouteTo, $_blkCabin);
+@endphp
+
+@if(!$_isBlocked)
 <div class="search_result">
     <div class="bg-white hox list-item mb-3 rounded position-relative demo NonStop">
 
@@ -41,20 +55,39 @@
                             @php
                                 $netPrice = $data['pricingInformation'][0]['fare']['totalFare']['totalPrice'];
                                 $basePrice = $data['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
-                                if(Auth::user()->user_type == 2) {
-                                    if($airlineInfo && $airlineInfo->comission > 0){ // if airline has comission
-                                        $b2bUsersComission = Auth::user()->comission;
-                                        if(!empty($b2bUsersComission) && is_numeric($b2bUsersComission) && $b2bUsersComission > 0) {
-                                            $comissionAmount = round(($basePrice * $b2bUsersComission) / 100, 2);
-                                            $netPrice -= $comissionAmount;
+
+                                // ═══ Rules Engine Commission ═══
+                                $_reAirline = $data['pricingInformation'][0]['fare']['validatingCarrierCode'] ?? '';
+                                $_reRouteFrom = session('segments.0.origin_airport_code', '');
+                                $_reRouteTo = session('segments.0.destination_airport_code', '');
+                                // Fallback route from itinerary group description
+                                if (empty($_reRouteFrom) && isset($searchResults['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0])) {
+                                    $_reRouteFrom = $searchResults['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0]['departureLocation'] ?? '';
+                                    $_reRouteTo = $searchResults['groupedItineraryResponse']['itineraryGroups'][0]['groupDescription']['legDescriptions'][0]['arrivalLocation'] ?? '';
+                                }
+                                $_reCabin = session('cabin_class', 'Y');
+                                $_reAgentId = Auth::user()->user_type == 2 ? Auth::user()->id : null;
+
+                                $comissionAmount = \App\Services\RulesEngineService::calculateCommission(
+                                    'sabre', $_reAirline, $_reRouteFrom, $_reRouteTo, $_reCabin, 'ADT', $_reAgentId, $basePrice
+                                );
+
+                                // Fallback: legacy commission if no rules engine rule matched
+                                if ($comissionAmount <= 0) {
+                                    if(Auth::user()->user_type == 2) {
+                                        if($airlineInfo && $airlineInfo->comission > 0){
+                                            $b2bUsersComission = Auth::user()->comission;
+                                            if(!empty($b2bUsersComission) && is_numeric($b2bUsersComission) && $b2bUsersComission > 0) {
+                                                $comissionAmount = round(($basePrice * $b2bUsersComission) / 100, 2);
+                                            }
+                                        }
+                                    } else {
+                                        if($airlineInfo && $airlineInfo->comission > 0){
+                                            $comissionAmount = round(($basePrice * 7) / 100, 2);
                                         }
                                     }
-                                } else {
-                                    if($airlineInfo && $airlineInfo->comission > 0){ // if airline has comission
-                                        $comissionAmount = round(($basePrice * 7) / 100, 2);
-                                        $netPrice -= $comissionAmount;
-                                    }
                                 }
+                                $netPrice -= $comissionAmount;
                             @endphp
                             Net: ৳ {{ number_format($netPrice) }}
                         </div>
@@ -76,3 +109,4 @@
 
     </div>
 </div>
+@endif

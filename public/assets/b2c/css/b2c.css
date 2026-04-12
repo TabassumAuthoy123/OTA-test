@@ -1072,6 +1072,517 @@ input[type="date"].b2c-col-value {
     color: rgba(255, 255, 255, 0.3);
 }
 
+/* ━━━ AIRLINE PARTNERS LOGO STRIP ━━━ */
+.b2c-airlines {
+    padding: 50px 0;
+    background: #fff;
+    overflow: hidden;
+}
+
+.b2c-airlines-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.b2c-airlines-header span {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--b2c-text-muted);
+    font-weight: 600;
+}
+
+.b2c-airlines-track {
+    display: flex;
+    animation: scrollLogos 25s linear infinite;
+    width: max-content;
+}
+
+.b2c-airlines-track:hover {
+    animation-play-state: paused;
+}
+
+.b2c-airline-logo {
+    flex-shrink: 0;
+    width: 140px;
+    height: 60px;
+    margin: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border-radius: var(--b2c-radius-md);
+    padding: 12px 20px;
+    border: 1px solid #f1f5f9;
+    transition: var(--b2c-transition);
+}
+
+.b2c-airline-logo:hover {
+    background: #fff;
+    box-shadow: var(--b2c-shadow-md);
+    transform: scale(1.05);
+}
+
+.b2c-airline-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: var(--b2c-transition);
+}
+
+.b2c-airline-logo:hover img {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+
+@keyframes scrollLogos {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* ━━━ HOW IT WORKS ━━━ */
+.b2c-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    position: relative;
+}
+
+.b2c-steps-grid::before {
+    content: '';
+    position: absolute;
+    top: 46px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--b2c-accent), var(--b2c-cta), var(--b2c-success), transparent);
+    z-index: 0;
+}
+
+.b2c-step-card {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.b2c-step-number {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.b2c-step-number::after {
+    content: attr(data-step);
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--b2c-primary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+}
+
+.b2c-step-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--b2c-text-dark);
+    margin-bottom: 8px;
+}
+
+.b2c-step-desc {
+    font-size: 0.85rem;
+    color: var(--b2c-text-muted);
+    line-height: 1.6;
+    max-width: 220px;
+    margin: 0 auto;
+}
+
+/* ━━━ DESTINATION INSPIRATION GALLERY ━━━ */
+.b2c-destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 300px;
+    gap: 20px;
+}
+
+.b2c-destination-card {
+    position: relative;
+    border-radius: var(--b2c-radius-lg);
+    overflow: hidden;
+    height: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+}
+
+.b2c-destination-card.b2c-dest-featured {
+    grid-column: span 2;
+}
+
+.b2c-destination-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.b2c-destination-card:hover img {
+    transform: scale(1.08);
+}
+
+.b2c-destination-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px;
+    transition: var(--b2c-transition);
+}
+
+.b2c-destination-card:hover .b2c-destination-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.2) 60%);
+}
+
+.b2c-dest-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 4px 14px;
+    border-radius: var(--b2c-radius-full);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+
+.b2c-dest-name {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.b2c-dest-country {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.b2c-dest-price {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--b2c-cta);
+}
+
+.b2c-dest-price small {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.b2c-dest-explore {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--b2c-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.9rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: var(--b2c-transition);
+}
+
+.b2c-destination-card:hover .b2c-dest-explore {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ━━━ EMI / PAYMENT OPTIONS ━━━ */
+.b2c-emi-section {
+    background: var(--b2c-gradient-hero);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.b2c-emi-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.b2c-emi-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.b2c-emi-content {
+    flex: 1;
+}
+
+.b2c-emi-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--b2c-cta);
+    padding: 6px 18px;
+    border-radius: var(--b2c-radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.b2c-emi-title {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 16px;
+}
+
+.b2c-emi-title span {
+    color: var(--b2c-cta);
+}
+
+.b2c-emi-desc {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    max-width: 500px;
+}
+
+.b2c-emi-features {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 32px;
+}
+
+.b2c-emi-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.b2c-emi-feature i {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--b2c-success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.b2c-emi-cards {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 440px;
+}
+
+.b2c-emi-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--b2c-radius-md);
+    padding: 20px;
+    text-align: center;
+    transition: var(--b2c-transition);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.b2c-emi-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.b2c-emi-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--b2c-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 1.5rem;
+}
+
+.b2c-emi-card-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.b2c-emi-card-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.b2c-emi-card-sub {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ━━━ CONTACT & SUPPORT BANNER ━━━ */
+.b2c-support-section {
+    padding: 60px 0;
+    background: #fff;
+}
+
+.b2c-support-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.b2c-support-card {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: var(--b2c-radius-lg);
+    padding: 32px 28px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    transition: var(--b2c-transition);
+    text-decoration: none;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.b2c-support-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+}
+
+.b2c-support-card.b2c-sc-phone::before {
+    background: var(--b2c-success);
+}
+
+.b2c-support-card.b2c-sc-whatsapp::before {
+    background: #25D366;
+}
+
+.b2c-support-card.b2c-sc-email::before {
+    background: var(--b2c-accent);
+}
+
+.b2c-support-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--b2c-shadow-lg);
+    border-color: transparent;
+}
+
+.b2c-support-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--b2c-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 1.6rem;
+}
+
+.b2c-support-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--b2c-text-dark);
+    margin-bottom: 6px;
+}
+
+.b2c-support-value {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--b2c-accent);
+    margin-bottom: 4px;
+}
+
+.b2c-support-sub {
+    font-size: 0.8rem;
+    color: var(--b2c-text-muted);
+}
+
+.b2c-support-response {
+    text-align: center;
+    margin-top: 24px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(99, 102, 241, 0.05));
+    border-radius: var(--b2c-radius-md);
+    border: 1px dashed rgba(14, 165, 233, 0.2);
+}
+
+.b2c-support-response p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--b2c-text);
+}
+
+.b2c-support-response strong {
+    color: var(--b2c-accent);
+}
+
 /* ━━━ ANIMATIONS ━━━ */
 @keyframes fadeInUp {
     from {
@@ -1147,6 +1658,45 @@ input[type="date"].b2c-col-value {
     .b2c-trust-stats {
         gap: 24px;
         flex-wrap: wrap;
+    }
+
+    .b2c-steps-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px 24px;
+    }
+
+    .b2c-steps-grid::before {
+        display: none;
+    }
+
+    .b2c-destinations-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .b2c-destination-card.b2c-dest-featured {
+        grid-column: span 2;
+        height: 260px;
+    }
+
+    .b2c-emi-wrapper {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .b2c-emi-desc {
+        margin: 0 auto 24px;
+    }
+
+    .b2c-emi-features {
+        align-items: center;
+    }
+
+    .b2c-emi-cards {
+        max-width: 100%;
+    }
+
+    .b2c-support-grid {
+        grid-template-columns: 1fr;
     }
 }
 
