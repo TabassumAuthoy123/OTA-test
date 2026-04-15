@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+
+  # PHP Laravel App
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: otaplatform_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - /var/www/vendor
+    environment:
+      - APP_ENV=local
+      - APP_KEY=${APP_KEY}
+    networks:
+      - otaplatform
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: otaplatform_nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - otaplatform
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: otaplatform_mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: otaplatform
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: otauser
+      MYSQL_PASSWORD: otapass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - otaplatform
+
+  # phpMyAdmin (optional - database GUI)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: otaplatform_pma
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    depends_on:
+      - mysql
+    networks:
+      - otaplatform
+
+networks:
+  otaplatform:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
