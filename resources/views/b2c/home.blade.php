@@ -1480,7 +1480,7 @@
             formData.append("adult", adult);
             formData.append("child", child);
             formData.append("infant", infant);
-            formData.append("preferred_airlines", preferred_airlines);
+            formData.append("preferred_airlines", preferred_airlines || '');
             formData.append("cabin_class", cabinClass);
 
             $.ajax({
@@ -1553,7 +1553,7 @@
             formData.append("adult", adult);
             formData.append("child", child);
             formData.append("infant", infant);
-            formData.append("preferred_airlines", preferred_airlines);
+            formData.append("preferred_airlines", preferred_airlines || '');
             formData.append("cabin_class", cabinClass);
 
             $.ajax({

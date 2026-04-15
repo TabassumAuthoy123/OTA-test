@@ -189,8 +189,7 @@
                         if ($maxPrice && $totalPrice > $maxPrice) $show = false;
                         if ($carrierFilter && !in_array($data['operating_carrier_code'], $carrierFilter)) $show = false;
 
-                        $airlineInfo = DB::table('airlines')->where('iata', $data['operating_carrier_code'])->where('active', 'Y')->first();
-                        $airlineName = $airlineInfo ? $airlineInfo->name : $data['operating_carrier_code'];
+                        $airlineName = $airlineNames[$data['operating_carrier_code']] ?? $data['operating_carrier_code'];
 
                         // Duration calc
                         $depTime = strtotime($data['departure_datetime']);

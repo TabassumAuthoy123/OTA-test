@@ -132,7 +132,7 @@
     <div x-data="{ m: false }">
         <div class="wrapper">
 
-            @if (Auth::user()->user_type == 1)
+            @if (Auth::user()->user_type == 0 || Auth::user()->user_type == 1)
                 @include('sidebar')
             @else
                 @include('sidebar_b2b')

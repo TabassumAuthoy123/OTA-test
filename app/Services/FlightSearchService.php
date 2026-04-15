@@ -125,8 +125,11 @@ class FlightSearchService
         $preferredAirlinesArray = [];
         $airlinePrefs = null;
 
-        if ($preferredAirlinesRaw) {
+        // Guard against "null"/"undefined" strings sent from the frontend
+        if ($preferredAirlinesRaw && !in_array(trim($preferredAirlinesRaw), ['null', 'undefined', ''])) {
             foreach (explode(",", $preferredAirlinesRaw) as $id) {
+                $id = trim($id);
+                if (!is_numeric($id)) continue;
                 $airline = DB::table('airlines')->where('id', $id)->first();
                 if ($airline && $airline->iata) {
                     $preferredAirlinesArray[] = $airline->iata;
@@ -171,6 +174,88 @@ class FlightSearchService
             'preferred_airlines' => $airlines['codes'],
             'airline_prefs' => $airlines['sabre_prefs'],
         ];
+    }
+
+    /**
+     * Normalize raw Sabre JSON response into a flat array matching Flyhub format.
+     * Used by B2C to render results with the standard flight cards view.
+     *
+     * @param  string $sabreJson  Raw JSON string from Sabre API
+     * @return array              Flat array of flight results
+     */
+    public static function normalizeSabreResults(string $sabreJson): array
+    {
+        $decoded = json_decode($sabreJson, true);
+        if (!isset($decoded['groupedItineraryResponse']['itineraryGroups'])) {
+            return [];
+        }
+
+        $response   = $decoded['groupedItineraryResponse'];
+        $legDescs   = $response['legDescs']      ?? [];
+        $schedDescs = $response['scheduleDescs'] ?? [];
+        $results    = [];
+
+        foreach ($response['itineraryGroups'] as $group) {
+            foreach (($group['itineraries'] ?? []) as $idx => $itinerary) {
+                // Resolve first leg's segments
+                $leg    = $itinerary['legs'][0] ?? null;
+                if (!$leg) continue;
+                $legDesc = $legDescs[($leg['ref'] - 1)] ?? null;
+                if (!$legDesc) continue;
+
+                $segments = [];
+                foreach ($legDesc['schedules'] as $sch) {
+                    $seg = $schedDescs[($sch['ref'] - 1)] ?? null;
+                    if ($seg) $segments[] = $seg;
+                }
+                if (empty($segments)) continue;
+
+                $first = $segments[0];
+                $last  = end($segments);
+
+                $depAirport = $first['departure']['airport'] ?? '';
+                $arrAirport = $last['arrival']['airport']   ?? '';
+
+                // City info lookup
+                $depInfo = DB::table('city_airports')->where('airport_code', $depAirport)->first();
+                $arrInfo = DB::table('city_airports')->where('airport_code', $arrAirport)->first();
+
+                // Datetime normalisation: "2026-04-20T10:00:00.000" → "2026-04-20 10:00:00"
+                $depDt = str_replace('T', ' ', substr($first['departure']['dateTime'] ?? '', 0, 19));
+                $arrDt = str_replace('T', ' ', substr($last['arrival']['dateTime']   ?? '', 0, 19));
+
+                $fare     = $itinerary['pricingInformation'][0]['fare']['totalFare'] ?? [];
+                $total    = $fare['totalPrice'] ?? 0;
+                $currency = $fare['currency']   ?? 'BDT';
+
+                $results[] = [
+                    'total_fare'              => $total,
+                    'selling_fare'            => $total,
+                    'currency'                => $currency,
+                    'departure_datetime'      => $depDt,
+                    'arrival_datetime'        => $arrDt,
+                    'departure_airport_code'  => $depAirport,
+                    'arrival_airport_code'    => $arrAirport,
+                    'departure_airport_name'  => $depInfo->airport_name ?? $depAirport,
+                    'departure_city_name'     => $depInfo->city_name    ?? $depAirport,
+                    'departure_country_name'  => $depInfo->country_name ?? '',
+                    'arrival_airport_name'    => $arrInfo->airport_name ?? $arrAirport,
+                    'arrival_city_name'       => $arrInfo->city_name    ?? $arrAirport,
+                    'arrival_country_name'    => $arrInfo->country_name ?? '',
+                    'operating_carrier_code'  => $first['carrier']['operating'] ?? 'XX',
+                    'flight_number'           => $first['carrier']['operatingFlightNumber'] ?? '',
+                    'stop_quantity'           => count($segments) - 1,
+                    'baggage'                 => 'Check with airline',
+                    'cabin_class'             => 'Economy',
+                    'search_id'               => null,
+                    'result_id'               => null,
+                    'gds'                     => 'sabre',
+                    'sabre_index'             => $idx,
+                ];
+            }
+        }
+
+        return $results;
     }
 
     /**

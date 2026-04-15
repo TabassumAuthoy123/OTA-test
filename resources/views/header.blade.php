@@ -5,7 +5,7 @@
     <div class="d-none" id="typed-strings"></div>
     <div class="navbar-icon d-flex">
         <ul class="navbar-nav flex-row align-items-center">
-            @if(Auth::user()->user_type == 1)
+            @if(Auth::user()->user_type == 0 || Auth::user()->user_type == 1)
                 <li class="nav-item me-2">
                     <a href="{{ url('/tasks') }}"
                         class="btn btn-sm {{ request()->routeIs('TaskBoard') ? 'btn-primary' : 'btn-outline-secondary' }}"
@@ -51,7 +51,7 @@
 
                     </div>
 
-                    @if(Auth::user()->user_type == 1)
+                    @if(Auth::user()->user_type == 0 || Auth::user()->user_type == 1)
                         <a href="{{url('my/profile')}}" class="dropdown-item">
                             <i class="typcn typcn-user-outline"></i>
                             My profile

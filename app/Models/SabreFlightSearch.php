@@ -18,6 +18,9 @@ class SabreFlightSearch extends Model
 
         // OTA account
         $sabreGdsInfo = SabreGdsConfig::where('id', 1)->first();
+        if (!$sabreGdsInfo) {
+            throw new \Exception('Sabre GDS not configured. Please add credentials at /edit/gds/sabre');
+        }
         if($sabreGdsInfo->is_production == 0){
             $username = base64_encode($sabreGdsInfo->user_id);
             $password = base64_encode($sabreGdsInfo->password);
@@ -181,6 +184,9 @@ class SabreFlightSearch extends Model
 
         // Sabre API request payload with dynamic query
         $sabreGdsInfo = SabreGdsConfig::where('id', 1)->first();
+        if (!$sabreGdsInfo) {
+            throw new \Exception('Sabre GDS not configured. Please add credentials at /edit/gds/sabre');
+        }
         if($sabreGdsInfo->is_production == 0){
             $apiEndPoint = 'https://api.cert.platform.sabre.com/v5/offers/shop';
             $requestTypeName = "200ITINS";
@@ -322,6 +328,9 @@ class SabreFlightSearch extends Model
 
         // Sabre API request payload with dynamic query
         $sabreGdsInfo = SabreGdsConfig::where('id', 1)->first();
+        if (!$sabreGdsInfo) {
+            throw new \Exception('Sabre GDS not configured. Please add credentials at /edit/gds/sabre');
+        }
         if($sabreGdsInfo->is_production == 0){
             $apiEndPoint = 'https://api.cert.platform.sabre.com/v5/offers/shop';
             $requestTypeName = "200ITINS";

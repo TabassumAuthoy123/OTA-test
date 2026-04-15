@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         // Rename tables
-        Schema::rename('flight_passangers', 'flight_passengers');
+       Schema::rename('flight_passangers', 'flight_passengers');
         Schema::rename('saved_passangers', 'saved_passengers');
 
         // Rename columns
@@ -21,7 +21,9 @@ return new class extends Migration {
 
         Schema::table('flight_bookings', function (Blueprint $table) {
             $table->renameColumn('passanger_id', 'passenger_id');
-        });
+        }); 
+
+        // skip - column already named correctly
     }
 
     /**
