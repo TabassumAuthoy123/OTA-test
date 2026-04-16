@@ -263,7 +263,7 @@ class PaymentController extends Controller
     {
         if ($request->ajax()) {
 
-            if (Auth::user()->user_type == UserType::Admin->value) {
+            if (Auth::user()->user_type == UserType::Admin->value || Auth::user()->user_type == UserType::SuperAdmin->value) {
                 $query = DB::table('recharge_requests')
                     ->leftJoin('users', 'recharge_requests.user_id', 'users.id')
                     ->leftJoin('company_profiles', 'users.id', 'company_profiles.user_id')
@@ -366,7 +366,7 @@ class PaymentController extends Controller
                     $btn = "";
                     if ($data->status == 0) {
                         $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="' . $data->slug . '" data-original-title="Delete" class="btn-sm btn-danger rounded d-inline-block deleteBtn mb-1"><i class="fa fa-trash"></i></a>';
-                        if (Auth::user()->user_type == UserType::Admin->value) {
+                        if (Auth::user()->user_type == UserType::Admin->value || Auth::user()->user_type == UserType::SuperAdmin->value) {
                             $btn .= ' <a href="javascript:void(0)" data-toggle="tooltip" data-id="' . $data->slug . '" data-original-title="Approve" class="btn-sm btn-success rounded d-inline-block approveBtn mb-1" style="background: green; box-shadow: none;"><i class="fa fa-check"></i></a>';
                             $btn .= ' <a href="javascript:void(0)" data-toggle="tooltip" data-id="' . $data->slug . '" data-original-title="Denied" class="btn-sm btn-warning rounded d-inline-block denyBtn mb-1" style="background: goldenrod; box-shadow: none;"><i class="fa fa-times"></i></a>';
                         }

@@ -417,9 +417,9 @@ class FlightSearchController extends Controller
         if ($sabreGds->status == 1) {
             $revlidatedData = json_decode(SabreFlightRevalidate::flightRevalidate($sessionIndex), true);
 
-
             if (isset($revlidatedData['groupedItineraryResponse']['itineraryGroups'])) {
-                return view('flight.select_flight', compact('revlidatedData'));
+                $countries = DB::table('country')->orderBy('name', 'asc')->get();
+                return view('flight.select_flight', compact('revlidatedData', 'countries'));
             } else {
                 Toastr::error('Flight is not available for Booking', 'Sorry! Please Search Again');
                 return redirect('/home');

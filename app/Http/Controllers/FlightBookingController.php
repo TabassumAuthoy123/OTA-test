@@ -131,7 +131,7 @@ class FlightBookingController extends Controller
                 })
                 ->orderBy('flight_bookings.id', 'desc');
 
-            if (Auth::user()->user_type != UserType::Admin->value) {
+            if (Auth::user()->user_type != UserType::Admin->value && Auth::user()->user_type != UserType::SuperAdmin->value) {
                 $query->where('flight_bookings.booked_by', Auth::user()->id);
             }
 
@@ -200,7 +200,7 @@ class FlightBookingController extends Controller
                 ->where('flight_bookings.status', 3)
                 ->orderBy('flight_bookings.id', 'desc');
 
-            if (Auth::user()->user_type != UserType::Admin->value) {
+            if (Auth::user()->user_type != UserType::Admin->value && Auth::user()->user_type != UserType::SuperAdmin->value) {
                 $query->where('flight_bookings.booked_by', Auth::user()->id);
             }
 
@@ -447,7 +447,7 @@ class FlightBookingController extends Controller
                 ->where('flight_bookings.departure_date', '>=', Carbon::today()->toDateString())
                 ->orderBy('flight_bookings.id', 'desc');
 
-            if (Auth::user()->user_type != UserType::Admin->value) {
+            if (Auth::user()->user_type != UserType::Admin->value && Auth::user()->user_type != UserType::SuperAdmin->value) {
                 $query->where('flight_bookings.booked_by', Auth::user()->id);
             }
 
@@ -513,7 +513,7 @@ class FlightBookingController extends Controller
                 ->where('flight_bookings.departure_date', '<', Carbon::today()->toDateString())
                 ->orderBy('flight_bookings.id', 'desc');
 
-            if (Auth::user()->user_type != UserType::Admin->value) {
+            if (Auth::user()->user_type != UserType::Admin->value && Auth::user()->user_type != UserType::SuperAdmin->value) {
                 $query->where('flight_bookings.booked_by', Auth::user()->id);
             }
 
@@ -578,7 +578,7 @@ class FlightBookingController extends Controller
                 ->where('flight_bookings.status', 4)
                 ->orderBy('flight_bookings.id', 'desc');
 
-            if (Auth::user()->user_type != UserType::Admin->value) {
+            if (Auth::user()->user_type != UserType::Admin->value && Auth::user()->user_type != UserType::SuperAdmin->value) {
                 $query->where('flight_bookings.booked_by', Auth::user()->id);
             }
 

@@ -16,7 +16,8 @@ class CheckUserType
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->user_type == UserType::Admin->value) {
+        $userType = auth()->user()->user_type;
+        if ($userType == UserType::SuperAdmin->value || $userType == UserType::Admin->value) {
             return $next($request);
         } else {
             return abort(401);

@@ -124,7 +124,7 @@ class FlightController extends Controller
             }
 
             foreach ($request->passenger_data as $passenger) {
-                DB::table('flight_passengers')->insert([
+                DB::table('flight_passangers')->insert([
                     'flight_booking_id' => $flightBookingId,
                     'passenger_type' => $passenger['passenger_type'],
                     'title' => $passenger['title'],

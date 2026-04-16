@@ -10,7 +10,7 @@ class FlightPassenger extends Model
 {
     use HasFactory;
 
-    protected $table = 'flight_passengers';
+    protected $table = 'flight_passangers';
 
     // ─── Relationships ───────────────────────────────────────
 

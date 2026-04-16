@@ -284,6 +284,8 @@ class SabreFlightRevalidate extends Model
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => $jsonRequestBody,
             CURLOPT_HTTPHEADER => [
@@ -530,6 +532,8 @@ class SabreFlightRevalidate extends Model
         curl_setopt_array($curl, [
             CURLOPT_URL => $apiEndPoint,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => $jsonRequestBody,
             CURLOPT_HTTPHEADER => [

@@ -102,6 +102,22 @@ Auth::routes([
     'verify' => false, // Email Verification Routes...
 ]);
 
+// Admin shortcut — redirects to login or dashboard
+Route::get('/admin', function () {
+    if (auth()->check()) {
+        return redirect('/dashboard');
+    }
+    return redirect('/login');
+})->name('admin.redirect');
+
+// GET logout fallback (in case user types /logout in browser)
+Route::get('/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout.get');
+
 Route::get('ckeditor', [CkeditorController::class, 'index']);
 Route::post('ckeditor/upload', [CkeditorController::class, 'upload'])->name('ckeditor.upload');
 
@@ -174,7 +190,7 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
     Route::get('create/topup/request', [PaymentController::class, 'createTopupRequest'])->name('CreateTopupRequest');
     Route::post('submit/recharge/request', [PaymentController::class, 'submitRechargeRequest'])->name('SubmitRechargeRequest');
     Route::get('view/recharge/requests', [PaymentController::class, 'viewRechargeRequests'])->name('ViewRechargeRequests');
-    Route::get('delete/recharge/request/{slug}', [PaymentController::class, 'deleteRechargeRequest'])->name('ViewRechargeRequests');
+    Route::get('delete/recharge/request/{slug}', [PaymentController::class, 'deleteRechargeRequest'])->name('DeleteRechargeRequest');
 
 
     // report

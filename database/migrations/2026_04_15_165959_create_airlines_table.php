@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name', 150)->nullable();
             $table->string('iata', 10)->nullable();
             $table->string('icao', 10)->nullable();
+            $table->string('country', 100)->nullable();
             $table->char('active', 1)->default('Y');
             $table->decimal('comission', 8, 2)->default(0);
             $table->timestamps();

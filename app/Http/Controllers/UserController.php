@@ -221,12 +221,12 @@ class UserController extends Controller
     {
         if ($request->ajax()) {
 
-            if (Auth::user()->user_type == UserType::Admin->value) {
-                $data = DB::table('saved_passengers')
+            if (Auth::user()->user_type == UserType::Admin->value || Auth::user()->user_type == UserType::SuperAdmin->value) {
+                $data = DB::table('saved_passangers')
                     ->orderBy('id', 'desc')
                     ->get();
             } else {
-                $data = DB::table('saved_passengers')
+                $data = DB::table('saved_passangers')
                     ->orderBy('id', 'desc')
                     ->where('saved_by', Auth::user()->id)
                     ->get();
@@ -260,7 +260,7 @@ class UserController extends Controller
 
     public function deleteSavedPassenger($id)
     {
-        DB::table('saved_passengers')->where('id', $id)->delete();
+        DB::table('saved_passangers')->where('id', $id)->delete();
         return response()->json(['success' => 'Deleted Successfully.']);
     }
 

@@ -42,6 +42,8 @@ class SabreFlightSearch extends Model
         CURLOPT_TIMEOUT => 0,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS =>'grant_type=client_credentials',
         CURLOPT_HTTPHEADER => array(
@@ -205,6 +207,8 @@ class SabreFlightSearch extends Model
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode(array(
                 "OTA_AirLowFareSearchRQ" => array(
@@ -212,7 +216,7 @@ class SabreFlightSearch extends Model
                     "POS" => array(
                         "Source" => array(
                             array(
-                                "PseudoCityCode" => "S00L",
+                                "PseudoCityCode" => $sabreGdsInfo->pcc,
                                 "RequestorID" => array(
                                     "Type" => "1",
                                     "ID" => "1",
@@ -349,6 +353,8 @@ class SabreFlightSearch extends Model
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode(array(
                 "OTA_AirLowFareSearchRQ" => array(
@@ -356,7 +362,7 @@ class SabreFlightSearch extends Model
                     "POS" => array(
                         "Source" => array(
                             array(
-                                "PseudoCityCode" => "S00L",
+                                "PseudoCityCode" => $sabreGdsInfo->pcc,
                                 "RequestorID" => array(
                                     "Type" => "1",
                                     "ID" => "1",
