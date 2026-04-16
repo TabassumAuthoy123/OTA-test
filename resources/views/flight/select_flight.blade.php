@@ -485,7 +485,7 @@
                                     </h6>
 
                                     @php
-                                        $savedpassengers = DB::table('saved_passangers')
+                                        $savedpassengers = DB::table('saved_passengers')
                                                             ->where('type', $passengerInfoList['passengerInfo']['passengerType'])
                                                             ->where('saved_by', Auth::user()->id)
                                                             ->orderBy('first_name', 'asc')

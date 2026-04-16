@@ -10,20 +10,26 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // Rename tables
-       Schema::rename('flight_passangers', 'flight_passengers');
-        Schema::rename('saved_passangers', 'saved_passengers');
+        // Rename tables (only if old name still exists)
+        if (Schema::hasTable('flight_passangers')) {
+            Schema::rename('flight_passangers', 'flight_passengers');
+        }
+        if (Schema::hasTable('saved_passangers')) {
+            Schema::rename('saved_passangers', 'saved_passengers');
+        }
 
         // Rename columns
-        Schema::table('flight_passengers', function (Blueprint $table) {
-            $table->renameColumn('passanger_type', 'passenger_type');
-        });
+        if (Schema::hasColumn('flight_passengers', 'passanger_type')) {
+            Schema::table('flight_passengers', function (Blueprint $table) {
+                $table->renameColumn('passanger_type', 'passenger_type');
+            });
+        }
 
-        Schema::table('flight_bookings', function (Blueprint $table) {
-            $table->renameColumn('passanger_id', 'passenger_id');
-        }); 
-
-        // skip - column already named correctly
+        if (Schema::hasColumn('flight_bookings', 'passanger_id')) {
+            Schema::table('flight_bookings', function (Blueprint $table) {
+                $table->renameColumn('passanger_id', 'passenger_id');
+            });
+        }
     }
 
     /**

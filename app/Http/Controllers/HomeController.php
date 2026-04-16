@@ -80,7 +80,7 @@ class HomeController extends Controller
 
     public function passengerLiveSearch(Request $request)
     {
-        $searchPassengers = DB::table('saved_passangers')
+        $searchPassengers = DB::table('saved_passengers')
             ->where('contact', 'LIKE', '%' . $request->search_keyword . '%')
             ->where('saved_by', Auth::user()->id)
             ->orderBy('first_name', 'asc')

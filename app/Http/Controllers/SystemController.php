@@ -16,6 +16,11 @@ class SystemController extends Controller
 {
     public function viewSmsGateways()
     {
+        // Ensure the 3 required gateway rows always exist
+        SmsGateway::firstOrCreate(['id' => 1], ['provider_name' => 'ElitBuzz',   'api_endpoint' => '', 'status' => 0]);
+        SmsGateway::firstOrCreate(['id' => 2], ['provider_name' => 'ReveSMS',    'api_endpoint' => '', 'status' => 0]);
+        SmsGateway::firstOrCreate(['id' => 3], ['provider_name' => 'KhudeBarta', 'api_endpoint' => '', 'status' => 0]);
+
         $gateways = SmsGateway::orderBy('id', 'asc')->get();
         return view('system.sms_gateway', compact('gateways'));
     }
@@ -101,7 +106,10 @@ class SystemController extends Controller
 
     public function viewEmailConfig()
     {
-        $config = EmailConfigure::where('id', 1)->first();
+        $config = EmailConfigure::firstOrCreate(
+            ['id' => 1],
+            ['host' => '', 'port' => 587, 'email' => '', 'password' => '', 'mail_from_name' => '', 'mail_from_email' => '', 'encryption' => 0]
+        );
         return view('system.email_config', compact('config'));
     }
 
@@ -124,7 +132,7 @@ class SystemController extends Controller
 
     public function searchResultsViewConfig()
     {
-        $config = Config::where('id', 1)->first();
+        $config = Config::firstOrCreate(['id' => 1], ['search_results_view' => 1]);
         return view('system.search_results_view', compact('config'));
     }
 

@@ -504,7 +504,7 @@
                                     <h6 class="fw-bold mb-4">Please fill the information for ADT - {{ $i }}</h6>
 
                                     @php
-                                        $savedPassengers = DB::table('saved_passangers')
+                                        $savedPassengers = DB::table('saved_passengers')
                                             ->where('type', 'ADT')
                                             ->where('saved_by', Auth::user()->id)
                                             ->orderBy('first_name', 'asc')
@@ -732,7 +732,7 @@
                                     <h6 class="fw-bold mb-4">Please fill the information for CHD - {{ $i }}</h6>
 
                                     @php
-                                        $savedPassengers = DB::table('saved_passangers')
+                                        $savedPassengers = DB::table('saved_passengers')
                                             ->where('type', 'CNN')
                                             ->where('saved_by', Auth::user()->id)
                                             ->orderBy('first_name', 'asc')
@@ -954,7 +954,7 @@
                                     <h6 class="fw-bold mb-4">Please fill the information for INF - {{ $i }}</h6>
 
                                     @php
-                                        $savedpassengers = DB::table('saved_passangers')
+                                        $savedpassengers = DB::table('saved_passengers')
                                             ->where('type', 'INF')
                                             ->where('saved_by', Auth::user()->id)
                                             ->orderBy('first_name', 'asc')
