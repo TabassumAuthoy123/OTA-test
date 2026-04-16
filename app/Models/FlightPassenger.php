@@ -12,6 +12,12 @@ class FlightPassenger extends Model
 
     protected $table = 'flight_passangers';
 
+    // Allow access via both spellings (DB uses 'passanger_type' typo)
+    public function getPassengerTypeAttribute(): ?string
+    {
+        return $this->attributes['passanger_type'] ?? null;
+    }
+
     // ─── Relationships ───────────────────────────────────────
 
     public function flightBooking(): BelongsTo
