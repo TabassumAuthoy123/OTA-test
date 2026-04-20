@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  # PHP Laravel App
+  # ── PHP Laravel App ──────────────────────────
   app:
     build:
       context: .
@@ -10,16 +10,20 @@ services:
     container_name: otaplatform_app
     restart: unless-stopped
     working_dir: /var/www
+    env_file:
+      - .env.docker
     volumes:
       - .:/var/www
-      - /var/www/vendor
-    environment:
-      - APP_ENV=local
-      - APP_KEY=${APP_KEY}
+      # Preserve vendor & bootstrap/cache from the image (not the host)
+      - vendor_data:/var/www/vendor
+      - cache_data:/var/www/bootstrap/cache
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
       - otaplatform
 
-  # Nginx Web Server
+  # ── Nginx Web Server ─────────────────────────
   nginx:
     image: nginx:alpine
     container_name: otaplatform_nginx
@@ -34,7 +38,7 @@ services:
     networks:
       - otaplatform
 
-  # MySQL Database
+  # ── MySQL Database ───────────────────────────
   mysql:
     image: mysql:8.0
     container_name: otaplatform_mysql
@@ -48,10 +52,16 @@ services:
       MYSQL_PASSWORD: otapass
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     networks:
       - otaplatform
 
-  # phpMyAdmin (optional - database GUI)
+  # ── phpMyAdmin (DB GUI) ───────────────────────
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: otaplatform_pma
@@ -61,8 +71,11 @@ services:
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - otaplatform
 
@@ -72,4 +85,8 @@ networks:
 
 volumes:
   mysql_data:
+    driver: local
+  vendor_data:
+    driver: local
+  cache_data:
     driver: local
