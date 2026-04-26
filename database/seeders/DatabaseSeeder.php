@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CityAirportSeeder::class,
             SystemSeeder::class,
+            GdsSeeder::class,
         ]);
     }
 }

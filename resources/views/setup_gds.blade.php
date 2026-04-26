@@ -74,7 +74,7 @@
                                     <div class="row">
                                         <div class="col-lg-2" style="padding-right: 0px;">
                                             <div class="gds_logo">
-                                                <img src="{{url($item->logo)}}">
+                                                <img src="{{ $item->logo ? url($item->logo) : url('gds_logo/'.$item->code.'.jpg') }}">
                                             </div>
                                         </div>
                                         <div class="col-lg-10">

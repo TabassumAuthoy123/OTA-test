@@ -10,13 +10,7 @@ class FlightPassenger extends Model
 {
     use HasFactory;
 
-    protected $table = 'flight_passangers';
-
-    // Allow access via both spellings (DB uses 'passanger_type' typo)
-    public function getPassengerTypeAttribute(): ?string
-    {
-        return $this->attributes['passanger_type'] ?? null;
-    }
+    protected $table = 'flight_passengers';
 
     // ─── Relationships ───────────────────────────────────────
 

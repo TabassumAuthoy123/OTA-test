@@ -138,16 +138,23 @@
                     <tr class="table-active">
                         <td class="text-center align-middle" colspan="9" style="font-size: 14px">
                             @php
-                                $firstArrival = new DateTime($arrivalDateTime[0].''.$arrivalDateTime[1]);
-                                $secondDepartureRes = $bookingResSegs ? $bookingResSegs[$index+1]['Product']['ProductDetails']['Air']['DepartureDateTime'] : null;
-                                $secondDepartureDateTime = explode('T', $secondDepartureRes);
-                                $secondDeparture = new DateTime($secondDepartureDateTime[0].''.$secondDepartureDateTime[1]);
-                                $interval = $firstArrival->diff($secondDeparture);
-                                $transitString = $interval->h . " hrs " . $interval->i . " mins Transit ";
-                                if($arrivalLocation){
-                                    $transitString .= "in ".$arrivalLocation->city_name . " (" . $arrivalLocation->airport_code . ")";
+                                $secondDepartureRes = $bookingResSegs ? ($bookingResSegs[$index+1]['Product']['ProductDetails']['Air']['DepartureDateTime'] ?? null) : null;
+                                if (isset($arrivalDateTime) && $secondDepartureRes) {
+                                    $firstArrival = new DateTime($arrivalDateTime[0].''.$arrivalDateTime[1]);
+                                    $secondDepartureDateTime = explode('T', $secondDepartureRes);
+                                    $secondDeparture = new DateTime($secondDepartureDateTime[0].''.$secondDepartureDateTime[1]);
+                                    $interval = $firstArrival->diff($secondDeparture);
+                                    $transitString = $interval->h . " hrs " . $interval->i . " mins Transit ";
+                                    if(isset($arrivalLocation) && $arrivalLocation){
+                                        $transitString .= "in ".$arrivalLocation->city_name . " (" . $arrivalLocation->airport_code . ")";
+                                    }
+                                    echo $transitString;
+                                } else {
+                                    echo "Transit";
+                                    if(isset($arrivalLocation) && $arrivalLocation){
+                                        echo " in ".$arrivalLocation->city_name . " (" . $arrivalLocation->airport_code . ")";
+                                    }
                                 }
-                                echo $transitString;
                             @endphp
                         </td>
                     </tr>

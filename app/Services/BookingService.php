@@ -311,7 +311,7 @@ class BookingService
             // Always save as flight passenger
             FlightPassenger::insert([
                 'flight_booking_id' => $flightBookingId,
-                'passanger_type' => $request->passenger_type[$passengerIndex],
+                'passenger_type' => $request->passenger_type[$passengerIndex],
                 'title' => $request->titles[$passengerIndex],
                 'first_name' => $firstName,
                 'last_name' => $request->last_name[$passengerIndex],
