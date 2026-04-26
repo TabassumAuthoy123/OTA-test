@@ -88,6 +88,50 @@
                     </a>
                 </li>
 
+                {{-- ═══ B2B ═══ --}}
+                <li class="@if(in_array($currentRoute, ['B2bFlightBookings','B2bTourBookings','B2bRegistrationRequests','B2bPartialPayBookings','B2bPendingTicketIssuance','B2bAgencyList','B2bUpcomingFlights'])) mm-active @endif">
+                    <a class="has-arrow material-ripple" href="javascript:void(0);">
+                        <i class="typcn typcn-briefcase"></i> B2B
+                    </a>
+                    <ul class="nav-second-level">
+                        <li class="@if($currentRoute == 'B2bFlightBookings') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2b/flight-bookings') }}">
+                                <i class="typcn typcn-plane-outline"></i> Flight Bookings
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2bTourBookings') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2b/tour-bookings') }}">
+                                <i class="typcn typcn-map"></i> Tour Bookings
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2bRegistrationRequests') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2b/registration-requests') }}">
+                                <i class="typcn typcn-document-text"></i> Registration Requests
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2bPartialPayBookings') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2b/partial-pay-bookings') }}">
+                                <i class="typcn typcn-credit-card"></i> Partial Pay Bookings
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2bPendingTicketIssuance') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2b/pending-ticket-issuance') }}">
+                                <i class="typcn typcn-ticket"></i> Pending Ticket Issuance
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2bAgencyList') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2b/agency-list') }}">
+                                <i class="typcn typcn-group-outline"></i> Agency
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2bUpcomingFlights') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2b/upcoming-flights') }}">
+                                <i class="typcn typcn-time"></i> Upcoming Flights
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 {{-- ═══ FINANCE & REPORTS ═══ --}}
                 <li class="sidebar-section-label">
                     <span>Finance & Reports</span>

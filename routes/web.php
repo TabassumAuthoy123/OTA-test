@@ -357,6 +357,17 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         Route::get('rules/blocking/{id}', [\App\Http\Controllers\RulesEngineController::class, 'getBlocking'])->name('BlockingRuleGet');
         Route::delete('rules/blocking/{id}', [\App\Http\Controllers\RulesEngineController::class, 'deleteBlocking'])->name('BlockingRuleDelete');
 
+        // ─── B2B Section ────────────────────────────────────────────────────────
+        Route::get('b2b/flight-bookings', [\App\Http\Controllers\B2bController::class, 'flightBookings'])->name('B2bFlightBookings');
+        Route::get('b2b/tour-bookings', [\App\Http\Controllers\B2bController::class, 'tourBookings'])->name('B2bTourBookings');
+        Route::get('b2b/registration-requests', [\App\Http\Controllers\B2bController::class, 'registrationRequests'])->name('B2bRegistrationRequests');
+        Route::post('b2b/registration-requests/{id}/update', [\App\Http\Controllers\B2bController::class, 'updateRegistrationRequest'])->name('B2bUpdateRegistrationRequest');
+        Route::get('b2b/partial-pay-bookings', [\App\Http\Controllers\B2bController::class, 'partialPayBookings'])->name('B2bPartialPayBookings');
+        Route::get('b2b/pending-ticket-issuance', [\App\Http\Controllers\B2bController::class, 'pendingTicketIssuance'])->name('B2bPendingTicketIssuance');
+        Route::get('b2b/agency-list', [\App\Http\Controllers\B2bController::class, 'agencyList'])->name('B2bAgencyList');
+        Route::post('b2b/agency/{userId}/add-money', [\App\Http\Controllers\B2bController::class, 'addMoneyToAgency'])->name('B2bAddMoneyToAgency');
+        Route::get('b2b/upcoming-flights', [\App\Http\Controllers\B2bController::class, 'upcomingFlights'])->name('B2bUpcomingFlights');
+
     });
 
 });
