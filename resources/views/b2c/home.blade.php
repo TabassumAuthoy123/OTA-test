@@ -590,6 +590,51 @@
         </div>
     </section>
 
+    {{-- ━━━ HERO BANNER CAROUSEL (from B2C CMS > Banner) ━━━ --}}
+    @if(isset($heroBanners) && $heroBanners->count())
+    <section style="background:#0d1b3e; padding:0;">
+        <div id="heroBannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+            <div class="carousel-inner">
+                @foreach($heroBanners as $idx => $hb)
+                <div class="carousel-item {{ $idx === 0 ? 'active' : '' }}">
+                    @if($hb->photo)
+                        <img src="{{ asset($hb->photo) }}" class="d-block w-100"
+                             style="max-height:420px; object-fit:cover;" alt="{{ $hb->title ?? 'Banner' }}">
+                    @endif
+                    @if($hb->title || $hb->link)
+                    <div class="carousel-caption d-flex flex-column align-items-center justify-content-center"
+                         style="background:rgba(0,0,0,.35); inset:0; border-radius:0; padding:24px;">
+                        @if($hb->title)
+                        <h3 style="font-size:clamp(1.1rem,3vw,2rem); font-weight:700; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.5);">
+                            {{ $hb->title }}
+                        </h3>
+                        @endif
+                        @if($hb->link)
+                        <a href="{{ $hb->link }}" class="btn btn-warning btn-sm mt-2 fw-bold px-4">Explore Now</a>
+                        @endif
+                    </div>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+            @if($heroBanners->count() > 1)
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroBannerCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroBannerCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+            <div class="carousel-indicators" style="bottom:8px;">
+                @foreach($heroBanners as $idx => $hb)
+                <button type="button" data-bs-target="#heroBannerCarousel" data-bs-slide-to="{{ $idx }}"
+                        class="{{ $idx === 0 ? 'active' : '' }}"></button>
+                @endforeach
+            </div>
+            @endif
+        </div>
+    </section>
+    @endif
+
     {{-- ━━━ AIRLINE PARTNERS LOGO STRIP ━━━ --}}
     <section class="b2c-airlines">
         <div class="container">
@@ -666,7 +711,8 @@
     </section>
 
     {{-- ━━━ DEALS SECTION ━━━ --}}
-    @if($promotions->count() > 0)
+    @php $dealsToShow = (isset($hotDeals) && $hotDeals->count()) ? $hotDeals : $promotions; @endphp
+    @if($dealsToShow->count() > 0)
         <section class="b2c-section" id="deals">
             <div class="container">
                 <div class="b2c-section-header">
@@ -674,37 +720,61 @@
                     <h2 class="b2c-section-title">Exclusive Offers & Discounts</h2>
                     <p class="b2c-section-subtitle">Save big on your next flight with exclusive deals</p>
                 </div>
-
                 <div class="b2c-deals-scroll">
-                    @foreach($promotions as $promo)
-                        <div class="b2c-deal-card">
-                            <div class="b2c-deal-image"
-                                style="background: {{ $promo->badge_color ?? 'var(--b2c-gradient-accent)' }}">
-                                @if($promo->image)
-                                    <img src="{{ $promo->image }}" alt="{{ $promo->title }}">
-                                @else
-                                    <i class="fas fa-percentage" style="font-size: 3rem; color: rgba(255,255,255,0.3);"></i>
-                                @endif
-                                @if($promo->discount_text)
-                                    <span class="b2c-deal-badge" style="background: {{ $promo->badge_color ?? '#dc3545' }}">
-                                        {{ $promo->discount_text }}
-                                    </span>
-                                @endif
-                            </div>
-                            <div class="b2c-deal-body">
-                                <div class="b2c-deal-title">{{ $promo->title }}</div>
-                                <div class="b2c-deal-desc">{{ Str::limit($promo->description, 80) }}</div>
-                                @if($promo->link)
-                                    <a href="{{ $promo->link }}" class="b2c-deal-link">
-                                        Learn More <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                @endif
-                            </div>
+                    @foreach($dealsToShow as $deal)
+                    <div class="b2c-deal-card">
+                        <div class="b2c-deal-image" style="background:var(--b2c-gradient-accent);">
+                            @if(isset($deal->photo) && $deal->photo)
+                                <img src="{{ asset($deal->photo) }}" alt="{{ $deal->title ?? '' }}" style="width:100%;height:100%;object-fit:cover;">
+                            @elseif(isset($deal->image) && $deal->image)
+                                <img src="{{ $deal->image }}" alt="{{ $deal->title ?? '' }}" style="width:100%;height:100%;object-fit:cover;">
+                            @else
+                                <i class="fas fa-fire" style="font-size:3rem;color:rgba(255,255,255,.3);"></i>
+                            @endif
                         </div>
+                        <div class="b2c-deal-body">
+                            <div class="b2c-deal-title">{{ $deal->title ?? 'Hot Deal' }}</div>
+                            <div class="b2c-deal-desc">{{ Str::limit($deal->description ?? '', 80) }}</div>
+                            @if($deal->link ?? null)
+                                <a href="{{ $deal->link }}" class="b2c-deal-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                            @endif
+                        </div>
+                    </div>
                     @endforeach
                 </div>
             </div>
         </section>
+    @endif
+
+    {{-- ━━━ AD BANNERS (from B2C CMS > AD) ━━━ --}}
+    @if(isset($adBanners) && $adBanners->count())
+    <section style="padding:24px 0; background:#f0f4f8;">
+        <div class="container">
+            <div class="row g-3">
+                @foreach($adBanners as $ad)
+                <div class="{{ $adBanners->count() === 1 ? 'col-12' : ($adBanners->count() === 2 ? 'col-md-6' : 'col-md-4') }}">
+                    @if($ad->link)
+                    <a href="{{ $ad->link }}" target="_blank" class="d-block" style="border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);">
+                    @else
+                    <div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);">
+                    @endif
+                        @if($ad->photo)
+                            <img src="{{ asset($ad->photo) }}" style="width:100%;max-height:160px;object-fit:cover;display:block;" alt="{{ $ad->title ?? 'Ad' }}">
+                        @endif
+                        @if($ad->title)
+                        <div style="padding:12px 16px;background:#fff;">
+                            <div style="font-weight:600;color:#1a3768;">{{ $ad->title }}</div>
+                            @if($ad->description)
+                            <div style="font-size:.85rem;color:#666;margin-top:4px;">{{ Str::limit($ad->description,80) }}</div>
+                            @endif
+                        </div>
+                        @endif
+                    @if($ad->link) </a> @else </div> @endif
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
     @endif
 
     {{-- ━━━ HOW IT WORKS ━━━ --}}
@@ -790,6 +860,16 @@
     @endif
 
     {{-- ━━━ DESTINATION INSPIRATION GALLERY ━━━ --}}
+    @php
+        $destFallback = [
+            ['name'=>'Dubai','country'=>'United Arab Emirates','price'=>'৳35,000','badge'=>'Popular','badgeColor'=>'var(--b2c-cta)','img'=>'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80','featured'=>true],
+            ['name'=>'Bangkok','country'=>'Thailand','price'=>'৳22,500','badge'=>'Trending','badgeColor'=>'var(--b2c-success)','img'=>'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&q=80','featured'=>false],
+            ['name'=>'Singapore','country'=>'Singapore','price'=>'৳28,000','badge'=>'','badgeColor'=>'','img'=>'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&q=80','featured'=>false],
+            ['name'=>'Kolkata','country'=>'India','price'=>'৳8,500','badge'=>'Hot Deal','badgeColor'=>'#EF4444','img'=>'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80','featured'=>false],
+            ['name'=>'Maldives','country'=>'Maldives','price'=>'৳45,000','badge'=>'Luxury','badgeColor'=>'#8B5CF6','img'=>'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=80','featured'=>false],
+            ['name'=>'Kuala Lumpur','country'=>'Malaysia','price'=>'৳18,000','badge'=>'Best Value','badgeColor'=>'var(--b2c-accent)','img'=>'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80','featured'=>true],
+        ];
+    @endphp
     <section class="b2c-section" style="background: var(--b2c-bg);">
         <div class="container">
             <div class="b2c-section-header">
@@ -797,91 +877,45 @@
                 <h2 class="b2c-section-title">Top Travel Destinations</h2>
                 <p class="b2c-section-subtitle">Get inspired for your next adventure</p>
             </div>
-
             <div class="b2c-destinations-grid">
-                {{-- Featured Card --}}
-                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
-                    class="b2c-destination-card b2c-dest-featured">
-                    <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" alt="Dubai">
-                    <div class="b2c-destination-overlay">
-                        <span class="b2c-dest-badge" style="background: var(--b2c-cta);">Popular</span>
-                        <div class="b2c-dest-name">Dubai</div>
-                        <div class="b2c-dest-country">United Arab Emirates</div>
-                        <div class="b2c-dest-price">৳35,000 <small>starting from</small></div>
-                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </a>
-
-                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
-                    class="b2c-destination-card">
-                    <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&q=80" alt="Bangkok">
-                    <div class="b2c-destination-overlay">
-                        <span class="b2c-dest-badge" style="background: var(--b2c-success);">Trending</span>
-                        <div class="b2c-dest-name">Bangkok</div>
-                        <div class="b2c-dest-country">Thailand</div>
-                        <div class="b2c-dest-price">৳22,500 <small>starting from</small></div>
-                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </a>
-
-                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
-                    class="b2c-destination-card">
-                    <img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&q=80" alt="Singapore">
-                    <div class="b2c-destination-overlay">
-                        <div class="b2c-dest-name">Singapore</div>
-                        <div class="b2c-dest-country">Singapore</div>
-                        <div class="b2c-dest-price">৳28,000 <small>starting from</small></div>
-                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </a>
-
-                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
-                    class="b2c-destination-card">
-                    <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80" alt="Kolkata">
-                    <div class="b2c-destination-overlay">
-                        <span class="b2c-dest-badge" style="background: #EF4444;">Hot Deal</span>
-                        <div class="b2c-dest-name">Kolkata</div>
-                        <div class="b2c-dest-country">India</div>
-                        <div class="b2c-dest-price">৳8,500 <small>starting from</small></div>
-                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </a>
-
-                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
-                    class="b2c-destination-card">
-                    <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=80" alt="Maldives">
-                    <div class="b2c-destination-overlay">
-                        <span class="b2c-dest-badge" style="background: #8B5CF6;">Luxury</span>
-                        <div class="b2c-dest-name">Maldives</div>
-                        <div class="b2c-dest-country">Maldives</div>
-                        <div class="b2c-dest-price">৳45,000 <small>starting from</small></div>
-                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </a>
-
-                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
-                    class="b2c-destination-card b2c-dest-featured">
-                    <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80" alt="Kuala Lumpur">
-                    <div class="b2c-destination-overlay">
-                        <span class="b2c-dest-badge" style="background: var(--b2c-accent);">Best Value</span>
-                        <div class="b2c-dest-name">Kuala Lumpur</div>
-                        <div class="b2c-dest-country">Malaysia</div>
-                        <div class="b2c-dest-price">৳18,000 <small>starting from</small></div>
-                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </a>
-
-                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
-                    class="b2c-destination-card">
-                    <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&q=80" alt="Chennai">
-                    <div class="b2c-destination-overlay">
-                        <span class="b2c-dest-badge" style="background: #F97316;">New Route</span>
-                        <div class="b2c-dest-name">Chennai</div>
-                        <div class="b2c-dest-country">India</div>
-                        <div class="b2c-dest-price">৳12,000 <small>starting from</small></div>
-                        <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </a>
+                @if(isset($popularDestinations) && $popularDestinations->count())
+                    @foreach($popularDestinations->take(7) as $idx => $dest)
+                    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                       class="b2c-destination-card {{ $idx === 0 || $idx === 5 ? 'b2c-dest-featured' : '' }}">
+                        @if($dest->image)
+                            <img src="{{ asset($dest->image) }}" alt="{{ $dest->name }}"
+                                 style="width:100%;height:100%;object-fit:cover;">
+                        @else
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a5276,#2471a3);display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-map-marker-alt" style="font-size:3rem;color:rgba(255,255,255,.4);"></i>
+                            </div>
+                        @endif
+                        <div class="b2c-destination-overlay">
+                            <div class="b2c-dest-name">{{ $dest->name }}</div>
+                            @if($dest->description)
+                            <div class="b2c-dest-country">{{ Str::limit($dest->description, 40) }}</div>
+                            @endif
+                            <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                        </div>
+                    </a>
+                    @endforeach
+                @else
+                    @foreach($destFallback as $idx => $dest)
+                    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                       class="b2c-destination-card {{ $dest['featured'] ? 'b2c-dest-featured' : '' }}">
+                        <img src="{{ $dest['img'] }}" alt="{{ $dest['name'] }}">
+                        <div class="b2c-destination-overlay">
+                            @if($dest['badge'])
+                            <span class="b2c-dest-badge" style="background:{{ $dest['badgeColor'] }};">{{ $dest['badge'] }}</span>
+                            @endif
+                            <div class="b2c-dest-name">{{ $dest['name'] }}</div>
+                            <div class="b2c-dest-country">{{ $dest['country'] }}</div>
+                            <div class="b2c-dest-price">{{ $dest['price'] }} <small>starting from</small></div>
+                            <div class="b2c-dest-explore"><i class="fas fa-arrow-right"></i></div>
+                        </div>
+                    </a>
+                    @endforeach
+                @endif
             </div>
         </div>
     </section>
@@ -1101,6 +1135,121 @@
             </a>
         </div>
     </section>
+
+    {{-- ━━━ GALLERY (from B2C CMS > Gallery) ━━━ --}}
+    @if(isset($galleryItems) && $galleryItems->count())
+    <section class="b2c-section" style="background:#f8f9fa;">
+        <div class="container">
+            <div class="b2c-section-header">
+                <span class="b2c-section-tag">🖼️ Gallery</span>
+                <h2 class="b2c-section-title">Our Gallery</h2>
+                <p class="b2c-section-subtitle">Moments captured from our travelers</p>
+            </div>
+            <div class="row g-3">
+                @foreach($galleryItems as $item)
+                @if($item->media_type === 'image')
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);aspect-ratio:4/3;background:#ddd;">
+                        <img src="{{ asset($item->file_path) }}" alt="{{ $item->title ?? '' }}"
+                             style="width:100%;height:100%;object-fit:cover;">
+                    </div>
+                    @if($item->title)
+                    <div style="font-size:.82rem;color:#555;margin-top:6px;text-align:center;">{{ $item->title }}</div>
+                    @endif
+                </div>
+                @elseif($item->media_type === 'video' && $item->file_path)
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);aspect-ratio:4/3;">
+                        <video src="{{ asset($item->file_path) }}" controls
+                               style="width:100%;height:100%;object-fit:cover;"></video>
+                    </div>
+                    @if($item->title)
+                    <div style="font-size:.82rem;color:#555;margin-top:6px;text-align:center;">{{ $item->title }}</div>
+                    @endif
+                </div>
+                @endif
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    {{-- ━━━ YOUTUBE TUTORIALS (from B2C CMS > YouTube Links) ━━━ --}}
+    @if(isset($youtubeLinks) && $youtubeLinks->count())
+    <section class="b2c-section">
+        <div class="container">
+            <div class="b2c-section-header">
+                <span class="b2c-section-tag">▶️ Watch & Learn</span>
+                <h2 class="b2c-section-title">Video Tutorials</h2>
+                <p class="b2c-section-subtitle">Learn how to book flights and manage your trips</p>
+            </div>
+            <div class="row g-4">
+                @foreach($youtubeLinks as $yt)
+                <div class="col-md-6 col-lg-4">
+                    <div style="border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);background:#fff;">
+                        @php
+                            $ytId = '';
+                            if ($yt->link) {
+                                preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/', $yt->link, $m);
+                                $ytId = $m[1] ?? '';
+                            }
+                        @endphp
+                        @if($ytId)
+                        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+                            <iframe src="https://www.youtube.com/embed/{{ $ytId }}"
+                                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+                                    allowfullscreen loading="lazy"></iframe>
+                        </div>
+                        @elseif($yt->logo)
+                        <img src="{{ asset('uploads/youtube/'.$yt->logo) }}" style="width:100%;height:180px;object-fit:cover;" alt="{{ $yt->name }}">
+                        @endif
+                        <div style="padding:12px 16px;">
+                            <div style="font-weight:600;color:#1a3768;font-size:.95rem;">{{ $yt->name }}</div>
+                            <a href="{{ $yt->link }}" target="_blank"
+                               style="display:inline-block;margin-top:8px;font-size:.82rem;color:#e53e3e;font-weight:600;">
+                                <i class="fab fa-youtube me-1"></i>Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    {{-- ━━━ FILM WATCH (from B2C CMS > Films) ━━━ --}}
+    @if(isset($filmWatchLinks) && $filmWatchLinks->count())
+    <section class="b2c-section" style="background:#0d1b3e;">
+        <div class="container">
+            <div class="b2c-section-header">
+                <span class="b2c-section-tag" style="color:#f5a623;">🎬 Watch</span>
+                <h2 class="b2c-section-title" style="color:#fff;">Watch Films & Shows</h2>
+                <p class="b2c-section-subtitle" style="color:rgba(255,255,255,.6);">Entertainment for your journey</p>
+            </div>
+            <div class="row g-3">
+                @foreach($filmWatchLinks as $film)
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a href="{{ $film->link }}" target="_blank"
+                       style="display:block;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.07);padding:20px;text-align:center;text-decoration:none;transition:transform .2s;"
+                       onmouseover="this.style.transform='translateY(-4px)'"
+                       onmouseout="this.style.transform='translateY(0)'">
+                        @if($film->logo)
+                            <img src="{{ asset('uploads/filmwatch/'.$film->logo) }}"
+                                 style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 12px;" alt="{{ $film->name }}">
+                        @else
+                            <div style="width:60px;height:60px;border-radius:50%;background:rgba(245,166,35,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                                <i class="fas fa-film" style="color:#f5a623;font-size:1.4rem;"></i>
+                            </div>
+                        @endif
+                        <div style="color:#fff;font-weight:600;font-size:.9rem;">{{ $film->name }}</div>
+                    </a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
 
     {{-- ═══ FAQ SECTION ═══ --}}
     @if(isset($faqs) && $faqs->count())

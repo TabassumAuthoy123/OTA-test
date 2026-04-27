@@ -1,8 +1,16 @@
 @php
     use App\Models\CmsSiteSetting;
     use App\Models\CmsPaymentMethod;
-    $footerSettings = CmsSiteSetting::allAsArray();
-    $paymentMethods = CmsPaymentMethod::active()->get();
+    use Illuminate\Support\Facades\DB;
+    $footerSettings  = CmsSiteSetting::allAsArray();
+    $paymentMethods  = CmsPaymentMethod::active()->get();
+    $b2cFooterInfo   = DB::table('b2c_footer_infos')->first();
+    $b2cSocialLinks  = DB::table('social_media_links')->orderBy('name')->get();
+    $b2cCompanyInfo  = $b2cFooterInfo ? $b2cFooterInfo->company_info : null;
+    $b2cSocial       = $b2cFooterInfo ? json_decode($b2cFooterInfo->social_links ?? '[]', true) : [];
+    $b2cCompanyLinks = $b2cFooterInfo ? json_decode($b2cFooterInfo->company_links ?? '[]', true) : [];
+    $b2cSupportLinks = $b2cFooterInfo ? json_decode($b2cFooterInfo->support_links ?? '[]', true) : [];
+    $b2cPayMethods   = $b2cFooterInfo ? json_decode($b2cFooterInfo->payment_methods ?? '[]', true) : [];
 @endphp
 <!-- B2C Footer -->
 <footer class="b2c-footer">
@@ -16,41 +24,64 @@
                         <span>{{ config('app.name', 'SkyTrip') }}</span>
                     </a>
                     <p class="b2c-footer-desc">
-                        {{ $footerSettings['footer_description'] ?? 'Your dream destination is just a few clicks away. Book flights at the best price with instant confirmation.' }}
+                        {{ $b2cCompanyInfo ?? $footerSettings['footer_description'] ?? 'Your dream destination is just a few clicks away. Book flights at the best price with instant confirmation.' }}
                     </p>
                     <div class="b2c-social-links">
-                        <a href="{{ $footerSettings['social_facebook'] ?? '#' }}" target="_blank"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a href="{{ $footerSettings['social_instagram'] ?? '#' }}" target="_blank"><i
-                                class="fab fa-instagram"></i></a>
-                        <a href="{{ $footerSettings['social_twitter'] ?? '#' }}" target="_blank"><i
-                                class="fab fa-twitter"></i></a>
-                        <a href="{{ $footerSettings['social_linkedin'] ?? '#' }}" target="_blank"><i
-                                class="fab fa-linkedin-in"></i></a>
+                        {{-- Dynamic social media from B2C CMS > Social Media table --}}
+                        @if($b2cSocialLinks->count())
+                            @foreach($b2cSocialLinks as $sm)
+                            <a href="{{ $sm->link }}" target="_blank" title="{{ $sm->name }}">
+                                @if($sm->logo)
+                                    <img src="{{ asset('uploads/social/'.$sm->logo) }}"
+                                         style="width:22px;height:22px;border-radius:50%;object-fit:cover;" alt="{{ $sm->name }}">
+                                @else
+                                    <i class="fas fa-share-alt"></i>
+                                @endif
+                            </a>
+                            @endforeach
+                        @else
+                            {{-- Fallback: site settings social links --}}
+                            <a href="{{ $footerSettings['social_facebook'] ?? '#' }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                            <a href="{{ $footerSettings['social_instagram'] ?? '#' }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                            <a href="{{ $footerSettings['social_twitter'] ?? '#' }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                            <a href="{{ $footerSettings['social_linkedin'] ?? '#' }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        @endif
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Links -->
+            <!-- Company Links (dynamic from B2C CMS Footer Info, fallback to hardcoded) -->
             <div class="col-lg-2 col-md-6">
                 <h5 class="b2c-footer-heading">Quick Links</h5>
                 <ul class="b2c-footer-links">
-                    <li><a href="{{ url('/') }}">Home</a></li>
-                    <li><a href="{{ url('/page/about') }}">About Us</a></li>
-                    <li><a href="{{ url('/page/terms') }}">Terms & Conditions</a></li>
-                    <li><a href="{{ url('/page/privacy') }}">Privacy Policy</a></li>
-                    <li><a href="{{ url('/page/refund') }}">Refund Policy</a></li>
+                    @if(!empty($b2cCompanyLinks))
+                        @foreach($b2cCompanyLinks as $cl)
+                        <li><a href="{{ $cl['url'] ?? '#' }}">{{ $cl['label'] ?? '' }}</a></li>
+                        @endforeach
+                    @else
+                        <li><a href="{{ url('/') }}">Home</a></li>
+                        <li><a href="{{ url('/page/about') }}">About Us</a></li>
+                        <li><a href="{{ url('/page/terms') }}">Terms & Conditions</a></li>
+                        <li><a href="{{ url('/page/privacy') }}">Privacy Policy</a></li>
+                        <li><a href="{{ url('/page/refund') }}">Refund Policy</a></li>
+                    @endif
                 </ul>
             </div>
 
-            <!-- Support -->
+            <!-- Support Links (dynamic from B2C CMS Footer Info, fallback to hardcoded) -->
             <div class="col-lg-3 col-md-6">
                 <h5 class="b2c-footer-heading">Support</h5>
                 <ul class="b2c-footer-links">
-                    <li><a href="{{ url('/page/faq') }}">FAQ</a></li>
-                    <li><a href="{{ url('/page/contact') }}">Contact Us</a></li>
-                    <li><a href="#">Live Chat</a></li>
-                    <li><a href="#">Manage Booking</a></li>
+                    @if(!empty($b2cSupportLinks))
+                        @foreach($b2cSupportLinks as $sl)
+                        <li><a href="{{ $sl['url'] ?? '#' }}">{{ $sl['label'] ?? '' }}</a></li>
+                        @endforeach
+                    @else
+                        <li><a href="{{ url('/page/faq') }}">FAQ</a></li>
+                        <li><a href="{{ url('/page/contact') }}">Contact Us</a></li>
+                        <li><a href="#">Live Chat</a></li>
+                        <li><a href="#">Manage Booking</a></li>
+                    @endif
                 </ul>
             </div>
 
@@ -78,7 +109,16 @@
         <div class="b2c-footer-payment">
             <span>We Accept</span>
             <div class="b2c-payment-icons">
-                @if($paymentMethods->count())
+                @if(!empty($b2cPayMethods))
+                    @foreach($b2cPayMethods as $pm)
+                        @if(!empty($pm['logo']))
+                            <img src="{{ Str::startsWith($pm['logo'], 'http') ? $pm['logo'] : asset($pm['logo']) }}"
+                                 alt="{{ $pm['name'] ?? '' }}" style="height:32px;object-fit:contain;">
+                        @else
+                            <span style="color:rgba(255,255,255,.7);font-size:.8rem;padding:4px 8px;border:1px solid rgba(255,255,255,.2);border-radius:4px;">{{ $pm['name'] ?? '' }}</span>
+                        @endif
+                    @endforeach
+                @elseif($paymentMethods->count())
                     @foreach($paymentMethods as $pm)
                         <img src="{{ asset($pm->image) }}" alt="{{ $pm->name }}">
                     @endforeach
