@@ -368,6 +368,76 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         Route::post('b2b/agency/{userId}/add-money', [\App\Http\Controllers\B2bController::class, 'addMoneyToAgency'])->name('B2bAddMoneyToAgency');
         Route::get('b2b/upcoming-flights', [\App\Http\Controllers\B2bController::class, 'upcomingFlights'])->name('B2bUpcomingFlights');
 
+        // ─── B2C Section ────────────────────────────────────────────────────────
+        Route::get('b2c/flight-bookings', [\App\Http\Controllers\B2cAdminController::class, 'flightBookings'])->name('B2cFlightBookings');
+        Route::get('b2c/tour-bookings', [\App\Http\Controllers\B2cAdminController::class, 'tourBookings'])->name('B2cTourBookings');
+        Route::get('b2c/user-list', [\App\Http\Controllers\B2cAdminController::class, 'userList'])->name('B2cUserList');
+        Route::get('b2c/upcoming-flights', [\App\Http\Controllers\B2cAdminController::class, 'upcomingFlights'])->name('B2cUpcomingFlights');
+
+        // ─── B2C Configuration ───────────────────────────────────────────────────
+        Route::get('b2c/config/commission', [\App\Http\Controllers\B2cAdminController::class, 'commission'])->name('B2cCommission');
+        Route::post('b2c/config/commission', [\App\Http\Controllers\B2cAdminController::class, 'assignCommission'])->name('B2cAssignCommission');
+
+        Route::get('b2c/config/terms-conditions', [\App\Http\Controllers\B2cAdminController::class, 'termsConditions'])->name('B2cTermsConditions');
+        Route::post('b2c/config/terms-conditions', [\App\Http\Controllers\B2cAdminController::class, 'saveTermsConditions'])->name('B2cSaveTermsConditions');
+
+        Route::get('b2c/config/privacy-policy', [\App\Http\Controllers\B2cAdminController::class, 'privacyPolicy'])->name('B2cPrivacyPolicy');
+        Route::post('b2c/config/privacy-policy', [\App\Http\Controllers\B2cAdminController::class, 'savePrivacyPolicy'])->name('B2cSavePrivacyPolicy');
+
+        Route::get('b2c/config/coin-config', [\App\Http\Controllers\B2cAdminController::class, 'coinConfig'])->name('B2cCoinConfig');
+        Route::post('b2c/config/coin-config', [\App\Http\Controllers\B2cAdminController::class, 'saveCoinConfig'])->name('B2cSaveCoinConfig');
+
+        // Gallery
+        Route::get('b2c/config/gallery', [\App\Http\Controllers\B2cAdminController::class, 'gallery'])->name('B2cGallery');
+        Route::post('b2c/config/gallery', [\App\Http\Controllers\B2cAdminController::class, 'storeGallery'])->name('B2cStoreGallery');
+        Route::put('b2c/config/gallery/{id}', [\App\Http\Controllers\B2cAdminController::class, 'updateGallery'])->name('B2cUpdateGallery');
+        Route::delete('b2c/config/gallery/{id}', [\App\Http\Controllers\B2cAdminController::class, 'deleteGallery'])->name('B2cDeleteGallery');
+
+        // Social Media
+        Route::get('b2c/config/social-media', [\App\Http\Controllers\B2cAdminController::class, 'socialMedia'])->name('B2cSocialMedia');
+        Route::post('b2c/config/social-media', [\App\Http\Controllers\B2cAdminController::class, 'storeSocialMedia'])->name('B2cStoreSocialMedia');
+        Route::put('b2c/config/social-media/{id}', [\App\Http\Controllers\B2cAdminController::class, 'updateSocialMedia'])->name('B2cUpdateSocialMedia');
+        Route::delete('b2c/config/social-media/{id}', [\App\Http\Controllers\B2cAdminController::class, 'deleteSocialMedia'])->name('B2cDeleteSocialMedia');
+
+        // YouTube Links
+        Route::get('b2c/config/youtube-links', [\App\Http\Controllers\B2cAdminController::class, 'youtubeLinks'])->name('B2cYoutubeLinks');
+        Route::post('b2c/config/youtube-links', [\App\Http\Controllers\B2cAdminController::class, 'storeYoutubeLink'])->name('B2cStoreYoutubeLink');
+        Route::put('b2c/config/youtube-links/{id}', [\App\Http\Controllers\B2cAdminController::class, 'updateYoutubeLink'])->name('B2cUpdateYoutubeLink');
+        Route::delete('b2c/config/youtube-links/{id}', [\App\Http\Controllers\B2cAdminController::class, 'deleteYoutubeLink'])->name('B2cDeleteYoutubeLink');
+
+        // Film Watch
+        Route::get('b2c/config/film-watch', [\App\Http\Controllers\B2cAdminController::class, 'filmWatch'])->name('B2cFilmWatch');
+        Route::post('b2c/config/film-watch', [\App\Http\Controllers\B2cAdminController::class, 'storeFilmWatch'])->name('B2cStoreFilm');
+        Route::put('b2c/config/film-watch/{id}', [\App\Http\Controllers\B2cAdminController::class, 'updateFilmWatch'])->name('B2cUpdateFilm');
+        Route::delete('b2c/config/film-watch/{id}', [\App\Http\Controllers\B2cAdminController::class, 'deleteFilmWatch'])->name('B2cDeleteFilm');
+
+        // Popular Destinations
+        Route::get('b2c/config/popular-destinations', [\App\Http\Controllers\B2cAdminController::class, 'popularDestinations'])->name('B2cPopularDestinations');
+        Route::post('b2c/config/popular-destinations', [\App\Http\Controllers\B2cAdminController::class, 'storeDestination'])->name('B2cStoreDestination');
+        Route::put('b2c/config/popular-destinations/{id}', [\App\Http\Controllers\B2cAdminController::class, 'updateDestination'])->name('B2cUpdateDestination');
+        Route::delete('b2c/config/popular-destinations/{id}', [\App\Http\Controllers\B2cAdminController::class, 'deleteDestination'])->name('B2cDeleteDestination');
+
+        // Special Offers (Hot Deals & AD)
+        Route::get('b2c/config/offers/{type}', [\App\Http\Controllers\B2cAdminController::class, 'specialOfferList'])->name('B2cSpecialOfferList');
+        Route::get('b2c/config/offers/{type}/create', [\App\Http\Controllers\B2cAdminController::class, 'createOffer'])->name('B2cCreateOffer');
+        Route::post('b2c/config/offers/{type}', [\App\Http\Controllers\B2cAdminController::class, 'storeOffer'])->name('B2cStoreOffer');
+        Route::get('b2c/config/offer/{id}/details', [\App\Http\Controllers\B2cAdminController::class, 'detailsOffer'])->name('B2cDetailsOffer');
+        Route::get('b2c/config/offers/{type}/{id}/edit', [\App\Http\Controllers\B2cAdminController::class, 'editOffer'])->name('B2cEditOffer');
+        Route::put('b2c/config/offers/{type}/{id}', [\App\Http\Controllers\B2cAdminController::class, 'updateOffer'])->name('B2cUpdateOffer');
+        Route::delete('b2c/config/offer/{id}', [\App\Http\Controllers\B2cAdminController::class, 'deleteOffer'])->name('B2cDeleteOffer');
+        Route::post('b2c/config/offer/{id}/toggle', [\App\Http\Controllers\B2cAdminController::class, 'toggleOfferActive'])->name('B2cToggleOffer');
+
+        // Banners (type=banner via offers + dedicated routes)
+        Route::get('b2c/config/banners', [\App\Http\Controllers\B2cAdminController::class, 'bannerList'])->name('B2cBannerList');
+        Route::get('b2c/config/banners/{id}/edit', [\App\Http\Controllers\B2cAdminController::class, 'editBanner'])->name('B2cEditBanner');
+        Route::put('b2c/config/banners/{id}', [\App\Http\Controllers\B2cAdminController::class, 'updateBanner'])->name('B2cUpdateBanner');
+        Route::post('b2c/config/banners', [\App\Http\Controllers\B2cAdminController::class, 'storeBanner'])->name('B2cStoreBanner');
+        Route::delete('b2c/config/banners/{id}', [\App\Http\Controllers\B2cAdminController::class, 'deleteBanner'])->name('B2cDeleteBanner');
+
+        // Footer Info
+        Route::get('b2c/config/footer-info', [\App\Http\Controllers\B2cAdminController::class, 'footerInfo'])->name('B2cFooterInfo');
+        Route::post('b2c/config/footer-info', [\App\Http\Controllers\B2cAdminController::class, 'saveFooterInfo'])->name('B2cSaveFooterInfo');
+
     });
 
 });

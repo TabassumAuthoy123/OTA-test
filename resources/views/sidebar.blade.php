@@ -301,16 +301,86 @@
                     </ul>
                 </li>
                 <li
-                    class="@if(in_array($currentRoute, ['CmsBanners', 'CmsPromotions', 'CmsRoutes', 'CmsTestimonials', 'CmsPages', 'CmsEditPage', 'CmsSiteSettings', 'CmsFaqs'])) mm-active @endif">
+                    class="@if(in_array($currentRoute, ['CmsBanners', 'CmsPromotions', 'CmsRoutes', 'CmsTestimonials', 'CmsPages', 'CmsEditPage', 'CmsSiteSettings', 'CmsFaqs', 'B2cCommission', 'B2cTermsConditions', 'B2cPrivacyPolicy', 'B2cCoinConfig', 'B2cGallery', 'B2cSocialMedia', 'B2cYoutubeLinks', 'B2cFilmWatch', 'B2cPopularDestinations', 'B2cSpecialOfferList', 'B2cCreateOffer', 'B2cDetailsOffer', 'B2cEditOffer', 'B2cBannerList', 'B2cEditBanner', 'B2cFooterInfo'])) mm-active @endif">
                     <a class="has-arrow material-ripple" href="javascript:void(0);">
                         <i class="typcn typcn-globe-outline"></i> B2C CMS
                     </a>
                     <ul class="nav-second-level">
-                        <li class="@if($currentRoute == 'CmsBanners') mm-active @endif">
-                            <a class="text-capitalize" href="{{url('cms/banners')}}">
-                                <i class="typcn typcn-image-outline"></i> Hero Banners
+
+                        {{-- ─── B2C Configuration nested dropdown ─── --}}
+                        <li class="@if(in_array($currentRoute, ['B2cCommission', 'B2cTermsConditions', 'B2cPrivacyPolicy', 'B2cCoinConfig', 'B2cGallery', 'B2cSocialMedia', 'B2cYoutubeLinks', 'B2cFilmWatch', 'B2cPopularDestinations', 'B2cSpecialOfferList', 'B2cCreateOffer', 'B2cDetailsOffer', 'B2cEditOffer', 'B2cBannerList', 'B2cEditBanner', 'B2cFooterInfo'])) mm-active @endif">
+                            <a class="has-arrow material-ripple" href="javascript:void(0);">
+                                <i class="typcn typcn-cog-outline"></i> B2C Configuration
                             </a>
+                            <ul class="nav-third-level">
+                                <li class="@if($currentRoute == 'B2cCommission') mm-active @endif">
+                                    <a href="{{ url('b2c/config/commission') }}">
+                                        <i class="typcn typcn-calculator"></i> B2C Commission
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cTermsConditions') mm-active @endif">
+                                    <a href="{{ url('b2c/config/terms-conditions') }}">
+                                        <i class="typcn typcn-document-text"></i> Terms &amp; Conditions
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cPrivacyPolicy') mm-active @endif">
+                                    <a href="{{ url('b2c/config/privacy-policy') }}">
+                                        <i class="typcn typcn-lock-closed-outline"></i> Privacy Policy
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cCoinConfig') mm-active @endif">
+                                    <a href="{{ url('b2c/config/coin-config') }}">
+                                        <i class="typcn typcn-gift-outline"></i> Coin Configuration
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cGallery') mm-active @endif">
+                                    <a href="{{ url('b2c/config/gallery') }}">
+                                        <i class="typcn typcn-image-outline"></i> Gallery
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cSocialMedia') mm-active @endif">
+                                    <a href="{{ url('b2c/config/social-media') }}">
+                                        <i class="typcn typcn-social-twitter"></i> Social Media
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cYoutubeLinks') mm-active @endif">
+                                    <a href="{{ url('b2c/config/youtube-links') }}">
+                                        <i class="typcn typcn-media-play-outline"></i> YouTube Links
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cFilmWatch') mm-active @endif">
+                                    <a href="{{ url('b2c/config/film-watch') }}">
+                                        <i class="typcn typcn-video-outline"></i> Films
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cPopularDestinations') mm-active @endif">
+                                    <a href="{{ url('b2c/config/popular-destinations') }}">
+                                        <i class="typcn typcn-location-outline"></i> Popular Destinations
+                                    </a>
+                                </li>
+                                <li class="@if(str_starts_with(request()->path(), 'b2c/config/offers/hot-deal')) mm-active @endif">
+                                    <a href="{{ url('b2c/config/offers/hot-deal') }}">
+                                        <i class="typcn typcn-fire-outline"></i> Hot Deals
+                                    </a>
+                                </li>
+                                <li class="@if(str_starts_with(request()->path(), 'b2c/config/offers/ad')) mm-active @endif">
+                                    <a href="{{ url('b2c/config/offers/ad') }}">
+                                        <i class="typcn typcn-chart-bar-outline"></i> AD
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cBannerList') mm-active @endif">
+                                    <a href="{{ url('b2c/config/banners') }}">
+                                        <i class="typcn typcn-tabs-outline"></i> Banner
+                                    </a>
+                                </li>
+                                <li class="@if($currentRoute == 'B2cFooterInfo') mm-active @endif">
+                                    <a href="{{ url('b2c/config/footer-info') }}">
+                                        <i class="typcn typcn-th-small-outline"></i> B2C Footer Info
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
+
                         <li class="@if($currentRoute == 'CmsPromotions') mm-active @endif">
                             <a class="text-capitalize" href="{{url('cms/promotions')}}">
                                 <i class="typcn typcn-tags"></i> Promotions
