@@ -175,66 +175,89 @@ class ConfigurationController extends Controller
 
     // ─── BLOCK ROUTES ────────────────────────────────────────────────────────────
 
+    private function blockRouteDropdowns(): array
+    {
+        $airports = DB::table('city_airports')
+            ->select('airport_code', 'airport_name', 'city_name', 'country_name')
+            ->orderBy('airport_code')->get();
+        $airlines = DB::table('airlines')->where('active', 'Y')
+            ->orderBy('name')->get(['iata', 'name']);
+        return compact('airports', 'airlines');
+    }
+
     public function blockRoutes(Request $request)
     {
         $q = DB::table('blocking_rules');
         if ($request->filled('search')) {
             $s = $request->search;
             $q->where(function ($w) use ($s) {
-                $w->where('name', 'like', "%$s%")
-                  ->orWhere('route_from', 'like', "%$s%")
-                  ->orWhere('route_to', 'like', "%$s%")
-                  ->orWhere('airline_code', 'like', "%$s%");
+                $w->where('departure',    'like', "%$s%")
+                  ->orWhere('arrival',     'like', "%$s%")
+                  ->orWhere('airline_code','like', "%$s%");
             });
         }
         if ($request->filled('filter_status') && $request->filter_status !== 'all') {
             $q->where('is_active', $request->filter_status);
         }
-        $rules = $q->orderByDesc('created_at')->paginate(20)->withQueryString();
-        return view('configuration.block_routes', compact('rules'));
+        $rules = $q->orderByDesc('created_at')->paginate(50)->withQueryString();
+        ['airports' => $airports, 'airlines' => $airlines] = $this->blockRouteDropdowns();
+        return view('configuration.block_routes', compact('rules', 'airports', 'airlines'));
+    }
+
+    public function blockRoutesCreate()
+    {
+        ['airports' => $airports, 'airlines' => $airlines] = $this->blockRouteDropdowns();
+        return view('configuration.block_routes_create', compact('airports', 'airlines'));
     }
 
     public function storeBlockRoute(Request $request)
     {
-        $request->validate(['name' => 'required|string|max:200']);
-        DB::table('blocking_rules')->insert([
-            'name'         => $request->name,
-            'gds'          => $request->gds ?? 'all',
-            'airline_code' => $request->airline_code ?: null,
-            'route_from'   => $request->route_from ?: null,
-            'route_to'     => $request->route_to ?: null,
-            'cabin_class'  => $request->cabin_class ?: null,
-            'block_type'   => $request->block_type ?? 'route',
-            'reason'       => $request->reason,
-            'is_active'    => $request->has('is_active') ? 1 : 0,
-            'created_at'   => now(),
-            'updated_at'   => now(),
-        ]);
-        return back()->with('success', 'Block route added.');
+        $rows = $request->input('routes', []);
+        if (empty($rows)) {
+            return redirect(route('ConfigBlockRoutes'))->with('success', 'Nothing to save.');
+        }
+        $inserts = [];
+        foreach ($rows as $row) {
+            if (empty($row['departure']) || empty($row['arrival'])) continue;
+            $inserts[] = [
+                'departure'     => strtoupper(trim($row['departure'])),
+                'arrival'       => strtoupper(trim($row['arrival'])),
+                'airline_code'  => !empty($row['airline_code']) ? strtoupper(trim($row['airline_code'])) : null,
+                'one_way'       => isset($row['one_way'])       && $row['one_way']       === 'true' ? 1 : 0,
+                'round_trip'    => isset($row['round_trip'])    && $row['round_trip']    === 'true' ? 1 : 0,
+                'booking_block' => isset($row['booking_block']) && $row['booking_block'] === 'true' ? 1 : 0,
+                'full_block'    => isset($row['full_block'])    && $row['full_block']    === 'true' ? 1 : 0,
+                'is_active'     => 1,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ];
+        }
+        if (!empty($inserts)) {
+            DB::table('blocking_rules')->insert($inserts);
+        }
+        return redirect(route('ConfigBlockRoutes'))->with('success', count($inserts) . ' block route(s) added.');
     }
 
     public function updateBlockRoute(Request $request, $id)
     {
-        $request->validate(['name' => 'required|string|max:200']);
         DB::table('blocking_rules')->where('id', $id)->update([
-            'name'         => $request->name,
-            'gds'          => $request->gds ?? 'all',
-            'airline_code' => $request->airline_code ?: null,
-            'route_from'   => $request->route_from ?: null,
-            'route_to'     => $request->route_to ?: null,
-            'cabin_class'  => $request->cabin_class ?: null,
-            'block_type'   => $request->block_type ?? 'route',
-            'reason'       => $request->reason,
-            'is_active'    => $request->has('is_active') ? 1 : 0,
-            'updated_at'   => now(),
+            'departure'     => strtoupper(trim($request->departure ?? '')),
+            'arrival'       => strtoupper(trim($request->arrival ?? '')),
+            'airline_code'  => $request->airline_code ? strtoupper(trim($request->airline_code)) : null,
+            'one_way'       => $request->one_way       === 'true' ? 1 : 0,
+            'round_trip'    => $request->round_trip    === 'true' ? 1 : 0,
+            'booking_block' => $request->booking_block === 'true' ? 1 : 0,
+            'full_block'    => $request->full_block    === 'true' ? 1 : 0,
+            'is_active'     => $request->status        === 'enable' ? 1 : 0,
+            'updated_at'    => now(),
         ]);
-        return back()->with('success', 'Block route updated.');
+        return response()->json(['success' => true]);
     }
 
     public function deleteBlockRoute($id)
     {
         DB::table('blocking_rules')->where('id', $id)->delete();
-        return back()->with('success', 'Block route deleted.');
+        return response()->json(['success' => true]);
     }
 
     // ─── AIRPORTS ────────────────────────────────────────────────────────────────

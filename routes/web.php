@@ -458,6 +458,7 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
 
         // Block Routes
         Route::get('configuration/block-routes', [\App\Http\Controllers\ConfigurationController::class, 'blockRoutes'])->name('ConfigBlockRoutes');
+        Route::get('configuration/block-routes/create', [\App\Http\Controllers\ConfigurationController::class, 'blockRoutesCreate'])->name('ConfigBlockRoutesCreate');
         Route::post('configuration/block-routes', [\App\Http\Controllers\ConfigurationController::class, 'storeBlockRoute'])->name('ConfigStoreBlockRoute');
         Route::put('configuration/block-routes/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateBlockRoute'])->name('ConfigUpdateBlockRoute');
         Route::delete('configuration/block-routes/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteBlockRoute'])->name('ConfigDeleteBlockRoute');
