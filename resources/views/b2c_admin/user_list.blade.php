@@ -39,12 +39,12 @@
             <tr>
               <td>{{ $users->firstItem() + $i }}</td>
               <td>{{ $u->created_at ? date('d-m-Y', strtotime($u->created_at)) : 'N/A' }}</td>
-              <td>{{ $u->email }}</td>
+              <td>{{ $u->username ?? $u->name }}</td>
               <td>{{ $u->name }}</td>
               <td>{{ $u->email }}</td>
               <td>{{ $u->phone ?? 'N/A' }}</td>
               <td>@if($u->status==1 || $u->status===null)<span class="badge-active">ACTIVE</span>@else<span class="badge-inactive">INACTIVE</span>@endif</td>
-              <td><a href="{{ url('b2c/user/'.$u->id) }}" class="btn-view">View</a></td>
+              <td><a href="{{ url('b2c/user/'.$u->id) }}" class="btn-view" style="background:#f0a500;">View</a></td>
             </tr>
             @empty
             <tr><td colspan="8" class="text-center py-5 text-muted">No B2C users found.</td></tr>

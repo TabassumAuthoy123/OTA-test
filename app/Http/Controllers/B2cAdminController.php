@@ -17,13 +17,15 @@ class B2cAdminController extends Controller
             return $this->exportB2cFlightsCsv($request);
         }
         $q = DB::table('flight_bookings as fb')
-            ->join('users as u', 'u.id', '=', 'fb.user_id')
+            ->join('users as u', 'u.id', '=', 'fb.booked_by')
             ->where('u.user_type', 3)
             ->select(
-                'fb.booking_no', 'u.name as username', 'u.email',
-                'fb.pnr_id', 'fb.departure_location', 'fb.arrival_location',
+                'fb.id', 'fb.booking_no', 'fb.created_at',
+                'fb.pnr_id', 'fb.airlines_pnr',
+                'u.name as username', 'u.email',
+                'fb.departure_location', 'fb.arrival_location',
                 'fb.departure_date', 'fb.flight_type', 'fb.status',
-                'fb.total_fare', 'fb.adult', 'fb.child', 'fb.infant', 'fb.created_at'
+                'fb.total_fare', 'fb.adult', 'fb.child', 'fb.infant'
             );
         if ($request->filled('search')) {
             $s = $request->search;
@@ -101,15 +103,15 @@ class B2cAdminController extends Controller
             return $this->exportUpcomingCsv($request);
         }
         $q = DB::table('flight_bookings as fb')
-            ->join('users as u', 'u.id', '=', 'fb.user_id')
+            ->join('users as u', 'u.id', '=', 'fb.booked_by')
             ->where('u.user_type', 3)
             ->where('fb.departure_date', '>=', date('Y-m-d'))
             ->whereNotIn('fb.status', [3, 4])
             ->select(
-                'fb.booking_no', 'u.name as username', 'fb.pnr_id',
+                'fb.id', 'fb.booking_no', 'u.name as username', 'fb.pnr_id',
                 'fb.departure_location', 'fb.arrival_location',
                 'fb.departure_date', 'fb.status', 'fb.total_fare',
-                'fb.flight_type', 'fb.adult', 'fb.child', 'fb.infant', 'fb.gds'
+                'fb.flight_type', 'fb.adult', 'fb.child', 'fb.infant'
             );
         if ($request->filled('search')) {
             $s = $request->search;
@@ -121,6 +123,44 @@ class B2cAdminController extends Controller
         }
         $bookings = $q->orderBy('fb.departure_date')->paginate(15)->withQueryString();
         return view('b2c_admin.upcoming_flights', compact('bookings'));
+    }
+
+    public function flightBookingDetail($id)
+    {
+        $booking = DB::table('flight_bookings as fb')
+            ->leftJoin('users as u', 'u.id', '=', 'fb.booked_by')
+            ->where('fb.id', $id)
+            ->select('fb.*', 'u.name as user_name', 'u.email as user_email', 'u.phone as user_phone')
+            ->first();
+        if (!$booking) abort(404);
+        $segments   = DB::table('flight_segments')->where('flight_booking_id', $id)->get();
+        $passengers = DB::table('flight_passengers')->where('flight_booking_id', $id)->get();
+        return view('b2c_admin.flight_booking_detail', compact('booking', 'segments', 'passengers'));
+    }
+
+    public function userDetail($id)
+    {
+        $user = DB::table('users')->where('id', $id)->where('user_type', 3)->first();
+        if (!$user) abort(404);
+        $flightBookings = DB::table('flight_bookings')
+            ->where('booked_by', $id)
+            ->orderByDesc('created_at')->limit(20)->get();
+        $tourBookings = DB::table('tour_bookings')
+            ->where('email', $user->email)
+            ->whereNull('b2b_user_id')
+            ->orderByDesc('created_at')->limit(20)->get();
+        $coinBalance = DB::table('b2c_coin_transactions')
+            ->where('user_id', $id)
+            ->selectRaw("COALESCE(SUM(CASE WHEN type IN ('earn','adjust') THEN coins ELSE -coins END),0) as balance")
+            ->value('balance') ?? 0;
+        return view('b2c_admin.user_detail', compact('user', 'flightBookings', 'tourBookings', 'coinBalance'));
+    }
+
+    public function tourBookingDetail($id)
+    {
+        $booking = DB::table('tour_bookings')->where('id', $id)->whereNull('b2b_user_id')->first();
+        if (!$booking) abort(404);
+        return view('b2c_admin.tour_booking_detail', compact('booking'));
     }
 
     // ─── B2C CONFIGURATION ──────────────────────────────────────────────────────
@@ -205,10 +245,24 @@ class B2cAdminController extends Controller
         return back()->with('success', 'Privacy Policy saved.');
     }
 
-    public function coinConfig()
+    public function coinConfig(Request $request)
     {
         $config = DB::table('b2c_coin_configs')->latest()->first();
-        $transactions = DB::table('b2c_coin_configs')->orderByDesc('updated_at')->get();
+        $txQuery = DB::table('b2c_coin_transactions as ct')
+            ->leftJoin('users as u', 'u.id', '=', 'ct.user_id')
+            ->select('ct.*', 'u.name as user_name', 'u.email as user_email');
+        if ($request->filled('tx_type') && $request->tx_type !== 'all') {
+            $txQuery->where('ct.type', $request->tx_type);
+        }
+        if ($request->filled('tx_search')) {
+            $s = $request->tx_search;
+            $txQuery->where(function ($w) use ($s) {
+                $w->where('ct.note', 'like', "%$s%")
+                  ->orWhere('u.name', 'like', "%$s%")
+                  ->orWhere('ct.reference', 'like', "%$s%");
+            });
+        }
+        $transactions = $txQuery->orderByDesc('ct.created_at')->paginate(20)->withQueryString();
         return view('b2c_admin.coin_config', compact('config', 'transactions'));
     }
 
@@ -525,7 +579,7 @@ class B2cAdminController extends Controller
             'created_at'  => now(),
             'updated_at'  => now(),
         ]);
-        return redirect(url('special-offer/lists/' . $type))->with('success', $this->typeLabel($type) . ' created.');
+        return redirect(route('B2cSpecialOfferList', $type))->with('success', $this->typeLabel($type) . ' created.');
     }
 
     public function detailsOffer($id)
@@ -545,7 +599,7 @@ class B2cAdminController extends Controller
 
     public function updateOffer(Request $request, $type, $id)
     {
-        $data = ['title' => $request->title, 'description' => $request->description, 'link' => $request->link, 'updated_at' => now()];
+        $data = ['title' => $request->title, 'description' => $request->description, 'link' => $request->link, 'is_active' => $request->input('is_active', 1), 'updated_at' => now()];
         if ($request->hasFile('photo')) {
             $f = $request->file('photo');
             $n = time() . '_' . $f->getClientOriginalName();
@@ -553,7 +607,7 @@ class B2cAdminController extends Controller
             $data['photo'] = 'uploads/offers/' . $n;
         }
         DB::table('special_offers')->where('id', $id)->update($data);
-        return redirect(url('special-offer/lists/' . $type))->with('success', 'Updated.');
+        return redirect(route('B2cSpecialOfferList', $type))->with('success', 'Updated.');
     }
 
     public function deleteOffer($id)
@@ -562,7 +616,7 @@ class B2cAdminController extends Controller
         $type = $offer ? $offer->type : 'hot_deal';
         DB::table('special_offers')->where('id', $id)->delete();
         $typeKey = $type === 'hot_deal' ? 'offer' : $type;
-        return redirect(url('special-offer/lists/' . $typeKey))->with('success', 'Deleted.');
+        return redirect(route('B2cSpecialOfferList', $typeKey))->with('success', 'Deleted.');
     }
 
     public function toggleOfferActive(Request $request, $id)
@@ -645,10 +699,20 @@ class B2cAdminController extends Controller
     public function saveFooterInfo(Request $request)
     {
         $social = [];
-        $names = $request->input('social_name', []);
-        $links = $request->input('social_link', []);
+        $names  = $request->input('social_name', []);
+        $links  = $request->input('social_link', []);
+        $existingLogos = $request->input('social_logo_existing', []);
+        $uploadedLogos = $request->file('social_logo', []);
         foreach ($names as $i => $name) {
-            if ($name) $social[] = ['name' => $name, 'link' => $links[$i] ?? ''];
+            if (!$name) continue;
+            $logo = $existingLogos[$i] ?? '';
+            if (isset($uploadedLogos[$i]) && $uploadedLogos[$i]) {
+                $f = $uploadedLogos[$i];
+                $n = time() . '_' . $i . '_' . $f->getClientOriginalName();
+                $f->move(public_path('uploads/social'), $n);
+                $logo = 'uploads/social/' . $n;
+            }
+            $social[] = ['name' => $name, 'link' => $links[$i] ?? '', 'logo' => $logo];
         }
 
         $companyLinks = [];
@@ -666,10 +730,19 @@ class B2cAdminController extends Controller
         }
 
         $paymentMethods = [];
-        $pmNames = $request->input('payment_method_name', []);
-        $pmLogos = $request->input('payment_method_logo', []);
+        $pmNames        = $request->input('payment_method_name', []);
+        $pmExisting     = $request->input('payment_method_logo_existing', []);
+        $pmFiles        = $request->file('payment_method_logo_file', []);
         foreach ($pmNames as $i => $name) {
-            if ($name) $paymentMethods[] = ['name' => $name, 'logo' => $pmLogos[$i] ?? ''];
+            if (!$name) continue;
+            $logo = $pmExisting[$i] ?? '';
+            if (isset($pmFiles[$i]) && $pmFiles[$i]) {
+                $f = $pmFiles[$i];
+                $n = time() . '_' . $i . '_' . $f->getClientOriginalName();
+                $f->move(public_path('uploads/footer'), $n);
+                $logo = 'uploads/footer/' . $n;
+            }
+            $paymentMethods[] = ['name' => $name, 'logo' => $logo];
         }
 
         $data = [

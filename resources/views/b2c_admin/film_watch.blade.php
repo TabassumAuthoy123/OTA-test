@@ -5,9 +5,9 @@
 .b2c-page-header h4{margin:0;font-weight:700;font-size:1.2rem;}
 .table thead th{background:#2471a3;color:#fff;border:none;font-size:.82rem;padding:10px 12px;}
 .table tbody tr:hover{background:#eaf4fb;}
-.btn-add-new{background:linear-gradient(135deg,#1a5276,#2471a3);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:.85rem;font-weight:600;}
+.btn-add-new{background:linear-gradient(135deg,#1a5276,#2471a3);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:.85rem;font-weight:600;cursor:pointer;}
 .btn-add-new:hover{background:#1a5276;color:#fff;}
-.logo-thumb{width:36px;height:36px;object-fit:cover;border-radius:50%;border:2px solid #2471a3;}
+.logo-thumb{width:40px;height:40px;object-fit:cover;border-radius:50%;border:2px solid #2471a3;}
 </style>
 @endsection
 @section('content')
@@ -16,7 +16,7 @@
     <div class="col-12">
       <div class="b2c-page-header d-flex align-items-center justify-content-between">
         <h4><i class="fas fa-film me-2"></i>Film Watch Links</h4>
-        <button class="btn btn-add-new" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-plus me-1"></i>Add Film</button>
+        <button class="btn btn-add-new" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-plus me-1"></i>Add Film Watch Link</button>
       </div>
       @if(session('success'))<div class="alert alert-success mt-2">{{ session('success') }}</div>@endif
       @if(session('error'))<div class="alert alert-danger mt-2">{{ session('error') }}</div>@endif
@@ -34,23 +34,23 @@
                 </tr>
               </thead>
               <tbody>
-                @forelse($films as $i => $film)
+                @forelse($items as $i => $item)
                 <tr>
                   <td>{{ $i+1 }}</td>
                   <td>
-                    @if($film->logo)
-                      <img src="{{ asset('uploads/filmwatch/'.$film->logo) }}" class="logo-thumb" alt="logo">
+                    @if($item->logo)
+                      <img src="{{ asset($item->logo) }}" class="logo-thumb" alt="{{ $item->name }}">
                     @else
                       <span class="text-muted">—</span>
                     @endif
                   </td>
-                  <td>{{ $film->name }}</td>
-                  <td><a href="{{ $film->link }}" target="_blank" class="text-primary">{{ Str::limit($film->link,50) }}</a></td>
+                  <td>{{ $item->name }}</td>
+                  <td><a href="{{ $item->link }}" target="_blank" class="text-primary">{{ Str::limit($item->link, 50) }}</a></td>
                   <td>
-                    <button class="btn btn-sm btn-warning" onclick="openEdit({{ $film->id }},'{{ addslashes($film->name) }}','{{ addslashes($film->link) }}','{{ $film->logo }}')">
+                    <button class="btn btn-sm btn-warning" onclick="openEdit({{ $item->id }},'{{ addslashes($item->name) }}','{{ addslashes($item->link) }}','{{ $item->logo }}')">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <form method="POST" action="{{ route('B2cDeleteFilm', $film->id) }}" style="display:inline" onsubmit="return confirm('Delete?')">
+                    <form method="POST" action="{{ route('B2cDeleteFilm', $item->id) }}" style="display:inline" onsubmit="return confirm('Delete?')">
                       @csrf @method('DELETE')
                       <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                     </form>
@@ -110,7 +110,8 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" id="editForm" enctype="multipart/form-data">
-        @csrf @method('PUT')
+        @csrf
+        <input type="hidden" name="_method" value="PUT">
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label fw-semibold">Name</label>
@@ -121,8 +122,9 @@
             <input type="url" name="link" id="editLink" class="form-control" required>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Logo (optional)</label>
+            <label class="form-label fw-semibold">Current Logo</label>
             <div id="currentLogo" class="mb-2"></div>
+            <label class="form-label fw-semibold">Change Logo (optional)</label>
             <input type="file" name="logo" class="form-control" accept="image/*">
           </div>
         </div>
@@ -140,9 +142,9 @@
 function openEdit(id, name, link, logo) {
   document.getElementById('editName').value = name;
   document.getElementById('editLink').value = link;
-  document.getElementById('editForm').action = '/b2c/config/film-watch/' + id;
+  document.getElementById('editForm').action = '{{ url("b2c/config/film-watch") }}/' + id;
   var logoDiv = document.getElementById('currentLogo');
-  logoDiv.innerHTML = logo ? '<img src="/uploads/filmwatch/' + logo + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">' : '';
+  logoDiv.innerHTML = logo ? '<img src="/' + logo + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">' : '<span class="text-muted small">No logo</span>';
   new bootstrap.Modal(document.getElementById('editModal')).show();
 }
 </script>

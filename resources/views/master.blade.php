@@ -51,7 +51,7 @@
     <link href="{{ url('assets') }}/plugins/swiper/swiper-bundle.min.css" rel="stylesheet" />
     <link href="{{ url('assets') }}/nanopkg-assets/css/custom.min.css" rel="stylesheet" />
     <link href="{{ url('assets') }}/admin-assets/css/style-new.css?v=3" rel="stylesheet" />
-    <link href="{{ url('assets') }}/admin-assets/css/custom.css" rel="stylesheet" />
+    <link href="{{ url('assets') }}/admin-assets/css/custom.css?v=2" rel="stylesheet" />
     <link href="{{ url('assets') }}/admin-assets/css/extra.css?v=3" rel="stylesheet" />
     <link href="{{ url('assets') }}/module-assets//css/booking/search_box.css?v=8" rel="stylesheet" type="text/css" />
     <link href="{{ url('assets') }}/module-assets//css/booking/search_box_custom.min.css?v=8" rel="stylesheet"

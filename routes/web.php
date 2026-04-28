@@ -370,8 +370,11 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
 
         // ─── B2C Section ────────────────────────────────────────────────────────
         Route::get('b2c/flight-bookings', [\App\Http\Controllers\B2cAdminController::class, 'flightBookings'])->name('B2cFlightBookings');
+        Route::get('b2c/flight-bookings/{id}', [\App\Http\Controllers\B2cAdminController::class, 'flightBookingDetail'])->name('B2cFlightBookingDetail');
         Route::get('b2c/tour-bookings', [\App\Http\Controllers\B2cAdminController::class, 'tourBookings'])->name('B2cTourBookings');
+        Route::get('b2c/tour-bookings/{id}', [\App\Http\Controllers\B2cAdminController::class, 'tourBookingDetail'])->name('B2cTourBookingDetail');
         Route::get('b2c/user-list', [\App\Http\Controllers\B2cAdminController::class, 'userList'])->name('B2cUserList');
+        Route::get('b2c/user/{id}', [\App\Http\Controllers\B2cAdminController::class, 'userDetail'])->name('B2cUserDetail');
         Route::get('b2c/upcoming-flights', [\App\Http\Controllers\B2cAdminController::class, 'upcomingFlights'])->name('B2cUpcomingFlights');
 
         // ─── B2C Configuration ───────────────────────────────────────────────────
@@ -437,6 +440,58 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         // Footer Info
         Route::get('b2c/config/footer-info', [\App\Http\Controllers\B2cAdminController::class, 'footerInfo'])->name('B2cFooterInfo');
         Route::post('b2c/config/footer-info', [\App\Http\Controllers\B2cAdminController::class, 'saveFooterInfo'])->name('B2cSaveFooterInfo');
+
+        // ── Configuration ──────────────────────────────────────────────────────
+
+        // Dynamic Fare Rules
+        Route::get('configuration/dynamic-fare-rules', [\App\Http\Controllers\ConfigurationController::class, 'dynamicFareRules'])->name('ConfigDynamicFareRules');
+        Route::post('configuration/dynamic-fare-rules', [\App\Http\Controllers\ConfigurationController::class, 'storeDynamicFareRule'])->name('ConfigStoreDynamicFareRule');
+        Route::put('configuration/dynamic-fare-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateDynamicFareRule'])->name('ConfigUpdateDynamicFareRule');
+        Route::delete('configuration/dynamic-fare-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteDynamicFareRule'])->name('ConfigDeleteDynamicFareRule');
+        Route::post('configuration/dynamic-fare-rules/{id}/toggle', [\App\Http\Controllers\ConfigurationController::class, 'toggleDynamicFareRule'])->name('ConfigToggleDynamicFareRule');
+
+        // Partial Payment Rules
+        Route::get('configuration/partial-payment-rules', [\App\Http\Controllers\ConfigurationController::class, 'partialPaymentRules'])->name('ConfigPartialPaymentRules');
+        Route::post('configuration/partial-payment-rules', [\App\Http\Controllers\ConfigurationController::class, 'storePartialPaymentRule'])->name('ConfigStorePartialPaymentRule');
+        Route::put('configuration/partial-payment-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updatePartialPaymentRule'])->name('ConfigUpdatePartialPaymentRule');
+        Route::delete('configuration/partial-payment-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deletePartialPaymentRule'])->name('ConfigDeletePartialPaymentRule');
+
+        // Block Routes
+        Route::get('configuration/block-routes', [\App\Http\Controllers\ConfigurationController::class, 'blockRoutes'])->name('ConfigBlockRoutes');
+        Route::post('configuration/block-routes', [\App\Http\Controllers\ConfigurationController::class, 'storeBlockRoute'])->name('ConfigStoreBlockRoute');
+        Route::put('configuration/block-routes/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateBlockRoute'])->name('ConfigUpdateBlockRoute');
+        Route::delete('configuration/block-routes/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteBlockRoute'])->name('ConfigDeleteBlockRoute');
+
+        // Airports
+        Route::get('configuration/airports', [\App\Http\Controllers\ConfigurationController::class, 'airports'])->name('ConfigAirports');
+        Route::post('configuration/airports', [\App\Http\Controllers\ConfigurationController::class, 'storeAirport'])->name('ConfigStoreAirport');
+        Route::put('configuration/airports/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateAirport'])->name('ConfigUpdateAirport');
+        Route::delete('configuration/airports/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteAirport'])->name('ConfigDeleteAirport');
+
+        // Airlines
+        Route::get('configuration/airlines', [\App\Http\Controllers\ConfigurationController::class, 'airlines'])->name('ConfigAirlines');
+        Route::post('configuration/airlines', [\App\Http\Controllers\ConfigurationController::class, 'storeAirline'])->name('ConfigStoreAirline');
+        Route::put('configuration/airlines/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateAirline'])->name('ConfigUpdateAirline');
+        Route::delete('configuration/airlines/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteAirline'])->name('ConfigDeleteAirline');
+
+        // Tracking
+        Route::get('configuration/tracking', [\App\Http\Controllers\ConfigurationController::class, 'tracking'])->name('ConfigTracking');
+        Route::post('configuration/tracking/{type}/update', [\App\Http\Controllers\ConfigurationController::class, 'updateTrackingByType'])->name('ConfigUpdateTrackingByType');
+        Route::post('configuration/tracking', [\App\Http\Controllers\ConfigurationController::class, 'storeTracking'])->name('ConfigStoreTracking');
+        Route::put('configuration/tracking/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateTracking'])->name('ConfigUpdateTracking');
+        Route::delete('configuration/tracking/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteTracking'])->name('ConfigDeleteTracking');
+
+        // Cities
+        Route::get('configuration/cities', [\App\Http\Controllers\ConfigurationController::class, 'cities'])->name('ConfigCities');
+        Route::post('configuration/cities', [\App\Http\Controllers\ConfigurationController::class, 'storeCity'])->name('ConfigStoreCity');
+        Route::delete('configuration/cities', [\App\Http\Controllers\ConfigurationController::class, 'deleteCity'])->name('ConfigDeleteCity');
+
+        // Announcements
+        Route::get('configuration/announcements', [\App\Http\Controllers\ConfigurationController::class, 'announcements'])->name('ConfigAnnouncements');
+        Route::post('configuration/announcements', [\App\Http\Controllers\ConfigurationController::class, 'storeAnnouncement'])->name('ConfigStoreAnnouncement');
+        Route::put('configuration/announcements/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateAnnouncement'])->name('ConfigUpdateAnnouncement');
+        Route::delete('configuration/announcements/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteAnnouncement'])->name('ConfigDeleteAnnouncement');
+        Route::post('configuration/announcements/{id}/toggle', [\App\Http\Controllers\ConfigurationController::class, 'toggleAnnouncement'])->name('ConfigToggleAnnouncement');
 
     });
 

@@ -132,6 +132,35 @@
                     </ul>
                 </li>
 
+                {{-- ═══ B2C ═══ --}}
+                <li class="@if(in_array($currentRoute, ['B2cFlightBookings','B2cTourBookings','B2cUserList','B2cUpcomingFlights'])) mm-active @endif">
+                    <a class="has-arrow material-ripple" href="javascript:void(0);">
+                        <i class="typcn typcn-user-outline"></i> B2C
+                    </a>
+                    <ul class="nav-second-level">
+                        <li class="@if($currentRoute == 'B2cFlightBookings') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2c/flight-bookings') }}">
+                                <i class="typcn typcn-plane-outline"></i> Flight Bookings
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2cTourBookings') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2c/tour-bookings') }}">
+                                <i class="typcn typcn-map"></i> Tour Bookings
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2cUserList') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2c/user-list') }}">
+                                <i class="typcn typcn-group-outline"></i> Users
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'B2cUpcomingFlights') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('b2c/upcoming-flights') }}">
+                                <i class="typcn typcn-time"></i> Upcoming Flights
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 {{-- ═══ FINANCE & REPORTS ═══ --}}
                 <li class="sidebar-section-label">
                     <span>Finance & Reports</span>
@@ -418,6 +447,58 @@
                         <i class="typcn typcn-document-text"></i>
                         Activity Logs
                     </a>
+                </li>
+
+                {{-- ═══ CONFIGURATION ═══ --}}
+                <li class="sidebar-section-label">
+                    <span>Configuration</span>
+                </li>
+                <li class="@if(in_array($currentRoute, ['ConfigDynamicFareRules','ConfigPartialPaymentRules','ConfigBlockRoutes','ConfigAirports','ConfigAirlines','ConfigTracking','ConfigCities','ConfigAnnouncements'])) mm-active @endif">
+                    <a class="has-arrow material-ripple" href="javascript:void(0);">
+                        <i class="typcn typcn-cog-outline"></i> Configuration
+                    </a>
+                    <ul class="nav-second-level">
+                        <li class="@if($currentRoute == 'ConfigDynamicFareRules') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/dynamic-fare-rules') }}">
+                                <i class="typcn typcn-calculator"></i> Dynamic Fare Rules
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'ConfigPartialPaymentRules') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/partial-payment-rules') }}">
+                                <i class="typcn typcn-credit-card"></i> Partial Payment Rules
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'ConfigBlockRoutes') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/block-routes') }}">
+                                <i class="typcn typcn-cancel-outline"></i> Block Route
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'ConfigAirports') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/airports') }}">
+                                <i class="typcn typcn-plane-outline"></i> Airports
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'ConfigAirlines') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/airlines') }}">
+                                <i class="typcn typcn-flight"></i> Airlines
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'ConfigTracking') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/tracking') }}">
+                                <i class="typcn typcn-chart-bar-outline"></i> Tracking
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'ConfigCities') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/cities') }}">
+                                <i class="typcn typcn-location-outline"></i> City
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'ConfigAnnouncements') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('configuration/announcements') }}">
+                                <i class="typcn typcn-bell"></i> Announcement
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
             </ul>

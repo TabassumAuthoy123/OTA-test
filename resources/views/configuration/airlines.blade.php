@@ -1,0 +1,162 @@
+@extends('master')
+@section('header_css')
+<style>
+.cfg-header{background:linear-gradient(135deg,#1a5276,#2471a3);color:#fff;padding:16px 24px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;}
+.cfg-header h5{margin:0;font-size:18px;font-weight:700;}
+.cfg-filters{background:#f8f9fa;padding:14px 16px;border-bottom:1px solid #dee2e6;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
+.cfg-filters .fg{display:flex;flex-direction:column;gap:4px;}
+.cfg-filters label{font-size:11px;font-weight:600;color:#555;margin:0;}
+.cfg-filters input,.cfg-filters select{font-size:13px;padding:5px 10px;border:1px solid #ced4da;border-radius:5px;height:34px;}
+.cfg-table th{background:#1a5276;color:#fff;font-size:13px;padding:10px 12px;white-space:nowrap;}
+.cfg-table td{font-size:13px;padding:9px 12px;vertical-align:middle;}
+.cfg-table tr:hover td{background:#eaf4ff;}
+.iata-badge{background:#e3f2fd;color:#0d47a1;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;font-family:monospace;}
+.badge-active{background:#d4edda;color:#155724;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.badge-inactive{background:#f8d7da;color:#721c24;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+</style>
+@endsection
+@section('content')
+<div class="row"><div class="col-lg-12">
+  <div class="card" style="border-radius:8px;overflow:hidden;">
+    <div class="cfg-header">
+      <div>
+        <h5><i class="typcn typcn-plane-outline me-2"></i> Airlines</h5>
+        <small>Configuration &rsaquo; Airlines &nbsp;|&nbsp; Total: {{ $airlines->total() }}</small>
+      </div>
+      <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+        <i class="typcn typcn-plus"></i> Add Airline
+      </button>
+    </div>
+
+    @if(session('success'))
+      <div class="alert alert-success m-3 py-2">{{ session('success') }}</div>
+    @endif
+
+    <form method="GET" action="{{ url('configuration/airlines') }}">
+      <div class="cfg-filters">
+        <div class="fg">
+          <label>Search</label>
+          <input type="text" name="search" value="{{ request('search') }}" placeholder="Name / IATA / ICAO / Country..." style="width:280px;">
+        </div>
+        <div class="fg">
+          <label>Status</label>
+          <select name="filter_status">
+            <option value="all">All</option>
+            <option value="Y" {{ request('filter_status')=='Y'?'selected':'' }}>Active</option>
+            <option value="N" {{ request('filter_status')=='N'?'selected':'' }}>Inactive</option>
+          </select>
+        </div>
+        <div class="fg"><label>&nbsp;</label>
+          <button type="submit" class="btn btn-primary btn-sm" style="height:34px;">Search</button>
+        </div>
+        @if(request()->hasAny(['search','filter_status']))
+          <div class="fg"><label>&nbsp;</label>
+            <a href="{{ url('configuration/airlines') }}" class="btn btn-secondary btn-sm" style="height:34px;">Clear</a>
+          </div>
+        @endif
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-bordered cfg-table mb-0">
+        <thead>
+          <tr>
+            <th>#</th><th>IATA</th><th>ICAO</th><th>Airline Name</th><th>Country</th>
+            <th>Commission %</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($airlines as $i => $al)
+          <tr>
+            <td>{{ $airlines->firstItem() + $i }}</td>
+            <td><span class="iata-badge">{{ $al->iata }}</span></td>
+            <td>{{ $al->icao ?: '—' }}</td>
+            <td><strong>{{ $al->name }}</strong></td>
+            <td>{{ $al->country ?: '—' }}</td>
+            <td>{{ $al->comission }}%</td>
+            <td><span class="{{ $al->active === 'Y' ? 'badge-active' : 'badge-inactive' }}">{{ $al->active === 'Y' ? 'Active' : 'Inactive' }}</span></td>
+            <td>
+              <button class="btn btn-sm btn-warning btn-edit-al" style="font-size:11px;"
+                data-id="{{ $al->id }}" data-name="{{ $al->name }}"
+                data-iata="{{ $al->iata }}" data-icao="{{ $al->icao }}"
+                data-country="{{ $al->country }}" data-commission="{{ $al->comission }}"
+                data-active="{{ $al->active }}">Edit</button>
+              <form method="POST" action="{{ url('configuration/airlines/'.$al->id) }}" class="d-inline"
+                onsubmit="return confirm('Delete airline?')">
+                @csrf @method('DELETE')
+                <button class="btn btn-sm btn-danger" style="font-size:11px;">Del</button>
+              </form>
+            </td>
+          </tr>
+          @empty
+          <tr><td colspan="8" class="text-center text-muted py-4">No airlines found.</td></tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+    <div class="p-3">{{ $airlines->links() }}</div>
+  </div>
+</div></div>
+
+{{-- Add Modal --}}
+<div class="modal fade" id="addModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#1a5276;color:#fff;">
+        <h5 class="modal-title">Add Airline</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{{ url('configuration/airlines') }}">
+        @csrf
+        <div class="modal-body">
+          @include('configuration._airline_fields')
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Airline</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{-- Edit Modal --}}
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#1a5276;color:#fff;">
+        <h5 class="modal-title">Edit Airline</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" id="editForm">
+        @csrf @method('PUT')
+        <div class="modal-body">
+          @include('configuration._airline_fields', ['edit' => true])
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endsection
+@section('footer_js')
+<script>
+document.querySelectorAll('.btn-edit-al').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const d = this.dataset;
+    const f = document.getElementById('editForm');
+    f.action = '/configuration/airlines/' + d.id;
+    f.querySelector('[name=name]').value = d.name;
+    f.querySelector('[name=iata]').value = d.iata;
+    f.querySelector('[name=icao]').value = d.icao || '';
+    f.querySelector('[name=country]').value = d.country || '';
+    f.querySelector('[name=comission]').value = d.commission;
+    f.querySelector('[name=active]').checked = d.active === 'Y';
+    new bootstrap.Modal(document.getElementById('editModal')).show();
+  });
+});
+</script>
+@endsection

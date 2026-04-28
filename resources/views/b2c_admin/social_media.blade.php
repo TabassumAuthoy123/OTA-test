@@ -6,10 +6,10 @@
 .b2c-table th{background:#1a5276;color:#fff;font-size:13px;padding:10px 12px;white-space:nowrap;}
 .b2c-table td{font-size:13px;padding:9px 12px;vertical-align:middle;}
 .b2c-table tr:hover td{background:#eaf4ff;}
-.btn-add{background:#f0a500;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:700;text-decoration:none;}
-.btn-edit{background:#f0a500;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:600;}
-.btn-del{background:#dc3545;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:600;}
-.soc-logo{max-width:40px;max-height:30px;}
+.btn-add{background:#f0a500;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;}
+.btn-edit{background:#f0a500;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-del{background:#dc3545;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;}
+.soc-logo{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #dee2e6;}
 </style>
 @endsection
 @section('content')
@@ -17,9 +17,11 @@
   @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
   <div class="card" style="border-radius:8px;overflow:hidden;">
     <div class="b2c-page-header">
-      <div><h5>Social Media Links</h5><small>Dashboard &rsaquo; Configuration &rsaquo; Social-media</small><br>
-        <form method="GET" action="{{ url('b2c/config/social-media') }}" class="mt-2 d-inline-flex gap-2">
-          <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." style="width:180px;font-size:13px;padding:4px 8px;border:1px solid #ccc;border-radius:5px;">
+      <div>
+        <h5>Social Media Links</h5>
+        <small>Dashboard &rsaquo; Configuration &rsaquo; Social-media</small>
+        <form method="GET" action="{{ route('B2cSocialMedia') }}" class="mt-2 d-inline-flex gap-2">
+          <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." style="width:180px;font-size:13px;padding:4px 8px;border:1px solid #ccc;border-radius:5px;color:#333;">
           <button class="btn btn-light btn-sm"><i class="fas fa-search"></i></button>
         </form>
       </div>
@@ -33,13 +35,24 @@
             @forelse($items as $i => $item)
             <tr>
               <td>{{ $i+1 }}</td>
-              <td>@if($item->logo && file_exists(public_path($item->logo)))<img src="{{ url($item->logo) }}" class="soc-logo">@else-@endif</td>
+              <td>
+                @if($item->logo)
+                  <img src="{{ asset($item->logo) }}" class="soc-logo" alt="{{ $item->name }}">
+                @else
+                  <span class="text-muted">—</span>
+                @endif
+              </td>
               <td>{{ $item->name }}</td>
-              <td><a href="{{ $item->link }}" target="_blank" style="color:#1a5276;">{{ $item->link }}</a></td>
+              <td><a href="{{ $item->link }}" target="_blank" style="color:#1a5276;">{{ Str::limit($item->link, 50) }}</a></td>
               <td>{{ $item->created_at ? date('d-m-Y', strtotime($item->created_at)) : 'N/A' }}</td>
               <td>
-                <button class="btn-edit" onclick="openEditSocial({{ $item->id }},'{{ addslashes($item->name) }}','{{ addslashes($item->link) }}')">Edit</button>
-                <a href="{{ url('b2c/config/social-media/'.$item->id.'/delete') }}" class="btn-del" onclick="return confirm('Delete?')">Delete</a>
+                <button class="btn-edit" onclick="openEditSocial({{ $item->id }},'{{ addslashes($item->name) }}','{{ addslashes($item->link) }}','{{ $item->logo }}')">
+                  <i class="fas fa-edit me-1"></i>Edit
+                </button>
+                <form method="POST" action="{{ route('B2cDeleteSocialMedia', $item->id) }}" style="display:inline" onsubmit="return confirm('Delete this social link?')">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="btn-del"><i class="fas fa-trash me-1"></i>Delete</button>
+                </form>
               </td>
             </tr>
             @empty
@@ -52,40 +65,68 @@
   </div>
 </div></div>
 
+<!-- Add Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
-  <div class="modal-dialog"><form method="POST" action="{{ url('b2c/config/social-media/store') }}" enctype="multipart/form-data">@csrf
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Add Social Media</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <div class="mb-3"><label class="form-label fw-bold text-danger">* Name</label><input type="text" name="name" class="form-control" placeholder="Facebook" required></div>
-        <div class="mb-3"><label class="form-label fw-bold text-danger">* Link</label><input type="url" name="link" class="form-control" placeholder="https://www.facebook.com/yourpage" required></div>
-        <div class="mb-3"><label class="form-label fw-bold">Logo</label><input type="file" name="logo" class="form-control" accept="image/*"></div>
+  <div class="modal-dialog">
+    <form method="POST" action="{{ route('B2cStoreSocialMedia') }}" enctype="multipart/form-data">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header" style="background:#2471a3;color:#fff;">
+          <h5 class="modal-title">Add Social Media</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label fw-bold text-danger">* Name</label><input type="text" name="name" class="form-control" placeholder="Facebook" required></div>
+          <div class="mb-3"><label class="form-label fw-bold text-danger">* Link</label><input type="url" name="link" class="form-control" placeholder="https://www.facebook.com/yourpage" required></div>
+          <div class="mb-3"><label class="form-label fw-bold">Logo</label><input type="file" name="logo" class="form-control" accept="image/*"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning text-white fw-bold">Submit</button>
+        </div>
       </div>
-      <div class="modal-footer"><button type="submit" class="btn btn-warning text-white fw-bold">Submit</button></div>
-    </div>
-  </form></div>
+    </form>
+  </div>
 </div>
 
+<!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1">
-  <div class="modal-dialog"><form id="editForm" method="POST" enctype="multipart/form-data">@csrf
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Edit Social Media</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <div class="mb-3"><label class="form-label fw-bold text-danger">* Name</label><input type="text" name="name" id="edit_name" class="form-control" required></div>
-        <div class="mb-3"><label class="form-label fw-bold text-danger">* Link</label><input type="url" name="link" id="edit_link" class="form-control" required></div>
-        <div class="mb-3"><label class="form-label fw-bold">Logo</label><input type="file" name="logo" class="form-control" accept="image/*"></div>
+  <div class="modal-dialog">
+    <form id="editForm" method="POST" enctype="multipart/form-data">
+      @csrf
+      <input type="hidden" name="_method" value="PUT">
+      <div class="modal-content">
+        <div class="modal-header" style="background:#1a5276;color:#fff;">
+          <h5 class="modal-title">Edit Social Media</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label fw-bold text-danger">* Name</label><input type="text" name="name" id="edit_name" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label fw-bold text-danger">* Link</label><input type="url" name="link" id="edit_link" class="form-control" required></div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Current Logo</label>
+            <div id="edit_logo_preview" class="mb-2"></div>
+            <label class="form-label fw-bold">Change Logo</label>
+            <input type="file" name="logo" class="form-control" accept="image/*">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning text-white fw-bold">Update</button>
+        </div>
       </div>
-      <div class="modal-footer"><button type="submit" class="btn btn-warning text-white fw-bold">Update</button></div>
-    </div>
-  </form></div>
+    </form>
+  </div>
 </div>
 @endsection
 @section('footer_js')
 <script>
-function openEditSocial(id,name,link){
-  document.getElementById('editForm').action='/b2c/config/social-media/'+id+'/update';
-  document.getElementById('edit_name').value=name;
-  document.getElementById('edit_link').value=link;
+function openEditSocial(id, name, link, logo) {
+  document.getElementById('editForm').action = '{{ url("b2c/config/social-media") }}/' + id;
+  document.getElementById('edit_name').value = name;
+  document.getElementById('edit_link').value = link;
+  var preview = document.getElementById('edit_logo_preview');
+  preview.innerHTML = logo ? '<img src="/' + logo + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #dee2e6;">' : '<span class="text-muted small">No logo</span>';
   new bootstrap.Modal(document.getElementById('editModal')).show();
 }
 </script>

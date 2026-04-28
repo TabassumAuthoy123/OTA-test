@@ -5,7 +5,7 @@
 .b2c-page-header h4{margin:0;font-weight:700;font-size:1.2rem;}
 .table thead th{background:#2471a3;color:#fff;border:none;font-size:.82rem;padding:10px 12px;}
 .table tbody tr:hover{background:#eaf4fb;}
-.btn-add-new{background:linear-gradient(135deg,#1a5276,#2471a3);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:.85rem;font-weight:600;}
+.btn-add-new{background:linear-gradient(135deg,#1a5276,#2471a3);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:.85rem;font-weight:600;cursor:pointer;}
 .dest-thumb{width:60px;height:45px;object-fit:cover;border-radius:6px;border:2px solid #2471a3;}
 </style>
 @endsection
@@ -33,12 +33,12 @@
                 </tr>
               </thead>
               <tbody>
-                @forelse($destinations as $i => $dest)
+                @forelse($items as $i => $dest)
                 <tr>
                   <td>{{ $i+1 }}</td>
                   <td>
                     @if($dest->image)
-                      <img src="{{ asset('uploads/destinations/'.$dest->image) }}" class="dest-thumb" alt="dest">
+                      <img src="{{ asset($dest->image) }}" class="dest-thumb" alt="{{ $dest->name }}">
                     @else
                       <span class="text-muted">—</span>
                     @endif
@@ -49,7 +49,7 @@
                     <button class="btn btn-sm btn-warning" onclick="openEdit({{ $dest->id }},'{{ addslashes($dest->name) }}','{{ addslashes($dest->description) }}','{{ $dest->image }}')">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <form method="POST" action="{{ route('B2cDeleteDestination', $dest->id) }}" style="display:inline" onsubmit="return confirm('Delete?')">
+                    <form method="POST" action="{{ route('B2cDeleteDestination', $dest->id) }}" style="display:inline" onsubmit="return confirm('Delete this destination?')">
                       @csrf @method('DELETE')
                       <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                     </form>
@@ -79,15 +79,15 @@
         @csrf
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label fw-semibold">Name</label>
+            <label class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
             <input type="text" name="name" class="form-control" required>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Description</label>
-            <textarea name="description" class="form-control" rows="3"></textarea>
+            <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+            <textarea name="description" class="form-control" rows="3" required></textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Image</label>
+            <label class="form-label fw-semibold">Upload Image</label>
             <input type="file" name="image" class="form-control" accept="image/*">
           </div>
         </div>
@@ -109,19 +109,21 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" id="editForm" enctype="multipart/form-data">
-        @csrf @method('PUT')
+        @csrf
+        <input type="hidden" name="_method" value="PUT">
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label fw-semibold">Name</label>
+            <label class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
             <input type="text" name="name" id="editName" class="form-control" required>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Description</label>
-            <textarea name="description" id="editDescription" class="form-control" rows="3"></textarea>
+            <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+            <textarea name="description" id="editDescription" class="form-control" rows="3" required></textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Image</label>
+            <label class="form-label fw-semibold">Current Image</label>
             <div id="currentImage" class="mb-2"></div>
+            <label class="form-label fw-semibold">Change Image</label>
             <input type="file" name="image" class="form-control" accept="image/*">
           </div>
         </div>
@@ -139,9 +141,9 @@
 function openEdit(id, name, description, image) {
   document.getElementById('editName').value = name;
   document.getElementById('editDescription').value = description;
-  document.getElementById('editForm').action = '/b2c/config/popular-destinations/' + id;
+  document.getElementById('editForm').action = '{{ url("b2c/config/popular-destinations") }}/' + id;
   var imgDiv = document.getElementById('currentImage');
-  imgDiv.innerHTML = image ? '<img src="/uploads/destinations/' + image + '" style="width:80px;height:60px;object-fit:cover;border-radius:6px;">' : '';
+  imgDiv.innerHTML = image ? '<img src="/' + image + '" style="width:80px;height:60px;object-fit:cover;border-radius:6px;">' : '<span class="text-muted small">No image</span>';
   new bootstrap.Modal(document.getElementById('editModal')).show();
 }
 </script>

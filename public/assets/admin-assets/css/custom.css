@@ -3,6 +3,31 @@
     overflow: hidden;
 }
 
+/* ── B2C Configuration: third-level nav items — always black/dark ── */
+.sidebar-nav .nav-third-level li a,
+.sidebar-nav .nav-third-level li a:link,
+.sidebar-nav .nav-third-level li a:visited {
+    color: #2c3e50 !important;
+    font-weight: 500;
+}
+.sidebar-nav .nav-third-level li a i {
+    color: #2c3e50 !important;
+}
+.sidebar-nav .nav-third-level li a:hover,
+.sidebar-nav .nav-third-level li a:focus {
+    color: #1a4fa0 !important;
+    background-color: #f0f2f5;
+}
+.sidebar-nav .nav-third-level li.mm-active > a,
+.sidebar-nav .nav-third-level li.mm-active > a:link,
+.sidebar-nav .nav-third-level li.mm-active > a:visited {
+    color: #1a5276 !important;
+    font-weight: 700;
+}
+.sidebar-nav .nav-third-level li.mm-active > a i {
+    color: #1a5276 !important;
+}
+
 .sidebar-header {
     background: #ffffff;
     border-bottom: 1px solid #f3eeee;

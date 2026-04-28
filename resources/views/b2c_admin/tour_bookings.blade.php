@@ -48,7 +48,7 @@
               <td>{{ $b->tour_type }}</td>
               <td>{{ $b->travel_date ? date('m/d/Y, g:i:s A', strtotime($b->travel_date)) : 'N/A' }}</td>
               <td>@if($b->status==1)<span class="s-confirmed">CONFIRMED</span>@elseif($b->status==2)<span class="s-cancelled">CANCELLED</span>@else<span class="s-pending">PENDING</span>@endif</td>
-              <td><a href="#" class="btn-view"><i class="fas fa-eye"></i></a></td>
+              <td><a href="{{ url('b2c/tour-bookings/'.$b->id) }}" class="btn-view" style="background:#f0a500;padding:5px 10px;border-radius:5px;"><i class="fas fa-eye"></i></a></td>
             </tr>
             @empty
             <tr><td colspan="8" class="text-center py-5 text-muted">No data</td></tr>
