@@ -7,97 +7,104 @@ use Illuminate\Support\Facades\DB;
 
 class ConfigurationController extends Controller
 {
-    // ─── DYNAMIC FARE RULES ─────────────────────────────────────────────────────
+    // ─── DYNAMIC FARE RULE SETS ─────────────────────────────────────────────────
 
     public function dynamicFareRules(Request $request)
     {
-        $q = DB::table('dynamic_fare_rules');
+        $q = DB::table('fare_rule_sets');
         if ($request->filled('search')) {
-            $s = $request->search;
-            $q->where(function ($w) use ($s) {
-                $w->where('name', 'like', "%$s%")
-                  ->orWhere('origin', 'like', "%$s%")
-                  ->orWhere('destination', 'like', "%$s%")
-                  ->orWhere('airline_code', 'like', "%$s%");
-            });
+            $q->where('name', 'like', '%' . $request->search . '%');
         }
-        if ($request->filled('filter_status') && $request->filter_status !== 'all') {
-            $q->where('is_active', $request->filter_status);
-        }
-        $rules = $q->orderByDesc('created_at')->paginate(20)->withQueryString();
-        return view('configuration.dynamic_fare_rules', compact('rules'));
+        $sets = $q->orderByDesc('created_at')->paginate(50)->withQueryString();
+        return view('configuration.dynamic_fare_rules', compact('sets'));
     }
 
-    public function storeDynamicFareRule(Request $request)
+    public function storeFareRuleSet(Request $request)
     {
-        $request->validate([
-            'name'         => 'required|string|max:150',
-            'markup_type'  => 'required|in:fixed,percentage',
-            'markup_value' => 'required|numeric|min:0',
-        ]);
-        DB::table('dynamic_fare_rules')->insert([
-            'name'         => $request->name,
-            'origin'       => $request->origin ?: null,
-            'destination'  => $request->destination ?: null,
-            'airline_code' => $request->airline_code ?: null,
-            'trip_type'    => $request->trip_type ?? 'all',
-            'cabin_class'  => $request->cabin_class ?: null,
-            'markup_type'  => $request->markup_type,
-            'markup_value' => $request->markup_value,
-            'min_fare'     => $request->min_fare ?: null,
-            'max_fare'     => $request->max_fare ?: null,
-            'valid_from'   => $request->valid_from ?: null,
-            'valid_until'  => $request->valid_until ?: null,
-            'is_active'    => $request->has('is_active') ? 1 : 0,
-            'notes'        => $request->notes,
-            'created_at'   => now(),
-            'updated_at'   => now(),
-        ]);
-        return back()->with('success', 'Dynamic fare rule added.');
+        $request->validate(['name' => 'required|string|max:150|unique:fare_rule_sets,name']);
+        DB::table('fare_rule_sets')->insert(['name' => trim($request->name), 'created_at' => now(), 'updated_at' => now()]);
+        return back()->with('success', 'Fare rules set created.');
     }
 
-    public function updateDynamicFareRule(Request $request, $id)
+    public function updateFareRuleSet(Request $request, $id)
     {
-        $request->validate([
-            'name'         => 'required|string|max:150',
-            'markup_type'  => 'required|in:fixed,percentage',
-            'markup_value' => 'required|numeric|min:0',
-        ]);
-        DB::table('dynamic_fare_rules')->where('id', $id)->update([
-            'name'         => $request->name,
-            'origin'       => $request->origin ?: null,
-            'destination'  => $request->destination ?: null,
-            'airline_code' => $request->airline_code ?: null,
-            'trip_type'    => $request->trip_type ?? 'all',
-            'cabin_class'  => $request->cabin_class ?: null,
-            'markup_type'  => $request->markup_type,
-            'markup_value' => $request->markup_value,
-            'min_fare'     => $request->min_fare ?: null,
-            'max_fare'     => $request->max_fare ?: null,
-            'valid_from'   => $request->valid_from ?: null,
-            'valid_until'  => $request->valid_until ?: null,
-            'is_active'    => $request->has('is_active') ? 1 : 0,
-            'notes'        => $request->notes,
-            'updated_at'   => now(),
-        ]);
-        return back()->with('success', 'Rule updated.');
+        $request->validate(['name' => 'required|string|max:150']);
+        DB::table('fare_rule_sets')->where('id', $id)->update(['name' => trim($request->name), 'updated_at' => now()]);
+        return response()->json(['success' => true]);
     }
 
-    public function deleteDynamicFareRule($id)
+    public function deleteFareRuleSet($id)
     {
-        DB::table('dynamic_fare_rules')->where('id', $id)->delete();
-        return back()->with('success', 'Rule deleted.');
+        DB::table('fare_rule_sets')->where('id', $id)->delete();
+        return response()->json(['success' => true]);
     }
 
-    public function toggleDynamicFareRule($id)
+    public function cloneFareRuleSet(Request $request, $id)
     {
-        $rule = DB::table('dynamic_fare_rules')->where('id', $id)->first();
-        if ($rule) {
-            DB::table('dynamic_fare_rules')->where('id', $id)->update([
-                'is_active'  => $rule->is_active ? 0 : 1,
-                'updated_at' => now(),
+        $request->validate(['name' => 'required|string|max:150|unique:fare_rule_sets,name']);
+        $original = DB::table('fare_rule_sets')->where('id', $id)->first();
+        if (!$original) return response()->json(['success' => false, 'message' => 'Not found.'], 404);
+
+        $newId = DB::table('fare_rule_sets')->insertGetId(['name' => trim($request->name), 'created_at' => now(), 'updated_at' => now()]);
+
+        $suppliers = DB::table('fare_rule_suppliers')->where('fare_rule_set_id', $id)->get();
+        foreach ($suppliers as $s) {
+            DB::table('fare_rule_suppliers')->insert([
+                'fare_rule_set_id'          => $newId,
+                'api_type'                  => $s->api_type,
+                'pax_markup_value'          => $s->pax_markup_value,
+                'commission_value'          => $s->commission_value,
+                'commission_type'           => $s->commission_type,
+                'markup_value'              => $s->markup_value,
+                'markup_type'               => $s->markup_type,
+                'segment_commission_value'  => $s->segment_commission_value,
+                'segment_commission_type'   => $s->segment_commission_type,
+                'segment_markup_value'      => $s->segment_markup_value,
+                'segment_markup_type'       => $s->segment_markup_type,
+                'is_active'                 => $s->is_active,
+                'created_at'                => now(),
+                'updated_at'                => now(),
             ]);
         }
+        return response()->json(['success' => true]);
+    }
+
+    // ─── FARE RULE SUPPLIERS ─────────────────────────────────────────────────────
+
+    public function fareRuleSuppliers(Request $request, $id)
+    {
+        $set = DB::table('fare_rule_sets')->where('id', $id)->first();
+        if (!$set) abort(404);
+        $suppliers = DB::table('fare_rule_suppliers')->where('fare_rule_set_id', $id)->orderByDesc('created_at')->get();
+        $gds = ['all' => 'All API', 'sabre' => 'SABRE', 'flyhub' => 'FlyHub'];
+        return view('configuration.fare_rule_suppliers', compact('set', 'suppliers', 'gds'));
+    }
+
+    public function storeFareRuleSupplier(Request $request, $id)
+    {
+        $request->validate(['api_type' => 'required|string|max:20']);
+        DB::table('fare_rule_suppliers')->insert([
+            'fare_rule_set_id'         => $id,
+            'api_type'                 => $request->api_type,
+            'pax_markup_value'         => (float)$request->pax_markup_value,
+            'commission_value'         => (float)$request->commission_value,
+            'commission_type'          => $request->commission_type ?? 'flat',
+            'markup_value'             => (float)$request->markup_value,
+            'markup_type'              => $request->markup_type ?? 'flat',
+            'segment_commission_value' => (float)$request->segment_commission_value,
+            'segment_commission_type'  => $request->segment_commission_type ?? 'flat',
+            'segment_markup_value'     => (float)$request->segment_markup_value,
+            'segment_markup_type'      => $request->segment_markup_type ?? 'flat',
+            'is_active'                => 1,
+            'created_at'               => now(),
+            'updated_at'               => now(),
+        ]);
+        return response()->json(['success' => true]);
+    }
+
+    public function deleteFareRuleSupplier($supplierId)
+    {
+        DB::table('fare_rule_suppliers')->where('id', $supplierId)->delete();
         return response()->json(['success' => true]);
     }
 

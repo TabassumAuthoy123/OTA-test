@@ -443,12 +443,16 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
 
         // ── Configuration ──────────────────────────────────────────────────────
 
-        // Dynamic Fare Rules
+        // Dynamic Fare Rules (Sets)
         Route::get('configuration/dynamic-fare-rules', [\App\Http\Controllers\ConfigurationController::class, 'dynamicFareRules'])->name('ConfigDynamicFareRules');
-        Route::post('configuration/dynamic-fare-rules', [\App\Http\Controllers\ConfigurationController::class, 'storeDynamicFareRule'])->name('ConfigStoreDynamicFareRule');
-        Route::put('configuration/dynamic-fare-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateDynamicFareRule'])->name('ConfigUpdateDynamicFareRule');
-        Route::delete('configuration/dynamic-fare-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteDynamicFareRule'])->name('ConfigDeleteDynamicFareRule');
-        Route::post('configuration/dynamic-fare-rules/{id}/toggle', [\App\Http\Controllers\ConfigurationController::class, 'toggleDynamicFareRule'])->name('ConfigToggleDynamicFareRule');
+        Route::post('configuration/dynamic-fare-rules', [\App\Http\Controllers\ConfigurationController::class, 'storeFareRuleSet'])->name('ConfigStoreFareRuleSet');
+        Route::put('configuration/dynamic-fare-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateFareRuleSet'])->name('ConfigUpdateFareRuleSet');
+        Route::delete('configuration/dynamic-fare-rules/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteFareRuleSet'])->name('ConfigDeleteFareRuleSet');
+        Route::post('configuration/dynamic-fare-rules/{id}/clone', [\App\Http\Controllers\ConfigurationController::class, 'cloneFareRuleSet'])->name('ConfigCloneFareRuleSet');
+        // Dynamic Fare Rule Suppliers
+        Route::get('configuration/dynamic-fare-rules/{id}/suppliers', [\App\Http\Controllers\ConfigurationController::class, 'fareRuleSuppliers'])->name('ConfigFareRuleSuppliers');
+        Route::post('configuration/dynamic-fare-rules/{id}/suppliers', [\App\Http\Controllers\ConfigurationController::class, 'storeFareRuleSupplier'])->name('ConfigStoreFareRuleSupplier');
+        Route::delete('configuration/dynamic-fare-rules/suppliers/{supplierId}', [\App\Http\Controllers\ConfigurationController::class, 'deleteFareRuleSupplier'])->name('ConfigDeleteFareRuleSupplier');
 
         // Partial Payment Rules
         Route::get('configuration/partial-payment-rules', [\App\Http\Controllers\ConfigurationController::class, 'partialPaymentRules'])->name('ConfigPartialPaymentRules');
