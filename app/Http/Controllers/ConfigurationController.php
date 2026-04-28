@@ -465,22 +465,6 @@ class ConfigurationController extends Controller
             ->with('success', $this->trackingTypes[$type] . ' updated successfully.');
     }
 
-    // kept for backward-compat with old generic routes (no-op redirect)
-    public function storeTracking(Request $request)
-    {
-        return redirect(url('configuration/tracking'))->with('success', 'Use the per-type update form.');
-    }
-
-    public function updateTracking(Request $request, $id)
-    {
-        return redirect(url('configuration/tracking'));
-    }
-
-    public function deleteTracking($id)
-    {
-        return redirect(url('configuration/tracking'));
-    }
-
     // ─── CITY ────────────────────────────────────────────────────────────────────
 
     public function cities(Request $request)

@@ -482,9 +482,6 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         // Tracking
         Route::get('configuration/tracking', [\App\Http\Controllers\ConfigurationController::class, 'tracking'])->name('ConfigTracking');
         Route::post('configuration/tracking/{type}/update', [\App\Http\Controllers\ConfigurationController::class, 'updateTrackingByType'])->name('ConfigUpdateTrackingByType');
-        Route::post('configuration/tracking', [\App\Http\Controllers\ConfigurationController::class, 'storeTracking'])->name('ConfigStoreTracking');
-        Route::put('configuration/tracking/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateTracking'])->name('ConfigUpdateTracking');
-        Route::delete('configuration/tracking/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteTracking'])->name('ConfigDeleteTracking');
 
         // Cities
         Route::get('configuration/cities', [\App\Http\Controllers\ConfigurationController::class, 'cities'])->name('ConfigCities');
