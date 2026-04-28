@@ -103,43 +103,44 @@ class ConfigurationController extends Controller
 
     // ─── PARTIAL PAYMENT RULES ───────────────────────────────────────────────────
 
+    private array $gdsOptions = ['all' => 'All API', 'sabre' => 'SABRE', 'flyhub' => 'FlyHub'];
+
     public function partialPaymentRules(Request $request)
     {
         $q = DB::table('partial_payment_rules');
-        if ($request->filled('search')) {
-            $s = $request->search;
-            $q->where(function ($w) use ($s) {
-                $w->where('name', 'like', "%$s%")
-                  ->orWhere('airline_code', 'like', "%$s%");
-            });
+        if ($request->filled('filter_api') && $request->filter_api !== 'all') {
+            $q->where('flight_api', $request->filter_api);
         }
         if ($request->filled('filter_status') && $request->filter_status !== 'all') {
             $q->where('is_active', $request->filter_status);
         }
-        $rules = $q->orderByDesc('created_at')->paginate(20)->withQueryString();
-        return view('configuration.partial_payment_rules', compact('rules'));
+        $rules    = $q->orderByDesc('created_at')->paginate(50)->withQueryString();
+        $airlines = DB::table('airlines')->where('active', 'Y')->orderBy('name')->get(['id', 'name', 'iata']);
+        $gds      = $this->gdsOptions;
+        return view('configuration.partial_payment_rules', compact('rules', 'airlines', 'gds'));
     }
 
     public function storePartialPaymentRule(Request $request)
     {
         $request->validate([
-            'name'                => 'required|string|max:150',
-            'min_payment_percent' => 'required|numeric|min:1|max:100',
-            'payment_due_days'    => 'required|integer|min:1',
+            'flight_api'     => 'required|string|max:20',
+            'payment_percent'=> 'required|numeric|min:0|max:100',
         ]);
         DB::table('partial_payment_rules')->insert([
-            'name'                => $request->name,
-            'min_payment_percent' => $request->min_payment_percent,
-            'max_defer_percent'   => 100 - $request->min_payment_percent,
-            'payment_due_days'    => $request->payment_due_days,
-            'applicable_for'      => $request->applicable_for ?? 'all',
-            'airline_code'        => $request->airline_code ?: null,
-            'route_from'          => $request->route_from ?: null,
-            'route_to'            => $request->route_to ?: null,
-            'is_active'           => $request->has('is_active') ? 1 : 0,
-            'notes'               => $request->notes,
-            'created_at'          => now(),
-            'updated_at'          => now(),
+            'flight_api'            => $request->flight_api,
+            'airline_code'          => $request->airline_code ?: null,
+            'from_dac'              => $request->from_dac == 'yes' ? 1 : 0,
+            'to_dac'                => $request->to_dac   == 'yes' ? 1 : 0,
+            'domestic'              => $request->domestic  == 'yes' ? 1 : 0,
+            'soto'                  => $request->soto      == 'yes' ? 1 : 0,
+            'one_way'               => $request->one_way   == 'yes' ? 1 : 0,
+            'round_trip'            => $request->round_trip== 'yes' ? 1 : 0,
+            'travel_date_from_now'  => (int)$request->travel_date_from_now,
+            'payment_before_days'   => (int)$request->payment_before_days,
+            'payment_percent'       => $request->payment_percent,
+            'is_active'             => 1,
+            'created_at'            => now(),
+            'updated_at'            => now(),
         ]);
         return back()->with('success', 'Partial payment rule added.');
     }
@@ -147,30 +148,29 @@ class ConfigurationController extends Controller
     public function updatePartialPaymentRule(Request $request, $id)
     {
         $request->validate([
-            'name'                => 'required|string|max:150',
-            'min_payment_percent' => 'required|numeric|min:1|max:100',
-            'payment_due_days'    => 'required|integer|min:1',
+            'payment_percent' => 'required|numeric|min:0|max:100',
         ]);
         DB::table('partial_payment_rules')->where('id', $id)->update([
-            'name'                => $request->name,
-            'min_payment_percent' => $request->min_payment_percent,
-            'max_defer_percent'   => 100 - $request->min_payment_percent,
-            'payment_due_days'    => $request->payment_due_days,
-            'applicable_for'      => $request->applicable_for ?? 'all',
-            'airline_code'        => $request->airline_code ?: null,
-            'route_from'          => $request->route_from ?: null,
-            'route_to'            => $request->route_to ?: null,
-            'is_active'           => $request->has('is_active') ? 1 : 0,
-            'notes'               => $request->notes,
-            'updated_at'          => now(),
+            'airline_code'         => $request->airline_code ?: null,
+            'from_dac'             => $request->from_dac  == 'yes' ? 1 : 0,
+            'to_dac'               => $request->to_dac    == 'yes' ? 1 : 0,
+            'domestic'             => $request->domestic   == 'yes' ? 1 : 0,
+            'soto'                 => $request->soto       == 'yes' ? 1 : 0,
+            'one_way'              => $request->one_way    == 'yes' ? 1 : 0,
+            'round_trip'           => $request->round_trip == 'yes' ? 1 : 0,
+            'travel_date_from_now' => (int)$request->travel_date_from_now,
+            'payment_before_days'  => (int)$request->payment_before_days,
+            'payment_percent'      => $request->payment_percent,
+            'is_active'            => $request->is_active == 'active' ? 1 : 0,
+            'updated_at'           => now(),
         ]);
-        return back()->with('success', 'Rule updated.');
+        return response()->json(['success' => true]);
     }
 
     public function deletePartialPaymentRule($id)
     {
         DB::table('partial_payment_rules')->where('id', $id)->delete();
-        return back()->with('success', 'Rule deleted.');
+        return response()->json(['success' => true]);
     }
 
     // ─── BLOCK ROUTES ────────────────────────────────────────────────────────────
