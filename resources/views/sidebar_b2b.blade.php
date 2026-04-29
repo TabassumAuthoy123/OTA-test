@@ -141,7 +141,7 @@
         </li>
 
         {{-- 2. My Bookings --}}
-        @php $bookActive = in_array($currentRoute, ['MyBookings','MyPendingBookings','MyApprovedBookings']); @endphp
+        @php $bookActive = in_array($currentRoute, ['MyBookings','MyPendingBookings','MyApprovedBookings','MyBookingDetail']); @endphp
         <li class="b2b-nav-item {{ $bookActive ? 'active' : '' }}">
           <button class="b2b-nav-toggle" onclick="toggleSub('sub-mybookings',this)">
             <i class="fas fa-ticket-alt ni"></i> My Bookings

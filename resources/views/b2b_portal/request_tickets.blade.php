@@ -1,112 +1,121 @@
 @extends('master')
 @section('header_css')
 <style>
-.b2b-page-header{background:linear-gradient(135deg,#0f1f3d,#1a3a6e);color:#fff;padding:16px 24px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;}
-.b2b-page-header h5{margin:0;font-size:18px;font-weight:700;}
-.b2b-filters{background:#f8f9fa;padding:14px 16px;border-bottom:1px solid #dee2e6;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
-.b2b-filters label{font-size:11px;font-weight:600;color:#555;margin:0;display:block;}
-.b2b-filters input{font-size:13px;padding:5px 10px;border:1px solid #ced4da;border-radius:5px;height:34px;}
-.b2b-table th{background:#0f1f3d;color:#fff;font-size:13px;padding:10px 12px;white-space:nowrap;}
-.b2b-table td{font-size:13px;padding:9px 12px;vertical-align:middle;}
-.b2b-table tr:hover td{background:#f0f4ff;}
-.s-open{background:#fff3cd;color:#856404;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;}
-.s-in_progress{background:#cce5ff;color:#004085;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;}
-.s-resolved{background:#d4edda;color:#155724;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;}
-.s-closed{background:#e2e3e5;color:#383d41;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;}
-.btn-new{background:#0f1f3d;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:12px;font-weight:600;text-decoration:none;display:inline-block;}
-.btn-new:hover{background:#1a3a6e;color:#fff;text-decoration:none;}
-.alert-success-b2b{background:#d4edda;color:#155724;border:1px solid #c3e6cb;padding:10px 16px;border-radius:6px;font-size:13px;margin:12px 16px 0;}
+.b2b-list-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #e9ecef;flex-wrap:wrap;gap:10px;}
+.b2b-list-title{font-size:15px;font-weight:700;color:#0f1f3d;margin:0;}
+.b2b-date-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.b2b-date-filter input[type="date"]{border:1px solid #ced4da;border-radius:5px;padding:5px 10px;font-size:13px;height:34px;outline:none;}
+.b2b-date-filter input[type="date"]:focus{border-color:#0f1f3d;}
+.b2b-date-arrow{color:#888;font-size:13px;}
+.btn-export{background:#0f1f3d;color:#fff;border:none;padding:6px 16px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;height:34px;}
+.btn-export:hover{background:#1a3a6b;color:#fff;text-decoration:none;}
+.b2b-table-wrap{overflow-x:auto;}
+.b2b-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.b2b-tbl thead th{background:#0f1f3d;color:#fff;padding:11px 14px;white-space:nowrap;font-weight:600;font-size:12px;border:none;}
+.b2b-tbl tbody td{padding:10px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle;color:#333;}
+.b2b-tbl tbody tr:hover td{background:#f4f7ff;}
+.booking-ref-link{color:#0d6efd;font-weight:600;text-decoration:none;}
+.booking-ref-link:hover{text-decoration:underline;}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+.st-open{background:#fff3cd;color:#856404;}
+.st-in_progress{background:#cce5ff;color:#004085;}
+.st-resolved{background:#d4edda;color:#155724;}
+.st-closed{background:#e2e3e5;color:#383d41;}
+.btn-eye{background:#0f1f3d;color:#fff;border:none;padding:5px 12px;border-radius:5px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;}
+.btn-eye:hover{background:#1a3a6b;color:#fff;text-decoration:none;}
+.b2b-pagination-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid #f0f0f0;flex-wrap:wrap;gap:8px;}
+.badge-na{background:#e9ecef;color:#6c757d;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:600;}
 </style>
 @endsection
 @section('content')
-<div class="row"><div class="col-lg-12">
-  <div class="card" style="border-radius:8px;overflow:hidden;">
-    <div class="b2b-page-header">
-      <div>
-        <h5>
-          @if($issueType == 'reissue')<i class="fas fa-redo me-2"></i>
-          @elseif($issueType == 'refund')<i class="fas fa-hand-holding-usd me-2"></i>
-          @else<i class="fas fa-ban me-2"></i>@endif
-          {{ $title }}
-        </h5>
-        <small>Dashboard &rsaquo; {{ ucfirst($issueType) }} &rsaquo; {{ $title }}</small>
+<div class="row"><div class="col-12">
+  @if(session('success'))<div class="alert alert-success py-2">{{ session('success') }}</div>@endif
+  <div class="card" style="border-radius:8px;overflow:hidden;border:1px solid #e0e0e0;">
+
+    {{-- Header: Title + Date Filter + Export --}}
+    <div class="b2b-list-header">
+      <span class="b2b-list-title">{{ $title }} ({{ $tickets->total() }})</span>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        @php
+          $createRoutes = ['reissue'=>'MyCreateReissue','refund'=>'MyCreateRefund','void'=>'MyCreateVoid'];
+          $createRoute  = $createRoutes[$issueType] ?? 'MyCreateReissue';
+        @endphp
+        <a href="{{ route($createRoute) }}" class="btn-export" style="background:#f0a500;">
+          <i class="fas fa-plus" style="font-size:12px;"></i> New {{ ucfirst($issueType) }} Request
+        </a>
+        <form method="GET" action="{{ request()->url() }}" class="b2b-date-filter" style="margin:0;">
+          <input type="date" name="start_date" value="{{ request('start_date') }}">
+          <span class="b2b-date-arrow">→</span>
+          <input type="date" name="end_date" value="{{ request('end_date') }}">
+          <button type="submit" class="btn-export" style="background:#1a3a6b;">
+            <i class="fas fa-search" style="font-size:12px;"></i>
+          </button>
+          @if(request('start_date') || request('end_date'))
+            <a href="{{ request()->url() }}" class="btn-export" style="background:#6c757d;">
+              <i class="fas fa-times" style="font-size:12px;"></i>
+            </a>
+          @endif
+          <button type="button" class="btn-export">
+            <i class="fas fa-file-excel"></i> Export to Excel
+          </button>
+        </form>
       </div>
-      @php
-        $createRoutes = ['reissue'=>'MyCreateReissue','refund'=>'MyCreateRefund','void'=>'MyCreateVoid'];
-        $createRoute  = $createRoutes[$issueType] ?? 'MyCreateReissue';
-      @endphp
-      <a href="{{ route($createRoute) }}" class="btn-new">
-        <i class="fas fa-plus me-1"></i> New {{ ucfirst($issueType) }} Request
-      </a>
     </div>
 
-    @if(session('success'))
-      <div class="alert-success-b2b"><i class="fas fa-check-circle me-1"></i>{{ session('success') }}</div>
-    @endif
+    {{-- Table --}}
+    <div class="b2b-table-wrap">
+      <table class="b2b-tbl">
+        <thead>
+          <tr>
+            <th>SL</th>
+            <th>Booking Date</th>
+            <th>Booking Time</th>
+            <th>Ref No.</th>
+            <th>Booking Ref No.</th>
+            <th>Staff Status</th>
+            <th>Staff Name</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($tickets as $i => $t)
+          <tr>
+            <td style="color:#555;">{{ $tickets->firstItem() + $i }}</td>
+            <td>{{ $t->created_at ? date('d-m-Y', strtotime($t->created_at)) : 'N/A' }}</td>
+            <td>{{ $t->created_at ? date('h:i A', strtotime($t->created_at)) : 'N/A' }}</td>
+            <td style="font-weight:700;color:#0f1f3d;">#{{ str_pad($t->id, 3, '0', STR_PAD_LEFT) }}</td>
+            <td>
+              @if($t->booking_ref)
+                <a href="{{ url('my/bookings') }}?search={{ urlencode($t->booking_ref) }}" class="booking-ref-link">{{ $t->booking_ref }}</a>
+              @else
+                <span class="text-muted">N/A</span>
+              @endif
+            </td>
+            <td><span class="badge-na">N/A</span></td>
+            <td><span class="badge-na">N/A</span></td>
+            <td><span class="status-badge st-{{ $t->status }}">{{ strtoupper(str_replace('_',' ',$t->status)) }}</span></td>
+            <td>
+              <a href="#" class="btn-eye" title="View Details">
+                <i class="fas fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+          @empty
+          <tr>
+            <td colspan="9" class="text-center py-5 text-muted">
+              <i class="fas fa-inbox fa-2x mb-2 d-block" style="opacity:.25;"></i>
+              No data
+            </td>
+          </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
 
-    <form method="GET" action="{{ request()->url() }}">
-      <div class="b2b-filters">
-        <div>
-          <label>Search Booking Ref / Subject</label>
-          <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." style="width:260px;">
-        </div>
-        <div>
-          <label>&nbsp;</label>
-          <button type="submit" class="btn btn-primary btn-sm" style="height:34px;"><i class="fas fa-search me-1"></i>Search</button>
-        </div>
-        @if(request('search'))
-        <div>
-          <label>&nbsp;</label>
-          <a href="{{ request()->url() }}" class="btn btn-secondary btn-sm" style="height:34px;line-height:22px;">Clear</a>
-        </div>
-        @endif
-      </div>
-    </form>
-
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-bordered mb-0 b2b-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Ref No</th>
-              <th>Booking Ref</th>
-              <th>Subject</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Admin Reply</th>
-              <th>Submitted</th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse($tickets as $i => $t)
-            <tr>
-              <td>{{ $tickets->firstItem() + $i }}</td>
-              <td style="font-weight:700;color:#0f1f3d;">#{{ $t->id }}</td>
-              <td>{{ $t->booking_ref ?? 'N/A' }}</td>
-              <td>{{ $t->subject }}</td>
-              <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $t->description }}</td>
-              <td><span class="s-{{ $t->status }}">{{ ucwords(str_replace('_',' ',$t->status)) }}</span></td>
-              <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                {{ $t->admin_reply ?? '—' }}
-              </td>
-              <td>{{ $t->created_at ? date('d M Y', strtotime($t->created_at)) : '' }}</td>
-            </tr>
-            @empty
-            <tr>
-              <td colspan="8" class="text-center py-5 text-muted">
-                <i class="fas fa-inbox fa-2x mb-2 d-block" style="opacity:.3;"></i>
-                No {{ $issueType }} requests found.
-              </td>
-            </tr>
-            @endforelse
-          </tbody>
-        </table>
-      </div>
-      <div class="d-flex justify-content-between align-items-center px-3 py-2">
-        <small class="text-muted">Showing {{ $tickets->firstItem() ?? 0 }}&ndash;{{ $tickets->lastItem() ?? 0 }} of {{ $tickets->total() }} entries</small>
-        {{ $tickets->links() }}
-      </div>
+    <div class="b2b-pagination-bar">
+      <small class="text-muted">Showing {{ $tickets->firstItem() ?? 0 }}–{{ $tickets->lastItem() ?? 0 }} of {{ $tickets->total() }}</small>
+      {{ $tickets->links() }}
     </div>
   </div>
 </div></div>

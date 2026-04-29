@@ -93,17 +93,31 @@ class B2bAgentController extends Controller
 
     public function myBookings(Request $request)
     {
-        return $this->flightBookingsList($request, null, 'All Request Booking', 'MyBookings');
+        return $this->flightBookingsList($request, null, 'All Booking List', 'MyBookings');
     }
 
     public function myPendingBookings(Request $request)
     {
-        return $this->flightBookingsList($request, [0], 'Pending Bookings', 'MyPendingBookings');
+        return $this->flightBookingsList($request, [0], 'Flight Bookings On Hold', 'MyPendingBookings');
     }
 
     public function myApprovedBookings(Request $request)
     {
-        return $this->flightBookingsList($request, [1, 2], 'Approved Bookings', 'MyApprovedBookings');
+        return $this->flightBookingsList($request, [1, 2], 'Flight Bookings Issued', 'MyApprovedBookings');
+    }
+
+    public function bookingDetail($id)
+    {
+        $booking = DB::table('flight_bookings')
+            ->where('id', $id)
+            ->where('booked_by', Auth::id())
+            ->first();
+        if (!$booking) abort(404);
+
+        $segments   = DB::table('flight_segments')->where('flight_booking_id', $id)->get();
+        $passengers = DB::table('flight_passengers')->where('flight_booking_id', $id)->get();
+
+        return view('b2b_portal.booking_detail', compact('booking', 'segments', 'passengers'));
     }
 
     private function flightBookingsList(Request $request, ?array $statuses, string $title, string $activeRoute)
@@ -117,9 +131,25 @@ class B2bAgentController extends Controller
             $q->where(function ($w) use ($s) {
                 $w->where('booking_no', 'like', "%$s%")
                   ->orWhere('pnr_id', 'like', "%$s%")
+                  ->orWhere('airlines_pnr', 'like', "%$s%")
                   ->orWhere('departure_location', 'like', "%$s%")
-                  ->orWhere('arrival_location', 'like', "%$s%");
+                  ->orWhere('arrival_location', 'like', "%$s%")
+                  ->orWhereExists(function ($sub) use ($s) {
+                      $sub->from('flight_passengers')
+                          ->whereColumn('flight_passengers.flight_booking_id', 'flight_bookings.id')
+                          ->where(function ($pp) use ($s) {
+                              $pp->where('first_name', 'like', "%$s%")
+                                 ->orWhere('last_name', 'like', "%$s%")
+                                 ->orWhere('document_no', 'like', "%$s%");
+                          });
+                  });
             });
+        }
+        if ($request->filled('start_date')) {
+            $q->whereDate('created_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $q->whereDate('created_at', '<=', $request->end_date);
         }
         $bookings = $q->orderByDesc('created_at')->paginate(15)->withQueryString();
         return view('b2b_portal.my_bookings', compact('bookings', 'title', 'activeRoute'));
@@ -219,6 +249,12 @@ class B2bAgentController extends Controller
                 $w->where('subject', 'like', "%$s%")
                   ->orWhere('booking_ref', 'like', "%$s%");
             });
+        }
+        if ($request->filled('start_date')) {
+            $q->whereDate('created_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $q->whereDate('created_at', '<=', $request->end_date);
         }
         $tickets = $q->orderByDesc('created_at')->paginate(15)->withQueryString();
         return view('b2b_portal.request_tickets', compact('tickets', 'title', 'activeRoute', 'issueType', 'statuses'));

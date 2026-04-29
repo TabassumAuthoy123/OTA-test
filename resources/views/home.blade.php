@@ -10,11 +10,11 @@
         gap: 8px;
         flex-wrap: wrap;
         padding: 10px 0 6px;
-        border-top: 1px solid rgba(255,255,255,.15);
+        border-top: 1px solid #dee2e6;
         margin-top: 8px;
     }
     .fare-type-label {
-        color: rgba(255,255,255,.7);
+        color: #0f1f3d;
         font-size: 12px;
         font-weight: 600;
         white-space: nowrap;
@@ -30,8 +30,8 @@
         display: flex;
         align-items: center;
         gap: 7px;
-        background: rgba(255,255,255,.08);
-        border: 1.5px solid rgba(255,255,255,.15);
+        background: #f8f9fa;
+        border: 1.5px solid #dee2e6;
         border-radius: 7px;
         padding: 7px 13px;
         cursor: pointer;
@@ -41,8 +41,8 @@
         max-width: 200px;
     }
     .fare-type-option:hover {
-        background: rgba(240,165,0,.12);
-        border-color: rgba(240,165,0,.5);
+        background: #fff8e6;
+        border-color: #f0a500;
     }
     .fare-type-option input[type="radio"] {
         accent-color: #f0a500;
@@ -55,7 +55,7 @@
         color: #f0a500;
     }
     .fare-type-option:has(input:checked) {
-        background: rgba(240,165,0,.15);
+        background: #fff8e6;
         border-color: #f0a500;
     }
     .fare-type-content {
@@ -65,12 +65,12 @@
     .fare-name {
         font-size: 12px;
         font-weight: 700;
-        color: #fff;
+        color: #0f1f3d;
         line-height: 1.2;
     }
     .fare-desc {
         font-size: 10px;
-        color: rgba(255,255,255,.5);
+        color: #6c757d;
         line-height: 1.3;
     }
     .btn-search-history {
@@ -99,40 +99,39 @@
 @section('content')
 
     {{-- ─── B2B Top Navigation Bar ─── --}}
-    @if(Auth::user()->user_type == 2)
+    @if(Auth::check() && Auth::user()->user_type == 2)
     @php
         $b2bBalance = Auth::user()->balance ?? 0;
-        $b2bUnread  = 0; // extend later for notifications
+        $b2bUnread  = 0;
     @endphp
+    <style>
+    .b2b-topnav{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;padding:10px 20px;margin:-0.5rem -1.5rem 0;border-bottom:3px solid #0f1f3d;box-shadow:0 2px 8px rgba(0,0,0,.08);position:sticky;top:0;z-index:100;}
+    .b2b-topnav-tabs{display:flex;gap:4px;flex-shrink:0;}
+    .b2b-tab{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;color:#555;background:transparent;transition:all .15s;border:2px solid transparent;}
+    .b2b-tab:hover{background:#f0f4ff;color:#0f1f3d;text-decoration:none;}
+    .b2b-tab.active{background:#0f1f3d;color:#fff;border-color:#0f1f3d;}
+    .b2b-tab.active i{color:#f0a500;}
+    .b2b-topnav-search{position:relative;flex:1;max-width:380px;min-width:220px;}
+    .b2b-topnav-right{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0;}
+    .b2b-topnav-notif{position:relative;cursor:pointer;color:#555;font-size:18px;padding:4px;}
+    .b2b-topnav-notif:hover{color:#0f1f3d;}
+    .notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:#dc3545;border-radius:50%;}
+    .b2b-topnav-user{display:flex;align-items:center;gap:10px;cursor:pointer;}
+    .b2b-topnav-avatar{width:36px;height:36px;border-radius:50%;background:#0f1f3d;color:#f0a500;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+    </style>
     <div class="b2b-topnav">
-
-        {{-- Left: Search tabs --}}
         <div class="b2b-topnav-tabs">
-            <a href="{{ url('/home') }}" class="b2b-tab active">
-                <i class="fas fa-plane"></i> Flight Search
-            </a>
-            <a href="{{ url('my/tour-bookings') }}" class="b2b-tab">
-                <i class="fas fa-umbrella-beach"></i> Tours Search
-            </a>
-            <a href="{{ url('my/visa-applications') }}" class="b2b-tab">
-                <i class="fas fa-passport"></i> Visa Search
-            </a>
+            <a href="{{ url('/home') }}" class="b2b-tab active"><i class="fas fa-plane"></i> Flight Search</a>
+            <a href="{{ url('my/tour-bookings') }}" class="b2b-tab"><i class="fas fa-umbrella-beach"></i> Tours Search</a>
+            <a href="{{ url('my/visa-applications') }}" class="b2b-tab"><i class="fas fa-passport"></i> Visa Search</a>
         </div>
-
-        {{-- Center: PNR / Booking search --}}
         <form method="GET" action="{{ url('my/bookings') }}" class="b2b-topnav-search">
             <i class="fas fa-search" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#aaa;font-size:13px;pointer-events:none;"></i>
-            <input type="text" name="search"
-                   placeholder="PNR / Ticket NO / Booking Ref"
-                   value="{{ request('search') }}"
+            <input type="text" name="search" placeholder="PNR / Ticket NO / Booking Ref" value="{{ request('search') }}"
                    style="width:100%;padding:8px 14px 8px 36px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none;transition:border .2s;"
                    onfocus="this.style.borderColor='#0f1f3d'" onblur="this.style.borderColor='#e0e0e0'">
-            <button type="submit" style="position:absolute;right:0;top:0;height:100%;padding:0 14px;background:#0f1f3d;color:#fff;border:none;border-radius:0 6px 6px 0;font-size:13px;cursor:pointer;">
-                Search
-            </button>
+            <button type="submit" style="position:absolute;right:0;top:0;height:100%;padding:0 14px;background:#0f1f3d;color:#fff;border:none;border-radius:0 6px 6px 0;font-size:13px;cursor:pointer;">Search</button>
         </form>
-
-        {{-- Right: Notifications + User balance --}}
         <div class="b2b-topnav-right">
             <div class="b2b-topnav-notif">
                 <i class="fas fa-bell"></i>
@@ -146,44 +145,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-
-    <style>
-    .b2b-topnav{
-        display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-        background:#fff;
-        padding:10px 20px;
-        margin:-0.5rem -1.5rem 0;
-        border-bottom:3px solid #0f1f3d;
-        box-shadow:0 2px 8px rgba(0,0,0,.08);
-        position:sticky;top:0;z-index:100;
-    }
-    .b2b-topnav-tabs{display:flex;gap:4px;flex-shrink:0;}
-    .b2b-tab{
-        display:flex;align-items:center;gap:7px;
-        padding:8px 16px;border-radius:6px;
-        font-size:13px;font-weight:600;
-        text-decoration:none;color:#555;
-        background:transparent;transition:all .15s;
-        border:2px solid transparent;
-    }
-    .b2b-tab:hover{background:#f0f4ff;color:#0f1f3d;text-decoration:none;}
-    .b2b-tab.active{background:#0f1f3d;color:#fff;border-color:#0f1f3d;}
-    .b2b-tab.active i{color:#f0a500;}
-    .b2b-topnav-search{position:relative;flex:1;max-width:380px;min-width:220px;}
-    .b2b-topnav-right{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0;}
-    .b2b-topnav-notif{position:relative;cursor:pointer;color:#555;font-size:18px;padding:4px;}
-    .b2b-topnav-notif:hover{color:#0f1f3d;}
-    .notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:#dc3545;border-radius:50%;}
-    .b2b-topnav-user{display:flex;align-items:center;gap:10px;cursor:pointer;}
-    .b2b-topnav-avatar{
-        width:36px;height:36px;border-radius:50%;
-        background:#0f1f3d;color:#f0a500;
-        display:flex;align-items:center;justify-content:center;
-        font-size:14px;font-weight:800;flex-shrink:0;
-    }
-    </style>
     @endif
 
     <div class="search_box_container">

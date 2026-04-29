@@ -135,13 +135,14 @@
             @if (Auth::user()->user_type == 0 || Auth::user()->user_type == 1)
                 @include('sidebar')
                 <div class="content-wrapper">
+                <div class="main-content">
+                    @include('header')
             @else
                 @include('sidebar_b2b')
                 <div class="content-wrapper b2b-content-wrapper">
+                <div class="main-content" style="display:flex;flex-direction:column;min-height:100vh;">
+                    @include('b2b_topbar')
             @endif
-                <div class="main-content">
-
-                    @include('header')
 
                     <div class="body-content">
 

@@ -217,6 +217,7 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
     Route::get('my/bookings', [\App\Http\Controllers\B2bAgentController::class, 'myBookings'])->name('MyBookings');
     Route::get('my/bookings/pending', [\App\Http\Controllers\B2bAgentController::class, 'myPendingBookings'])->name('MyPendingBookings');
     Route::get('my/bookings/approved', [\App\Http\Controllers\B2bAgentController::class, 'myApprovedBookings'])->name('MyApprovedBookings');
+    Route::get('my/bookings/{id}', [\App\Http\Controllers\B2bAgentController::class, 'bookingDetail'])->name('MyBookingDetail');
 
     // B2B Reissued
     Route::get('my/reissue/new', [\App\Http\Controllers\B2bAgentController::class, 'reissueNew'])->name('MyReissueNew');

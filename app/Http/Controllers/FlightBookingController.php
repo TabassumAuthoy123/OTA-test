@@ -70,7 +70,8 @@ class FlightBookingController extends Controller
             'status' => $result['status'] == 0 ? 'Pending' : 'Confirmed',
         ]));
 
-        return redirect('/view/all/booking');
+        $dest = Auth::user()->user_type == 2 ? '/my/bookings' : '/view/all/booking';
+        return redirect($dest);
     }
 
     public function bookFlightWithPnr(Request $request)
@@ -106,7 +107,8 @@ class FlightBookingController extends Controller
         ]));
 
         Toastr::success('Flight Booking Request Sent', 'Success');
-        return redirect('/view/all/booking');
+        $dest = Auth::user()->user_type == 2 ? '/my/bookings' : '/view/all/booking';
+        return redirect($dest);
     }
 
     public function viewAllBooking(Request $request)
@@ -420,7 +422,8 @@ class FlightBookingController extends Controller
                 'ticket_number' => $result['ticket_number'] ?? '',
             ]));
 
-            return redirect('view/issued/tickets');
+            $dest = Auth::user()->user_type == 2 ? 'my/bookings/approved' : 'view/issued/tickets';
+            return redirect($dest);
         }
 
         $flightBookingInfo->save();
