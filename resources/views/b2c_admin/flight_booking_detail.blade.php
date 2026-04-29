@@ -29,7 +29,7 @@
       <a href="{{ url('b2c/flight-bookings/'.$booking->id) }}" class="btn-action" style="background:#17a2b8;color:#fff;">
         <i class="fas fa-sync-alt"></i> Refresh Booking
       </a>
-      <a href="{{ route('BookingPreview', $booking->pnr_id) }}" class="btn-action" style="background:#6f42c1;color:#fff;">
+      <a href="{{ route('BookingPreview', $booking->booking_no) }}" class="btn-action" style="background:#6f42c1;color:#fff;">
         <i class="fas fa-file-alt"></i> Preview Booking
       </a>
       <span class="btn-action" style="background:#6c757d;color:#fff;cursor:default;">

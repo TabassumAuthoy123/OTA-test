@@ -31,7 +31,7 @@
           <h5><i class="typcn typcn-group-outline me-2"></i> Agency List</h5>
           <small>Dashboard &rsaquo; B2B &rsaquo; Agency-list</small>
         </div>
-        <a href="{{ url('b2b/create-agency') }}" class="btn-create">+ Create Agency</a>
+        <a href="{{ url('create/b2b/users') }}" class="btn-create">+ Create Agency</a>
       </div>
 
       <form method="GET" action="{{ url('b2b/agency-list') }}">

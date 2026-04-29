@@ -81,7 +81,7 @@
                         Archived Issued Tickets
                     </a>
                 </li>
-                <li class="@if($currentRoute == 'ViewSavedPassengers') mm-active @endif">
+                <li class="@if($currentRoute == 'SavedPassengers') mm-active @endif">
                     <a class="text-capitalize" href="{{ url('/view/saved/passengers') }}">
                         <i class="typcn typcn-user-outline"></i>
                         Saved Passengers

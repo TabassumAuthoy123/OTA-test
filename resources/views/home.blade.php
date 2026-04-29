@@ -6,6 +6,33 @@
 @endsection
 
 @section('content')
+
+    {{-- ─── B2B Top Bar (PNR Search + Quick Nav) ─── --}}
+    @if(Auth::user()->user_type == 2)
+    <div style="background:#0f1f3d; padding:10px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:-0.5rem -1.5rem 16px; border-bottom:3px solid #f0a500;">
+        <div style="display:flex; gap:8px;">
+            <a href="{{ url('/home') }}" style="background:#f0a500;color:#0f1f3d;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-plane"></i> Flight Search
+            </a>
+            <a href="#" style="background:rgba(255,255,255,.1);color:#fff;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-map-marked-alt"></i> Tours Search
+            </a>
+            <a href="#" style="background:rgba(255,255,255,.1);color:#fff;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-passport"></i> Visa Search
+            </a>
+        </div>
+        <form method="GET" action="{{ url('view/all/booking') }}" style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+            <input type="text" name="pnr_search" placeholder="PNR / Ticket NO / Booking Ref..."
+                   style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:6px;font-size:13px;width:280px;outline:none;"
+                   onfocus="this.style.borderColor='#f0a500'" onblur="this.style.borderColor='rgba(255,255,255,.2)'"
+                   value="{{ request('pnr_search') }}">
+            <button type="submit" style="background:#f0a500;color:#0f1f3d;border:none;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+    @endif
+
     <div class="search_box_container">
         <img class="search_bg" src="{{ url('assets') }}/img/bg_search.jpg" alt="" />
         <div data-airport-url="#">

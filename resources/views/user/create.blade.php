@@ -4,7 +4,7 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <form action="{{url('save/b2b/user')}}" method="POST" enctype="multipart/form-data">
+            <form action="{{url('save/b2b/user')}}" method="POST" enctype="multipart/form-data" autocomplete="off">
                 @csrf
                 <div class="card">
                     <div class="card-header">
@@ -24,7 +24,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="email" class="col-form-label fw-bold justify-content-start d-flex">Email (Username for Login) <i class="text-danger">*</i></label>
-                                        <input type="email" name="email" id="email" class="form-control" placeholder="sample@email.com" required="">
+                                        <input type="email" name="email" id="email" class="form-control" placeholder="sample@email.com" required="" autocomplete="off">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="phone" class="col-form-label fw-bold justify-content-start d-flex">Phone No <i class="text-danger">*</i></label>
@@ -32,7 +32,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="password" class="col-form-label fw-bold justify-content-start d-flex">Password <i class="text-danger">*</i></label>
-                                        <input type="password" name="password" id="password" class="form-control" placeholder="********" required="">
+                                        <input type="password" name="password" id="password" class="form-control" placeholder="********" required="" autocomplete="new-password">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="comission" class="col-form-label fw-bold justify-content-start d-flex">Profit Comission (In Percentage)</label>

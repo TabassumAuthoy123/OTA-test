@@ -101,6 +101,49 @@ class HomeController extends Controller
         return view('payment_method', compact('bankAccounts', 'mfsAccounts', 'companyProfile', 'officeAddress'));
     }
 
+    public function myUpcomingFlights(Request $request)
+    {
+        $q = DB::table('flight_bookings')
+            ->where('booked_by', Auth::user()->id)
+            ->where('departure_date', '>=', date('Y-m-d'))
+            ->whereNotIn('status', [3, 4]);
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $q->where(function ($w) use ($s) {
+                $w->where('booking_no', 'like', "%$s%")
+                  ->orWhere('pnr_id', 'like', "%$s%")
+                  ->orWhere('departure_location', 'like', "%$s%")
+                  ->orWhere('arrival_location', 'like', "%$s%");
+            });
+        }
+
+        $bookings = $q->orderBy('departure_date')->paginate(15)->withQueryString();
+        return view('b2b_portal.upcoming_flights', compact('bookings'));
+    }
+
+    public function myPartialPayBookings(Request $request)
+    {
+        $q = DB::table('flight_bookings')
+            ->where('booked_by', Auth::user()->id)
+            ->where('partial_payment', 1);
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $q->where(function ($w) use ($s) {
+                $w->where('booking_no', 'like', "%$s%")
+                  ->orWhere('pnr_id', 'like', "%$s%");
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $q->where('status', $request->status);
+        }
+
+        $bookings = $q->orderByDesc('created_at')->paginate(15)->withQueryString();
+        return view('b2b_portal.partial_pay_bookings', compact('bookings'));
+    }
+
     public function viewActivityLogs(Request $request)
     {
         if ($request->ajax()) {

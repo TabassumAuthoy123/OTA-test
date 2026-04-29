@@ -134,11 +134,11 @@
 
             @if (Auth::user()->user_type == 0 || Auth::user()->user_type == 1)
                 @include('sidebar')
+                <div class="content-wrapper">
             @else
                 @include('sidebar_b2b')
+                <div class="content-wrapper b2b-content-wrapper">
             @endif
-
-            <div class="content-wrapper">
                 <div class="main-content">
 
                     @include('header')
@@ -216,7 +216,6 @@
     <script src="{{ url('assets') }}/nanopkg-assets/js/main.min.js"></script>
     <script src="{{ url('assets') }}/admin-assets/js/sidebar.min.js"></script>
     <script src="{{ url('assets') }}/nanopkg-assets/js/tosterSession.min.js"></script>
-    <script defer src="{{ url('assets') }}/nanopkg-assets/vendor/alpine/alpine.min.js"></script>
     <script defer src="{{ url('assets') }}/nanopkg-assets/vendor/alpine/alpine.min.js"></script>
     @yield('footer_js')
 

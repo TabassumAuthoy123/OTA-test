@@ -193,6 +193,10 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
     Route::get('delete/recharge/request/{slug}', [PaymentController::class, 'deleteRechargeRequest'])->name('DeleteRechargeRequest');
 
 
+    // B2B user own pages (no CheckUserType — accessible by B2B agents)
+    Route::get('my/upcoming-flights', [HomeController::class, 'myUpcomingFlights'])->name('MyUpcomingFlights');
+    Route::get('my/partial-pay-bookings', [HomeController::class, 'myPartialPayBookings'])->name('MyPartialPayBookings');
+
     // report
     Route::get('flight/booking/report', [ReportController::class, 'flightBookingReport'])->name('FlightBookingReport');
     Route::post('generate/flight/booking/report', [ReportController::class, 'generateFlightBookingReport'])->name('GenerateFlightBookingReport');
