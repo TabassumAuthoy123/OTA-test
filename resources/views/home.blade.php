@@ -3,6 +3,97 @@
 @section('header_css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
     <link href="{{ url('assets') }}/admin-assets/css/homepage.css" rel="stylesheet" />
+    <style>
+    .fare-type-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 10px 0 6px;
+        border-top: 1px solid rgba(255,255,255,.15);
+        margin-top: 8px;
+    }
+    .fare-type-label {
+        color: rgba(255,255,255,.7);
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        margin-right: 4px;
+    }
+    .fare-type-options {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+    .fare-type-option {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255,255,255,.08);
+        border: 1.5px solid rgba(255,255,255,.15);
+        border-radius: 7px;
+        padding: 7px 13px;
+        cursor: pointer;
+        transition: all .15s;
+        flex: 1;
+        min-width: 130px;
+        max-width: 200px;
+    }
+    .fare-type-option:hover {
+        background: rgba(240,165,0,.12);
+        border-color: rgba(240,165,0,.5);
+    }
+    .fare-type-option input[type="radio"] {
+        accent-color: #f0a500;
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+    .fare-type-option input[type="radio"]:checked + .fare-type-content .fare-name {
+        color: #f0a500;
+    }
+    .fare-type-option:has(input:checked) {
+        background: rgba(240,165,0,.15);
+        border-color: #f0a500;
+    }
+    .fare-type-content {
+        display: flex;
+        flex-direction: column;
+    }
+    .fare-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.2;
+    }
+    .fare-desc {
+        font-size: 10px;
+        color: rgba(255,255,255,.5);
+        line-height: 1.3;
+    }
+    .btn-search-history {
+        background: #0f1f3d;
+        color: #fff;
+        border: 1.5px solid rgba(255,255,255,.25);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 9px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all .15s;
+        white-space: nowrap;
+    }
+    .btn-search-history:hover {
+        background: #1a3a6b;
+        border-color: #f0a500;
+        color: #f0a500;
+    }
+    </style>
 @endsection
 
 @section('content')
@@ -38,8 +129,13 @@
         <div data-airport-url="#">
             <div class="mx-auto text-center top_part">
                 <h2 class="top_heading">
-                    <strong>Start your journey</strong> By one click
-                    <span class="text-warning">Explore beautiful world!</span>
+                    @if(Auth::check() && Auth::user()->user_type == 2)
+                        <strong>Welcome to {{ env('APP_NAME') }}!</strong>
+                        <span class="text-warning">Find Flights at Best Price</span>
+                    @else
+                        <strong>Start your journey</strong> By one click
+                        <span class="text-warning">Explore beautiful world!</span>
+                    @endif
                 </h2>
             </div>
             <div class="search-box container p-2">
@@ -215,12 +311,52 @@
                                     </div>
                                 </div>
 
-                                <div id="btn-hub-oneway">
+                                {{-- Fare Type --}}
+                                <div class="fare-type-row">
+                                    <span class="fare-type-label">Fare Type</span>
+                                    <div class="fare-type-options">
+                                        <label class="fare-type-option">
+                                            <input type="radio" name="fare_type" value="regular" checked>
+                                            <div class="fare-type-content">
+                                                <span class="fare-name">Regular Fare</span>
+                                                <span class="fare-desc">Standard adult, child &amp; infant fares</span>
+                                            </div>
+                                        </label>
+                                        <label class="fare-type-option">
+                                            <input type="radio" name="fare_type" value="senior_citizen">
+                                            <div class="fare-type-content">
+                                                <span class="fare-name">Senior Citizen</span>
+                                                <span class="fare-desc">Only adult passengers are allowed</span>
+                                            </div>
+                                        </label>
+                                        <label class="fare-type-option">
+                                            <input type="radio" name="fare_type" value="student">
+                                            <div class="fare-type-content">
+                                                <span class="fare-name">Student Fare</span>
+                                                <span class="fare-desc">Only adult passengers are allowed</span>
+                                            </div>
+                                        </label>
+                                        <label class="fare-type-option">
+                                            <input type="radio" name="fare_type" value="umrah">
+                                            <div class="fare-type-content">
+                                                <span class="fare-name">Umrah Fare</span>
+                                                <span class="fare-desc">Only adult passengers are allowed</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="btn-hub-oneway" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:10px;">
                                     <button type="button" style="padding: 0.8rem 2rem;" onclick="searchForFlights()"
                                         id="btn-search-oneway" class="btn btn-primary btn-search">
-                                        Search flights
+                                        SEARCH
                                         <i class="fas fa-plane-departure"></i>
                                     </button>
+                                    @if(Auth::check() && Auth::user()->user_type == 2)
+                                    <a href="{{ url('view/all/booking') }}" class="btn-search-history">
+                                        <i class="fas fa-history"></i> Show Search History
+                                    </a>
+                                    @endif
                                 </div>
                             </form>
                         </div>
@@ -597,6 +733,8 @@
 
             $(".page-loader-wrapper").show();
 
+            var fareType = $('input[name="fare_type"]:checked').val() || 'regular';
+
             var formData = new FormData();
             formData.append("flight_type", flightType);
             formData.append("departure_location_id", departureLocationId);
@@ -608,6 +746,7 @@
             formData.append("infant", infant);
             formData.append("preferred_airlines", preferred_airlines);
             formData.append("cabin_class", cabinClass);
+            formData.append("fare_type", fareType);
 
             $.ajax({
                 data: formData,
@@ -670,6 +809,8 @@
 
             $(".page-loader-wrapper").show();
 
+            var fareType = $('input[name="fare_type"]:checked').val() || 'regular';
+
             var formData = new FormData();
             formData.append("flight_type", flightType);
             segments.forEach((seg, i) => {
@@ -682,6 +823,7 @@
             formData.append("infant", infant);
             formData.append("preferred_airlines", preferred_airlines);
             formData.append("cabin_class", cabinClass);
+            formData.append("fare_type", fareType);
 
             $.ajax({
                 data: formData,

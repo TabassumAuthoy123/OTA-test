@@ -238,6 +238,11 @@
                                 <i class="typcn typcn-group-outline"></i> View B2B Users
                             </a>
                         </li>
+                        <li class="@if($currentRoute == 'AgentRegistrations') mm-active @endif">
+                            <a class="text-capitalize" href="{{ url('admin/agent-registrations') }}">
+                                <i class="typcn typcn-clipboard"></i> Agent Requests
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="@if($currentRoute == 'ViewRegisteredCustomers') mm-active @endif">

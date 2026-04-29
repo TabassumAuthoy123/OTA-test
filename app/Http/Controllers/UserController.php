@@ -46,7 +46,7 @@ class UserController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'nid' => $request->nid,
-            'comission' => $request->comission,
+            'comission' => $request->comission ?? 0,
             'password' => Hash::make($request->password),
 
             // b2b user access control

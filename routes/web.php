@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AgentAuthController;
 use App\Http\Controllers\FlightSearchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GdsController;
@@ -24,6 +25,21 @@ use App\Http\Controllers\B2c\FlightSearchController as B2cFlightSearchController
 use App\Models\SabreFlightBooking;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+
+/*
+|--------------------------------------------------------------------------
+| B2B Agent Portal Routes (No Auth Required)
+|--------------------------------------------------------------------------
+*/
+Route::get('agent/login', [AgentAuthController::class, 'showLogin'])->name('agent.login');
+Route::get('agent/register', [AgentAuthController::class, 'showRegister'])->name('agent.register');
+Route::post('agent/register', [AgentAuthController::class, 'register'])->name('agent.register.submit');
+Route::get('agent/forgot-password', [AgentAuthController::class, 'showForgotPassword'])->name('agent.forgot-password');
+Route::middleware(['auth', 'CheckUserStatus', 'CheckUserType'])->group(function () {
+    Route::get('admin/agent-registrations', [AgentAuthController::class, 'viewAgentRegistrations'])->name('AgentRegistrations');
+    Route::get('admin/agent-registrations/{id}/approve', [AgentAuthController::class, 'approveAgentRegistration'])->name('AgentRegistrationApprove');
+    Route::post('admin/agent-registrations/{id}/reject', [AgentAuthController::class, 'rejectAgentRegistration'])->name('AgentRegistrationReject');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -197,6 +213,54 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
     Route::get('my/upcoming-flights', [HomeController::class, 'myUpcomingFlights'])->name('MyUpcomingFlights');
     Route::get('my/partial-pay-bookings', [HomeController::class, 'myPartialPayBookings'])->name('MyPartialPayBookings');
 
+    // B2B My Bookings
+    Route::get('my/bookings', [\App\Http\Controllers\B2bAgentController::class, 'myBookings'])->name('MyBookings');
+    Route::get('my/bookings/pending', [\App\Http\Controllers\B2bAgentController::class, 'myPendingBookings'])->name('MyPendingBookings');
+    Route::get('my/bookings/approved', [\App\Http\Controllers\B2bAgentController::class, 'myApprovedBookings'])->name('MyApprovedBookings');
+
+    // B2B Reissued
+    Route::get('my/reissue/new', [\App\Http\Controllers\B2bAgentController::class, 'reissueNew'])->name('MyReissueNew');
+    Route::get('my/reissue/in-process', [\App\Http\Controllers\B2bAgentController::class, 'reissueInProcess'])->name('MyReissueInProcess');
+    Route::get('my/reissue/confirmed', [\App\Http\Controllers\B2bAgentController::class, 'reissueConfirmed'])->name('MyReissueConfirmed');
+    Route::get('my/reissue/create', [\App\Http\Controllers\B2bAgentController::class, 'createReissue'])->name('MyCreateReissue');
+    Route::post('my/reissue', [\App\Http\Controllers\B2bAgentController::class, 'storeReissue'])->name('MyStoreReissue');
+
+    // B2B Refunded
+    Route::get('my/refund/new', [\App\Http\Controllers\B2bAgentController::class, 'refundNew'])->name('MyRefundNew');
+    Route::get('my/refund/in-process', [\App\Http\Controllers\B2bAgentController::class, 'refundInProcess'])->name('MyRefundInProcess');
+    Route::get('my/refund/confirmed', [\App\Http\Controllers\B2bAgentController::class, 'refundConfirmed'])->name('MyRefundConfirmed');
+    Route::get('my/refund/create', [\App\Http\Controllers\B2bAgentController::class, 'createRefund'])->name('MyCreateRefund');
+    Route::post('my/refund', [\App\Http\Controllers\B2bAgentController::class, 'storeRefund'])->name('MyStoreRefund');
+
+    // B2B Void Request
+    Route::get('my/void/new', [\App\Http\Controllers\B2bAgentController::class, 'voidNew'])->name('MyVoidNew');
+    Route::get('my/void/in-process', [\App\Http\Controllers\B2bAgentController::class, 'voidInProcess'])->name('MyVoidInProcess');
+    Route::get('my/void/confirmed', [\App\Http\Controllers\B2bAgentController::class, 'voidConfirmed'])->name('MyVoidConfirmed');
+    Route::get('my/void/create', [\App\Http\Controllers\B2bAgentController::class, 'createVoid'])->name('MyCreateVoid');
+    Route::post('my/void', [\App\Http\Controllers\B2bAgentController::class, 'storeVoid'])->name('MyStoreVoid');
+
+    // B2B Tour Bookings
+    Route::get('my/tour-bookings', [\App\Http\Controllers\B2bAgentController::class, 'tourBookings'])->name('MyTourBookings');
+    Route::get('my/tour-bookings/approved', [\App\Http\Controllers\B2bAgentController::class, 'tourBookingsApproved'])->name('MyTourApproved');
+    Route::get('my/tour-bookings/pending', [\App\Http\Controllers\B2bAgentController::class, 'tourBookingsPending'])->name('MyTourPending');
+
+    // B2B Administrator
+    Route::get('my/agency/users', [\App\Http\Controllers\B2bAgentController::class, 'agencyUsers'])->name('MyAgencyUsers');
+    Route::get('my/agency/roles', [\App\Http\Controllers\B2bAgentController::class, 'agencyRoles'])->name('MyAgencyRoles');
+
+    // Travelers — accessible by B2B and admin
+    Route::get('view/saved/passengers', [UserController::class, 'savedPassengers'])->name('SavedPassengers');
+
+    // B2B Visa Applications
+    Route::get('my/visa-applications', [\App\Http\Controllers\B2bAgentController::class, 'visaApplications'])->name('MyVisaApplications');
+    Route::get('my/visa-applications/create', [\App\Http\Controllers\B2bAgentController::class, 'createVisa'])->name('MyCreateVisa');
+    Route::post('my/visa-applications', [\App\Http\Controllers\B2bAgentController::class, 'storeVisa'])->name('MyStoreVisa');
+
+    // B2B Booking Support
+    Route::get('my/booking-support', [\App\Http\Controllers\B2bAgentController::class, 'bookingSupport'])->name('MyBookingSupport');
+    Route::get('my/booking-support/create', [\App\Http\Controllers\B2bAgentController::class, 'createSupportTicket'])->name('MyCreateSupportTicket');
+    Route::post('my/booking-support', [\App\Http\Controllers\B2bAgentController::class, 'storeSupportTicket'])->name('MyStoreSupportTicket');
+
     // report
     Route::get('flight/booking/report', [ReportController::class, 'flightBookingReport'])->name('FlightBookingReport');
     Route::post('generate/flight/booking/report', [ReportController::class, 'generateFlightBookingReport'])->name('GenerateFlightBookingReport');
@@ -284,7 +348,6 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         Route::get('delete/b2b/user/{id}', [UserController::class, 'deleteB2bUser'])->name('DeleteB2bUser');
         Route::get('edit/b2b/user/{id}', [UserController::class, 'editB2bUser'])->name('EditB2bUser');
         Route::post('update/b2b/user', [UserController::class, 'updateB2bUser'])->name('UpdateB2bUser');
-        Route::get('view/saved/passengers', [UserController::class, 'savedPassengers'])->name('SavedPassengers');
         Route::get('delete/saved/passenger/{id}', [UserController::class, 'deleteSavedPassenger'])->name('DeleteSavedPassenger');
         Route::get('view/registered/customers', [UserController::class, 'viewRegisteredCustomers'])->name('ViewRegisteredCustomers');
 

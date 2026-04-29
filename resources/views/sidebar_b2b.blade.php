@@ -6,150 +6,117 @@
 
 <style>
 /* ─── B2B Sidebar ─── */
-.b2b-sidebar {
-    width: 240px;
-    min-height: 100vh;
-    background: #0f1f3d;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0;
-    z-index: 1000;
-    overflow-y: auto;
-    box-shadow: 3px 0 15px rgba(0,0,0,.3);
+.b2b-sidebar{
+    width:240px;height:100vh;
+    background:#0f1f3d;
+    display:flex;flex-direction:column;
+    position:fixed;top:0;left:0;
+    z-index:1000;
+    box-shadow:3px 0 15px rgba(0,0,0,.3);
+    overflow:hidden;
 }
-.b2b-sidebar::-webkit-scrollbar { width: 4px; }
-.b2b-sidebar::-webkit-scrollbar-thumb { background: #2a4a7f; border-radius: 4px; }
+.b2b-sidebar-inner{
+    display:flex;flex-direction:column;
+    height:100%;overflow-y:auto;
+    scrollbar-width:thin;scrollbar-color:#2a4a7f transparent;
+}
+.b2b-sidebar-inner::-webkit-scrollbar{width:4px;}
+.b2b-sidebar-inner::-webkit-scrollbar-thumb{background:#2a4a7f;border-radius:4px;}
 
-/* Logo */
-.b2b-logo {
-    padding: 18px 20px 14px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    display: flex; align-items: center; gap: 10px;
-    text-decoration: none;
+.b2b-logo{
+    padding:14px 18px 12px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    display:flex;align-items:center;gap:10px;
+    text-decoration:none;flex-shrink:0;
 }
-.b2b-logo img { height: 36px; max-width: 140px; object-fit: contain; }
-.b2b-logo-text { color: #fff; font-size: 20px; font-weight: 800; letter-spacing: .5px; }
-.b2b-logo-text span { color: #f0a500; }
+.b2b-logo img{height:34px;max-width:130px;object-fit:contain;}
+.b2b-logo-text{color:#fff;font-size:19px;font-weight:800;letter-spacing:.5px;}
+.b2b-logo-text span{color:#f0a500;}
 
-/* User info */
-.b2b-user-card {
-    margin: 12px 14px;
-    background: rgba(255,255,255,.07);
-    border-radius: 8px;
-    padding: 12px 14px;
-    display: flex; align-items: center; gap: 10px;
+.b2b-user-card{
+    margin:10px 12px;
+    background:rgba(255,255,255,.07);
+    border-radius:8px;padding:10px 12px;
+    display:flex;align-items:center;gap:10px;flex-shrink:0;
 }
-.b2b-user-avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: #f0a500; display: flex; align-items: center;
-    justify-content: center; font-size: 16px; font-weight: 700; color: #0f1f3d;
-    flex-shrink: 0;
+.b2b-user-avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:#f0a500;display:flex;align-items:center;
+    justify-content:center;font-size:14px;font-weight:700;
+    color:#0f1f3d;flex-shrink:0;
 }
-.b2b-user-info .name { color: #fff; font-size: 13px; font-weight: 600; line-height: 1.2; }
-.b2b-user-info .balance { color: #f0a500; font-size: 12px; font-weight: 600; margin-top: 2px; }
-.b2b-user-info .role { color: rgba(255,255,255,.5); font-size: 10px; }
+.b2b-user-info .uname{color:#fff;font-size:12px;font-weight:600;line-height:1.2;}
+.b2b-user-info .ubal{color:#f0a500;font-size:11px;font-weight:700;margin-top:2px;}
 
-/* Nav */
-.b2b-nav { padding: 8px 0 80px; }
-.b2b-nav ul { list-style: none; margin: 0; padding: 0; }
-.b2b-nav-label {
-    padding: 14px 18px 6px;
-    font-size: 10px; font-weight: 700; text-transform: uppercase;
-    color: rgba(255,255,255,.3); letter-spacing: 1px;
-}
+.b2b-nav{padding:4px 0 16px;flex:1;}
+.b2b-nav ul{list-style:none;margin:0;padding:0;}
 
-/* Nav items */
-.b2b-nav-item > a,
-.b2b-nav-item > .b2b-nav-toggle {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 18px;
-    color: rgba(255,255,255,.75);
-    text-decoration: none;
-    font-size: 13px; font-weight: 500;
-    border-radius: 6px;
-    margin: 1px 8px;
-    transition: all .2s;
-    cursor: pointer;
-    background: none; border: none; width: calc(100% - 16px); text-align: left;
+.b2b-nav-item>a,
+.b2b-nav-item>.b2b-nav-toggle{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 16px;
+    color:rgba(255,255,255,.78);
+    text-decoration:none;font-size:13px;font-weight:500;
+    transition:all .15s;cursor:pointer;
+    background:none;border:none;width:100%;text-align:left;
 }
-.b2b-nav-item > a:hover,
-.b2b-nav-item > .b2b-nav-toggle:hover {
-    background: rgba(255,255,255,.08);
-    color: #fff;
+.b2b-nav-item>a:hover,
+.b2b-nav-item>.b2b-nav-toggle:hover{background:rgba(255,255,255,.07);color:#fff;}
+.b2b-nav-item.active>a,
+.b2b-nav-item.active>.b2b-nav-toggle{
+    background:rgba(240,165,0,.15);color:#f0a500;
+    font-weight:700;border-left:3px solid #f0a500;
 }
-.b2b-nav-item.active > a,
-.b2b-nav-item.active > .b2b-nav-toggle {
-    background: #f0a500;
-    color: #0f1f3d;
-    font-weight: 700;
+.b2b-nav-item>a i.ni,.b2b-nav-item>.b2b-nav-toggle i.ni{
+    font-size:14px;width:16px;text-align:center;
+    color:rgba(255,255,255,.4);flex-shrink:0;
 }
-.b2b-nav-item.active > a i,
-.b2b-nav-item.active > .b2b-nav-toggle i { color: #0f1f3d; }
-.b2b-nav-item > a i,
-.b2b-nav-item > .b2b-nav-toggle i { font-size: 15px; width: 18px; text-align: center; color: rgba(255,255,255,.5); }
-.b2b-nav-item.active > a i { color: #0f1f3d; }
-.b2b-chevron { margin-left: auto; font-size: 11px; transition: transform .2s; }
-.b2b-chevron.open { transform: rotate(90deg); }
+.b2b-nav-item.active>a i.ni,
+.b2b-nav-item.active>.b2b-nav-toggle i.ni{color:#f0a500;}
 
-/* Sub menu */
-.b2b-submenu { display: none; }
-.b2b-submenu.open { display: block; }
-.b2b-submenu a {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 18px 8px 44px;
-    color: rgba(255,255,255,.6);
-    text-decoration: none; font-size: 12px;
-    margin: 1px 8px;
-    border-radius: 5px;
-    transition: all .2s;
-}
-.b2b-submenu a:hover { background: rgba(255,255,255,.06); color: #fff; }
-.b2b-submenu a.active { color: #f0a500; font-weight: 600; }
-.b2b-submenu a::before { content: '•'; font-size: 10px; color: rgba(255,255,255,.3); }
-.b2b-submenu a.active::before { color: #f0a500; }
+.b2b-chevron{margin-left:auto;font-size:10px;transition:transform .2s;color:rgba(255,255,255,.3)!important;}
+.b2b-chevron.open{transform:rotate(90deg);}
 
-/* Badge */
-.b2b-badge {
-    margin-left: auto;
-    background: #f0a500; color: #0f1f3d;
-    font-size: 10px; font-weight: 700;
-    padding: 2px 6px; border-radius: 10px;
-    line-height: 1.4;
+.b2b-submenu{display:none;background:rgba(0,0,0,.18);}
+.b2b-submenu.open{display:block;}
+.b2b-submenu a{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 16px 8px 42px;
+    color:rgba(255,255,255,.5);
+    text-decoration:none;font-size:12px;
+    transition:all .15s;border-left:3px solid transparent;
 }
-.b2b-badge.coming {
-    background: rgba(255,255,255,.15); color: rgba(255,255,255,.5);
-    font-size: 9px;
-}
+.b2b-submenu a::before{content:'→';font-size:10px;color:rgba(255,255,255,.2);}
+.b2b-submenu a:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.85);}
+.b2b-submenu a.active{color:#f0a500;font-weight:600;border-left-color:#f0a500;background:rgba(240,165,0,.08);}
+.b2b-submenu a.active::before{color:#f0a500;}
 
-/* Logout footer */
-.b2b-logout {
-    position: fixed;
-    bottom: 0; left: 0; width: 240px;
-    padding: 12px 14px;
-    background: #0a1628;
-    border-top: 1px solid rgba(255,255,255,.08);
+.b2b-logout{
+    flex-shrink:0;
+    padding:10px 12px;
+    background:#0a1628;
+    border-top:1px solid rgba(255,255,255,.08);
 }
-.b2b-logout a {
-    display: flex; align-items: center; gap: 8px;
-    color: rgba(255,255,255,.6); text-decoration: none;
-    font-size: 13px; padding: 8px 12px; border-radius: 6px;
-    transition: all .2s;
+.b2b-logout a{
+    display:flex;align-items:center;gap:8px;
+    color:rgba(255,255,255,.5);text-decoration:none;
+    font-size:13px;padding:7px 12px;border-radius:5px;
+    transition:all .15s;
 }
-.b2b-logout a:hover { background: rgba(220,53,69,.15); color: #ff6b6b; }
+.b2b-logout a:hover{background:rgba(220,53,69,.12);color:#ff6b6b;}
 
-/* Content offset */
-.b2b-content-wrapper { margin-left: 240px; }
+.b2b-content-wrapper{margin-left:240px;}
 </style>
 
 <aside class="b2b-sidebar">
+  <div class="b2b-sidebar-inner">
 
     {{-- Logo --}}
     <a href="{{ url('/home') }}" class="b2b-logo">
         @if($companyProfile && $companyProfile->logo && file_exists(public_path($companyProfile->logo)))
             <img src="{{ url($companyProfile->logo) }}" alt="logo">
         @else
-            <span class="b2b-logo-text">OTA<span>platform</span></span>
+            <span class="b2b-logo-text">{{ env('APP_NAME','OTA') }}</span>
         @endif
     </a>
 
@@ -157,122 +124,167 @@
     <div class="b2b-user-card">
         <div class="b2b-user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
         <div class="b2b-user-info">
-            <div class="name">{{ Str::limit(Auth::user()->name, 18) }}</div>
-            <div class="balance">{{ number_format(Auth::user()->balance, 2) }} BDT</div>
-            <div class="role">B2B Agent</div>
+            <div class="uname">{{ Str::limit(Auth::user()->name, 20) }}</div>
+            <div class="ubal">{{ number_format(Auth::user()->balance ?? 0, 2) }} BDT</div>
         </div>
     </div>
 
     {{-- Navigation --}}
     <nav class="b2b-nav">
-        <ul>
+      <ul>
 
-            {{-- MAIN --}}
-            <li class="b2b-nav-label">Main</li>
+        {{-- 1. Dashboard --}}
+        <li class="b2b-nav-item {{ $currentRoute == 'home' ? 'active' : '' }}">
+          <a href="{{ url('/home') }}">
+            <i class="fas fa-th-large ni"></i> Dashboard
+          </a>
+        </li>
 
-            <li class="b2b-nav-item {{ $currentRoute == 'home' ? 'active' : '' }}">
-                <a href="{{ url('/home') }}">
-                    <i class="fas fa-th-large"></i> Dashboard
-                </a>
-            </li>
+        {{-- 2. My Bookings --}}
+        @php $bookActive = in_array($currentRoute, ['MyBookings','MyPendingBookings','MyApprovedBookings']); @endphp
+        <li class="b2b-nav-item {{ $bookActive ? 'active' : '' }}">
+          <button class="b2b-nav-toggle" onclick="toggleSub('sub-mybookings',this)">
+            <i class="fas fa-ticket-alt ni"></i> My Bookings
+            <i class="fas fa-chevron-right b2b-chevron {{ $bookActive ? 'open' : '' }}"></i>
+          </button>
+          <div class="b2b-submenu {{ $bookActive ? 'open' : '' }}" id="sub-mybookings">
+            <a href="{{ url('my/bookings') }}" class="{{ $currentRoute=='MyBookings'?'active':'' }}">All Request Booking</a>
+            <a href="{{ url('my/bookings/pending') }}" class="{{ $currentRoute=='MyPendingBookings'?'active':'' }}">Pending Booking</a>
+            <a href="{{ url('my/bookings/approved') }}" class="{{ $currentRoute=='MyApprovedBookings'?'active':'' }}">Approved Booking</a>
+          </div>
+        </li>
 
-            {{-- MY BOOKINGS --}}
-            <li class="b2b-nav-label">Bookings & Tickets</li>
+        {{-- 3. Reissued --}}
+        @php $reissueActive = in_array($currentRoute, ['MyReissueNew','MyReissueInProcess','MyReissueConfirmed','MyCreateReissue']); @endphp
+        <li class="b2b-nav-item {{ $reissueActive ? 'active' : '' }}">
+          <button class="b2b-nav-toggle" onclick="toggleSub('sub-reissued',this)">
+            <i class="fas fa-redo ni"></i> Reissued
+            <i class="fas fa-chevron-right b2b-chevron {{ $reissueActive ? 'open' : '' }}"></i>
+          </button>
+          <div class="b2b-submenu {{ $reissueActive ? 'open' : '' }}" id="sub-reissued">
+            <a href="{{ url('my/reissue/new') }}" class="{{ $currentRoute=='MyReissueNew'?'active':'' }}">New Request</a>
+            <a href="{{ url('my/reissue/in-process') }}" class="{{ $currentRoute=='MyReissueInProcess'?'active':'' }}">In Process</a>
+            <a href="{{ url('my/reissue/confirmed') }}" class="{{ $currentRoute=='MyReissueConfirmed'?'active':'' }}">Confirm</a>
+          </div>
+        </li>
 
-            <li class="b2b-nav-item {{ in_array($currentRoute, ['ViewAllBooking','ViewCancelBooking','ViewIssuedTickets','ViewCancelledTickets','ArchivedIssuedTickets']) ? 'active' : '' }}">
-                <button class="b2b-nav-toggle" onclick="toggleSub('sub-bookings', this)">
-                    <i class="fas fa-ticket-alt"></i>
-                    My Bookings
-                    <i class="fas fa-chevron-right b2b-chevron {{ in_array($currentRoute, ['ViewAllBooking','ViewCancelBooking','ViewIssuedTickets','ViewCancelledTickets','ArchivedIssuedTickets']) ? 'open' : '' }}"></i>
-                </button>
-                <div class="b2b-submenu {{ in_array($currentRoute, ['ViewAllBooking','ViewCancelBooking','ViewIssuedTickets','ViewCancelledTickets','ArchivedIssuedTickets']) ? 'open' : '' }}" id="sub-bookings">
-                    <a href="{{ url('view/all/booking') }}" class="{{ $currentRoute == 'ViewAllBooking' ? 'active' : '' }}">All Bookings</a>
-                    <a href="{{ url('view/issued/tickets') }}" class="{{ $currentRoute == 'ViewIssuedTickets' ? 'active' : '' }}">Issued Tickets</a>
-                    <a href="{{ url('view/cancel/booking') }}" class="{{ $currentRoute == 'ViewCancelBooking' ? 'active' : '' }}">Cancelled Bookings</a>
-                    <a href="{{ url('view/cancelled/tickets') }}" class="{{ $currentRoute == 'ViewCancelledTickets' ? 'active' : '' }}">Void / Cancelled Tickets</a>
-                    <a href="{{ url('archived/issued/tickets') }}" class="{{ $currentRoute == 'ArchivedIssuedTickets' ? 'active' : '' }}">Archived Tickets</a>
-                </div>
-            </li>
+        {{-- 4. Refunded --}}
+        @php $refundActive = in_array($currentRoute, ['MyRefundNew','MyRefundInProcess','MyRefundConfirmed','MyCreateRefund']); @endphp
+        <li class="b2b-nav-item {{ $refundActive ? 'active' : '' }}">
+          <button class="b2b-nav-toggle" onclick="toggleSub('sub-refunded',this)">
+            <i class="fas fa-hand-holding-usd ni"></i> Refunded
+            <i class="fas fa-chevron-right b2b-chevron {{ $refundActive ? 'open' : '' }}"></i>
+          </button>
+          <div class="b2b-submenu {{ $refundActive ? 'open' : '' }}" id="sub-refunded">
+            <a href="{{ url('my/refund/new') }}" class="{{ $currentRoute=='MyRefundNew'?'active':'' }}">New Request</a>
+            <a href="{{ url('my/refund/in-process') }}" class="{{ $currentRoute=='MyRefundInProcess'?'active':'' }}">In Process</a>
+            <a href="{{ url('my/refund/confirmed') }}" class="{{ $currentRoute=='MyRefundConfirmed'?'active':'' }}">Confirm</a>
+          </div>
+        </li>
 
-            <li class="b2b-nav-item {{ $currentRoute == 'MyUpcomingFlights' ? 'active' : '' }}">
-                <a href="{{ url('my/upcoming-flights') }}">
-                    <i class="fas fa-plane-departure"></i> Upcoming Flights
-                </a>
-            </li>
+        {{-- 5. Void Request --}}
+        @php $voidActive = in_array($currentRoute, ['MyVoidNew','MyVoidInProcess','MyVoidConfirmed','MyCreateVoid']); @endphp
+        <li class="b2b-nav-item {{ $voidActive ? 'active' : '' }}">
+          <button class="b2b-nav-toggle" onclick="toggleSub('sub-void',this)">
+            <i class="fas fa-ban ni"></i> Void Request
+            <i class="fas fa-chevron-right b2b-chevron {{ $voidActive ? 'open' : '' }}"></i>
+          </button>
+          <div class="b2b-submenu {{ $voidActive ? 'open' : '' }}" id="sub-void">
+            <a href="{{ url('my/void/new') }}" class="{{ $currentRoute=='MyVoidNew'?'active':'' }}">New Request</a>
+            <a href="{{ url('my/void/in-process') }}" class="{{ $currentRoute=='MyVoidInProcess'?'active':'' }}">In Process</a>
+            <a href="{{ url('my/void/confirmed') }}" class="{{ $currentRoute=='MyVoidConfirmed'?'active':'' }}">Confirm</a>
+          </div>
+        </li>
 
-            <li class="b2b-nav-item {{ $currentRoute == 'MyPartialPayBookings' ? 'active' : '' }}">
-                <a href="{{ url('my/partial-pay-bookings') }}">
-                    <i class="fas fa-credit-card"></i> Partial Pay Bookings
-                </a>
-            </li>
+        {{-- 6. Tour Bookings --}}
+        @php $tourActive = in_array($currentRoute, ['MyTourBookings','MyTourApproved','MyTourPending']); @endphp
+        <li class="b2b-nav-item {{ $tourActive ? 'active' : '' }}">
+          <button class="b2b-nav-toggle" onclick="toggleSub('sub-tour',this)">
+            <i class="fas fa-umbrella-beach ni"></i> Tour Bookings
+            <i class="fas fa-chevron-right b2b-chevron {{ $tourActive ? 'open' : '' }}"></i>
+          </button>
+          <div class="b2b-submenu {{ $tourActive ? 'open' : '' }}" id="sub-tour">
+            <a href="{{ url('my/tour-bookings') }}" class="{{ $currentRoute=='MyTourBookings'?'active':'' }}">All Booking</a>
+            <a href="{{ url('my/tour-bookings/approved') }}" class="{{ $currentRoute=='MyTourApproved'?'active':'' }}">Approved Booking</a>
+            <a href="{{ url('my/tour-bookings/pending') }}" class="{{ $currentRoute=='MyTourPending'?'active':'' }}">Pending Booking</a>
+          </div>
+        </li>
 
-            <li class="b2b-nav-item {{ $currentRoute == 'SavedPassengers' ? 'active' : '' }}">
-                <a href="{{ url('view/saved/passengers') }}">
-                    <i class="fas fa-users"></i> Travelers
-                </a>
-            </li>
+        {{-- 7. Visa Application List --}}
+        <li class="b2b-nav-item {{ $currentRoute=='MyVisaApplications'?'active':'' }}">
+          <a href="{{ url('my/visa-applications') }}">
+            <i class="fas fa-passport ni"></i> Visa Application List
+          </a>
+        </li>
 
-            {{-- FINANCE --}}
-            <li class="b2b-nav-label">Finance</li>
+        {{-- 8. TopUp Request --}}
+        <li class="b2b-nav-item {{ in_array($currentRoute,['CreateTopupRequest','ViewRechargeRequests'])?'active':'' }}">
+          <a href="{{ url('create/topup/request') }}">
+            <i class="fas fa-wallet ni"></i> TopUp Request
+          </a>
+        </li>
 
-            <li class="b2b-nav-item {{ in_array($currentRoute, ['CreateTopupRequest','ViewRechargeRequests']) ? 'active' : '' }}">
-                <button class="b2b-nav-toggle" onclick="toggleSub('sub-topup', this)">
-                    <i class="fas fa-wallet"></i>
-                    TopUp / Recharge
-                    <i class="fas fa-chevron-right b2b-chevron {{ in_array($currentRoute, ['CreateTopupRequest','ViewRechargeRequests']) ? 'open' : '' }}"></i>
-                </button>
-                <div class="b2b-submenu {{ in_array($currentRoute, ['CreateTopupRequest','ViewRechargeRequests']) ? 'open' : '' }}" id="sub-topup">
-                    <a href="{{ url('create/topup/request') }}" class="{{ $currentRoute == 'CreateTopupRequest' ? 'active' : '' }}">Submit TopUp Request</a>
-                    <a href="{{ url('view/recharge/requests') }}" class="{{ $currentRoute == 'ViewRechargeRequests' ? 'active' : '' }}">TopUp History</a>
-                </div>
-            </li>
+        {{-- 9. Invoice --}}
+        <li class="b2b-nav-item {{ $currentRoute=='FlightBookingReport'?'active':'' }}">
+          <a href="{{ url('flight/booking/report') }}">
+            <i class="fas fa-file-invoice ni"></i> Invoice
+          </a>
+        </li>
 
-            <li class="b2b-nav-item {{ $currentRoute == 'FlightBookingReport' ? 'active' : '' }}">
-                <a href="{{ url('flight/booking/report') }}">
-                    <i class="fas fa-chart-bar"></i> Reports
-                </a>
-            </li>
+        {{-- 10. Upcoming Flights --}}
+        <li class="b2b-nav-item {{ $currentRoute=='MyUpcomingFlights'?'active':'' }}">
+          <a href="{{ url('my/upcoming-flights') }}">
+            <i class="fas fa-plane-departure ni"></i> Upcoming Flights
+          </a>
+        </li>
 
-            {{-- ACCOUNT --}}
-            <li class="b2b-nav-label">Account</li>
+        {{-- 11. Partial Pay Booking --}}
+        <li class="b2b-nav-item {{ $currentRoute=='MyPartialPayBookings'?'active':'' }}">
+          <a href="{{ url('my/partial-pay-bookings') }}">
+            <i class="fas fa-credit-card ni"></i> Partial Pay Booking
+          </a>
+        </li>
 
-            <li class="b2b-nav-item {{ $currentRoute == 'MyProfile' ? 'active' : '' }}">
-                <a href="{{ url('/my/profile') }}">
-                    <i class="fas fa-user-circle"></i> My Profile
-                </a>
-            </li>
+        {{-- 12. Travelers --}}
+        <li class="b2b-nav-item {{ $currentRoute=='SavedPassengers'?'active':'' }}">
+          <a href="{{ url('view/saved/passengers') }}">
+            <i class="fas fa-users ni"></i> Travelers
+          </a>
+        </li>
 
-            <li class="b2b-nav-item {{ $currentRoute == 'CompanyProfile' ? 'active' : '' }}">
-                <a href="{{ url('/company/profile') }}">
-                    <i class="fas fa-building"></i> Company Profile
-                </a>
-            </li>
+        {{-- 13. Booking Support --}}
+        <li class="b2b-nav-item {{ in_array($currentRoute,['MyBookingSupport','MyCreateSupportTicket'])?'active':'' }}">
+          <a href="{{ url('my/booking-support') }}">
+            <i class="fas fa-headset ni"></i> Booking Support
+          </a>
+        </li>
 
-            {{-- PAYMENT METHODS --}}
-            <li class="b2b-nav-item {{ in_array($currentRoute, ['ViewBankAccounts','ViewMfsAccounts']) ? 'active' : '' }}">
-                <button class="b2b-nav-toggle" onclick="toggleSub('sub-payments', this)">
-                    <i class="fas fa-university"></i>
-                    Payment Accounts
-                    <i class="fas fa-chevron-right b2b-chevron {{ in_array($currentRoute, ['ViewBankAccounts','ViewMfsAccounts']) ? 'open' : '' }}"></i>
-                </button>
-                <div class="b2b-submenu {{ in_array($currentRoute, ['ViewBankAccounts','ViewMfsAccounts']) ? 'open' : '' }}" id="sub-payments">
-                    <a href="{{ url('view/bank/accounts') }}" class="{{ $currentRoute == 'ViewBankAccounts' ? 'active' : '' }}">Bank Accounts</a>
-                    <a href="{{ url('view/mfs/accounts') }}" class="{{ $currentRoute == 'ViewMfsAccounts' ? 'active' : '' }}">MFS Accounts</a>
-                </div>
-            </li>
+        {{-- 14. Administrator --}}
+        @php $adminActive = in_array($currentRoute, ['MyAgencyUsers','MyAgencyRoles']); @endphp
+        <li class="b2b-nav-item {{ $adminActive ? 'active' : '' }}">
+          <button class="b2b-nav-toggle" onclick="toggleSub('sub-administrator',this)">
+            <i class="fas fa-user-shield ni"></i> Administrator
+            <i class="fas fa-chevron-right b2b-chevron {{ $adminActive ? 'open' : '' }}"></i>
+          </button>
+          <div class="b2b-submenu {{ $adminActive ? 'open' : '' }}" id="sub-administrator">
+            <a href="{{ url('my/agency/users') }}" class="{{ $currentRoute=='MyAgencyUsers'?'active':'' }}">User</a>
+            <a href="{{ url('my/agency/roles') }}" class="{{ $currentRoute=='MyAgencyRoles'?'active':'' }}">Role</a>
+          </div>
+        </li>
 
-        </ul>
+      </ul>
     </nav>
 
     {{-- Logout --}}
     <div class="b2b-logout">
-        <a href="{{ route('logout') }}"
-           onclick="event.preventDefault(); document.getElementById('b2b-logout-form').submit();">
-            <i class="fas fa-sign-out-alt"></i> Sign Out
-        </a>
-        <form id="b2b-logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+      <a href="{{ route('logout') }}"
+         onclick="event.preventDefault(); document.getElementById('b2b-logout-form').submit();">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </a>
+      <form id="b2b-logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
     </div>
 
+  </div>
 </aside>
 
 <script>
