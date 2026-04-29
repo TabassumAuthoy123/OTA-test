@@ -98,30 +98,92 @@
 
 @section('content')
 
-    {{-- ─── B2B Top Bar (PNR Search + Quick Nav) ─── --}}
+    {{-- ─── B2B Top Navigation Bar ─── --}}
     @if(Auth::user()->user_type == 2)
-    <div style="background:#0f1f3d; padding:10px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:-0.5rem -1.5rem 16px; border-bottom:3px solid #f0a500;">
-        <div style="display:flex; gap:8px;">
-            <a href="{{ url('/home') }}" style="background:#f0a500;color:#0f1f3d;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;">
+    @php
+        $b2bBalance = Auth::user()->balance ?? 0;
+        $b2bUnread  = 0; // extend later for notifications
+    @endphp
+    <div class="b2b-topnav">
+
+        {{-- Left: Search tabs --}}
+        <div class="b2b-topnav-tabs">
+            <a href="{{ url('/home') }}" class="b2b-tab active">
                 <i class="fas fa-plane"></i> Flight Search
             </a>
-            <a href="#" style="background:rgba(255,255,255,.1);color:#fff;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px;">
-                <i class="fas fa-map-marked-alt"></i> Tours Search
+            <a href="{{ url('my/tour-bookings') }}" class="b2b-tab">
+                <i class="fas fa-umbrella-beach"></i> Tours Search
             </a>
-            <a href="#" style="background:rgba(255,255,255,.1);color:#fff;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px;">
+            <a href="{{ url('my/visa-applications') }}" class="b2b-tab">
                 <i class="fas fa-passport"></i> Visa Search
             </a>
         </div>
-        <form method="GET" action="{{ url('view/all/booking') }}" style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-            <input type="text" name="pnr_search" placeholder="PNR / Ticket NO / Booking Ref..."
-                   style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:6px;font-size:13px;width:280px;outline:none;"
-                   onfocus="this.style.borderColor='#f0a500'" onblur="this.style.borderColor='rgba(255,255,255,.2)'"
-                   value="{{ request('pnr_search') }}">
-            <button type="submit" style="background:#f0a500;color:#0f1f3d;border:none;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;">
-                <i class="fas fa-search"></i>
+
+        {{-- Center: PNR / Booking search --}}
+        <form method="GET" action="{{ url('my/bookings') }}" class="b2b-topnav-search">
+            <i class="fas fa-search" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#aaa;font-size:13px;pointer-events:none;"></i>
+            <input type="text" name="search"
+                   placeholder="PNR / Ticket NO / Booking Ref"
+                   value="{{ request('search') }}"
+                   style="width:100%;padding:8px 14px 8px 36px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none;transition:border .2s;"
+                   onfocus="this.style.borderColor='#0f1f3d'" onblur="this.style.borderColor='#e0e0e0'">
+            <button type="submit" style="position:absolute;right:0;top:0;height:100%;padding:0 14px;background:#0f1f3d;color:#fff;border:none;border-radius:0 6px 6px 0;font-size:13px;cursor:pointer;">
+                Search
             </button>
         </form>
+
+        {{-- Right: Notifications + User balance --}}
+        <div class="b2b-topnav-right">
+            <div class="b2b-topnav-notif">
+                <i class="fas fa-bell"></i>
+                @if($b2bUnread > 0)<span class="notif-dot"></span>@endif
+            </div>
+            <div class="b2b-topnav-user">
+                <div class="b2b-topnav-avatar">{{ strtoupper(substr(Auth::user()->name,0,1)) }}</div>
+                <div>
+                    <div style="font-size:13px;font-weight:700;color:#0f1f3d;line-height:1.2;">{{ Str::limit(Auth::user()->name,16) }}</div>
+                    <div style="font-size:11px;font-weight:700;color:#f0a500;">{{ number_format($b2bBalance,2) }} BDT</div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <style>
+    .b2b-topnav{
+        display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+        background:#fff;
+        padding:10px 20px;
+        margin:-0.5rem -1.5rem 0;
+        border-bottom:3px solid #0f1f3d;
+        box-shadow:0 2px 8px rgba(0,0,0,.08);
+        position:sticky;top:0;z-index:100;
+    }
+    .b2b-topnav-tabs{display:flex;gap:4px;flex-shrink:0;}
+    .b2b-tab{
+        display:flex;align-items:center;gap:7px;
+        padding:8px 16px;border-radius:6px;
+        font-size:13px;font-weight:600;
+        text-decoration:none;color:#555;
+        background:transparent;transition:all .15s;
+        border:2px solid transparent;
+    }
+    .b2b-tab:hover{background:#f0f4ff;color:#0f1f3d;text-decoration:none;}
+    .b2b-tab.active{background:#0f1f3d;color:#fff;border-color:#0f1f3d;}
+    .b2b-tab.active i{color:#f0a500;}
+    .b2b-topnav-search{position:relative;flex:1;max-width:380px;min-width:220px;}
+    .b2b-topnav-right{display:flex;align-items:center;gap:14px;margin-left:auto;flex-shrink:0;}
+    .b2b-topnav-notif{position:relative;cursor:pointer;color:#555;font-size:18px;padding:4px;}
+    .b2b-topnav-notif:hover{color:#0f1f3d;}
+    .notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:#dc3545;border-radius:50%;}
+    .b2b-topnav-user{display:flex;align-items:center;gap:10px;cursor:pointer;}
+    .b2b-topnav-avatar{
+        width:36px;height:36px;border-radius:50%;
+        background:#0f1f3d;color:#f0a500;
+        display:flex;align-items:center;justify-content:center;
+        font-size:14px;font-weight:800;flex-shrink:0;
+    }
+    </style>
     @endif
 
     <div class="search_box_container">
@@ -353,7 +415,7 @@
                                         <i class="fas fa-plane-departure"></i>
                                     </button>
                                     @if(Auth::check() && Auth::user()->user_type == 2)
-                                    <a href="{{ url('view/all/booking') }}" class="btn-search-history">
+                                    <a href="{{ url('my/bookings') }}" class="btn-search-history">
                                         <i class="fas fa-history"></i> Show Search History
                                     </a>
                                     @endif
