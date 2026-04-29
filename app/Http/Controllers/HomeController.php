@@ -118,6 +118,29 @@ class HomeController extends Controller
             });
         }
 
+        if ($request->export === 'excel') {
+            $statusMap = [0=>'Booking Hold',1=>'Booked',2=>'Issued',3=>'Cancelled',4=>'Refunded'];
+            $rows = (clone $q)->orderBy('departure_date')->get();
+            return $this->streamCsv('upcoming_flights_' . date('Y-m-d') . '.csv',
+                ['Booking No', 'PNR', 'Route', 'Departure Date', 'Passengers', 'Fare (BDT)', 'Status'],
+                $rows->map(function ($b) use ($statusMap) {
+                    $dep = strtoupper(substr($b->departure_location ?? '', 0, 3));
+                    $arr = strtoupper(substr($b->arrival_location ?? '', 0, 3));
+                    $pax = (int)$b->adult + (int)$b->child + (int)$b->infant;
+                    $daysLeft = $b->departure_date ? max(0, (int)\Carbon\Carbon::parse($b->departure_date)->diffInDays(now(), false) * -1) : '';
+                    return [
+                        $b->booking_no,
+                        $b->pnr_id ?? '',
+                        "$dep-$arr",
+                        $b->departure_date ? date('d-m-Y', strtotime($b->departure_date)) . ($daysLeft !== '' ? " ($daysLeft days)" : '') : '',
+                        $pax,
+                        number_format($b->total_fare ?? 0, 2),
+                        $statusMap[$b->status] ?? ucfirst((string)$b->status),
+                    ];
+                })->toArray()
+            );
+        }
+
         $bookings = $q->orderBy('departure_date')->paginate(15)->withQueryString();
         return view('b2b_portal.upcoming_flights', compact('bookings'));
     }
@@ -140,8 +163,44 @@ class HomeController extends Controller
             $q->where('status', $request->status);
         }
 
+        if ($request->export === 'excel') {
+            $statusMap = [0=>'Booking Hold',1=>'Booked',2=>'Issued',3=>'Cancelled',4=>'Refunded'];
+            $rows = (clone $q)->orderByDesc('created_at')->get();
+            return $this->streamCsv('partial_pay_bookings_' . date('Y-m-d') . '.csv',
+                ['Booking No', 'PNR', 'Route', 'Total Fare (BDT)', 'Paid Amount (BDT)', 'Due Amount (BDT)', 'Status'],
+                $rows->map(function ($b) use ($statusMap) {
+                    $dep = strtoupper(substr($b->departure_location ?? '', 0, 3));
+                    $arr = strtoupper(substr($b->arrival_location ?? '', 0, 3));
+                    $total = $b->total_fare ?? 0;
+                    $paid  = $b->paid_amount ?? ($total * ($b->payment_percentage ?? 100) / 100);
+                    $due   = $total - $paid;
+                    return [
+                        $b->booking_no, $b->pnr_id ?? '', "$dep-$arr",
+                        number_format($total, 2), number_format($paid, 2), number_format(max(0, $due), 2),
+                        $statusMap[$b->status] ?? ucfirst((string)$b->status),
+                    ];
+                })->toArray()
+            );
+        }
+
         $bookings = $q->orderByDesc('created_at')->paginate(15)->withQueryString();
         return view('b2b_portal.partial_pay_bookings', compact('bookings'));
+    }
+
+    private function streamCsv(string $filename, array $headers, array $rows)
+    {
+        return response()->streamDownload(function () use ($headers, $rows) {
+            $out = fopen('php://output', 'w');
+            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($out, $headers);
+            foreach ($rows as $row) {
+                fputcsv($out, $row);
+            }
+            fclose($out);
+        }, $filename, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     public function viewActivityLogs(Request $request)

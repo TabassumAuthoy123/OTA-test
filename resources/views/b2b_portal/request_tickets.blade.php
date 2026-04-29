@@ -55,10 +55,10 @@
               <i class="fas fa-times" style="font-size:12px;"></i>
             </a>
           @endif
-          <button type="button" class="btn-export">
-            <i class="fas fa-file-excel"></i> Export to Excel
-          </button>
         </form>
+        <a href="{{ request()->url() }}?export=excel{{ request('start_date') ? '&start_date='.request('start_date') : '' }}{{ request('end_date') ? '&end_date='.request('end_date') : '' }}" class="btn-export" style="background:#1d7a4b;">
+          <i class="fas fa-file-excel"></i> Export
+        </a>
       </div>
     </div>
 

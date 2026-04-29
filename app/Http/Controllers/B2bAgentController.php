@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class B2bAgentController extends Controller
 {
+    // ── Tour Bookings ────────────────────────────────────────────────────────
+
     public function tourBookings(Request $request)
     {
         $q = DB::table('tour_bookings')->where('b2b_user_id', Auth::id());
@@ -30,11 +32,28 @@ class B2bAgentController extends Controller
             $q->whereDate('travel_date', '<=', $request->end_date);
         }
 
+        if ($request->export === 'excel') {
+            $rows = (clone $q)->orderByDesc('created_at')->get();
+            return $this->streamCsv('tour_bookings_' . date('Y-m-d') . '.csv',
+                ['ID', 'Booking Ref', 'Name', 'Email', 'Tour Type', 'Travel Date', 'Amount (BDT)', 'Status', 'Created At'],
+                $rows->map(fn($r) => [
+                    $r->id, $r->booking_id ?? '', $r->name, $r->email,
+                    ucfirst($r->tour_type ?? ''),
+                    $r->travel_date ? date('d-m-Y', strtotime($r->travel_date)) : '',
+                    number_format($r->amount ?? 0, 2),
+                    $r->status == 1 ? 'Confirmed' : ($r->status == 2 ? 'Cancelled' : 'Pending'),
+                    $r->created_at ? date('d-m-Y', strtotime($r->created_at)) : '',
+                ])->toArray()
+            );
+        }
+
         $bookings  = $q->orderByDesc('created_at')->paginate(20)->withQueryString();
         $total     = DB::table('tour_bookings')->where('b2b_user_id', Auth::id())->count();
         $pageTitle = $request->input('_page_title', 'All Tour Bookings');
         return view('b2b_portal.tour_bookings', compact('bookings', 'total', 'pageTitle'));
     }
+
+    // ── Visa Applications ─────────────────────────────────────────────────────
 
     public function visaApplications(Request $request)
     {
@@ -50,6 +69,21 @@ class B2bAgentController extends Controller
         }
         if ($request->filled('filter_status') && $request->filter_status !== 'all') {
             $q->where('status', $request->filter_status);
+        }
+
+        if ($request->export === 'excel') {
+            $rows = (clone $q)->orderByDesc('created_at')->get();
+            return $this->streamCsv('visa_applications_' . date('Y-m-d') . '.csv',
+                ['Applicant Name', 'Passport No', 'Nationality', 'Destination', 'Visa Type', 'Travel Date', 'Passport Expiry', 'Status', 'Applied At'],
+                $rows->map(fn($r) => [
+                    $r->applicant_name, $r->passport_no ?? '', $r->nationality ?? '',
+                    $r->destination_country, ucfirst($r->visa_type),
+                    $r->travel_date ? date('d-m-Y', strtotime($r->travel_date)) : '',
+                    $r->passport_expiry ? date('d-m-Y', strtotime($r->passport_expiry)) : '',
+                    strtoupper($r->status),
+                    $r->created_at ? date('d-m-Y', strtotime($r->created_at)) : '',
+                ])->toArray()
+            );
         }
 
         $applications = $q->orderByDesc('created_at')->paginate(20)->withQueryString();
@@ -151,6 +185,31 @@ class B2bAgentController extends Controller
         if ($request->filled('end_date')) {
             $q->whereDate('created_at', '<=', $request->end_date);
         }
+
+        if ($request->export === 'excel') {
+            $statusMap = [0=>'Booking Hold',1=>'Booking Success',2=>'Ticket Issued',3=>'Cancelled',4=>'Refunded',5=>'Voided'];
+            $rows = (clone $q)->orderByDesc('created_at')->get();
+            return $this->streamCsv('flight_bookings_' . date('Y-m-d') . '.csv',
+                ['Booking Ref', 'PNR', 'Airlines PNR', 'Route', 'Journey Type', 'Fare (BDT)', 'Status', 'Booking Date'],
+                $rows->map(function ($b) use ($statusMap) {
+                    $jt = (int)($b->journey_type ?? 1);
+                    $jtText = $jt === 2 ? 'Round Trip' : ($jt === 3 ? 'Multi City' : 'One Way');
+                    $dep = strtoupper(substr($b->departure_location ?? '', 0, 3));
+                    $arr = strtoupper(substr($b->arrival_location ?? '', 0, 3));
+                    return [
+                        $b->booking_no,
+                        $b->pnr_id ?? '',
+                        $b->airlines_pnr ?? '',
+                        "$dep-$arr",
+                        $jtText,
+                        number_format($b->total_fare ?? 0, 2),
+                        $statusMap[$b->status] ?? ucfirst((string)$b->status),
+                        $b->created_at ? date('d-m-Y', strtotime($b->created_at)) : '',
+                    ];
+                })->toArray()
+            );
+        }
+
         $bookings = $q->orderByDesc('created_at')->paginate(15)->withQueryString();
         return view('b2b_portal.my_bookings', compact('bookings', 'title', 'activeRoute'));
     }
@@ -256,6 +315,22 @@ class B2bAgentController extends Controller
         if ($request->filled('end_date')) {
             $q->whereDate('created_at', '<=', $request->end_date);
         }
+
+        if ($request->export === 'excel') {
+            $rows = (clone $q)->orderByDesc('created_at')->get();
+            return $this->streamCsv(
+                $issueType . '_requests_' . date('Y-m-d') . '.csv',
+                ['Ref No', 'Booking Ref', 'Subject', 'Status', 'Submitted At'],
+                $rows->map(fn($r) => [
+                    '#' . str_pad($r->id, 3, '0', STR_PAD_LEFT),
+                    $r->booking_ref ?? '',
+                    $r->subject,
+                    strtoupper(str_replace('_', ' ', $r->status)),
+                    $r->created_at ? date('d-m-Y H:i', strtotime($r->created_at)) : '',
+                ])->toArray()
+            );
+        }
+
         $tickets = $q->orderByDesc('created_at')->paginate(15)->withQueryString();
         return view('b2b_portal.request_tickets', compact('tickets', 'title', 'activeRoute', 'issueType', 'statuses'));
     }
@@ -309,6 +384,8 @@ class B2bAgentController extends Controller
         return view('b2b_portal.agency_roles');
     }
 
+    // ── Booking Support ───────────────────────────────────────────────────────
+
     public function bookingSupport(Request $request)
     {
         $q = DB::table('booking_support_tickets')->where('user_id', Auth::id());
@@ -322,6 +399,21 @@ class B2bAgentController extends Controller
         }
         if ($request->filled('filter_status') && $request->filter_status !== 'all') {
             $q->where('status', $request->filter_status);
+        }
+
+        if ($request->export === 'excel') {
+            $rows = (clone $q)->orderByDesc('created_at')->get();
+            return $this->streamCsv('booking_support_' . date('Y-m-d') . '.csv',
+                ['Ticket #', 'Booking Ref', 'Issue Type', 'Subject', 'Status', 'Submitted At'],
+                $rows->map(fn($r) => [
+                    '#' . str_pad($r->id, 3, '0', STR_PAD_LEFT),
+                    $r->booking_ref ?? '',
+                    ucfirst(str_replace('_', ' ', $r->issue_type)),
+                    $r->subject,
+                    strtoupper(str_replace('_', ' ', $r->status)),
+                    $r->created_at ? date('d-m-Y H:i', strtotime($r->created_at)) : '',
+                ])->toArray()
+            );
         }
 
         $tickets = $q->orderByDesc('created_at')->paginate(20)->withQueryString();
@@ -353,5 +445,23 @@ class B2bAgentController extends Controller
         ]);
 
         return redirect(url('my/booking-support'))->with('success', 'Support ticket submitted. We will respond shortly.');
+    }
+
+    // ── CSV Export Helper ─────────────────────────────────────────────────────
+
+    private function streamCsv(string $filename, array $headers, array $rows)
+    {
+        return response()->streamDownload(function () use ($headers, $rows) {
+            $out = fopen('php://output', 'w');
+            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF)); // UTF-8 BOM for Excel
+            fputcsv($out, $headers);
+            foreach ($rows as $row) {
+                fputcsv($out, $row);
+            }
+            fclose($out);
+        }, $filename, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

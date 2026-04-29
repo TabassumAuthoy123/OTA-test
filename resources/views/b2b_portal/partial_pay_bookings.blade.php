@@ -27,6 +27,10 @@
         <h5><i class="fas fa-credit-card me-2"></i> My Partial Pay Bookings</h5>
         <small>Dashboard &rsaquo; Partial Pay Bookings</small>
       </div>
+      <a href="{{ url(request()->path()) }}?{{ http_build_query(array_merge(request()->except('page'), ['export'=>'excel'])) }}"
+         style="background:#1d7a4b;color:#fff;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:700;text-decoration:none;">
+        <i class="fas fa-file-excel me-1"></i> Export
+      </a>
     </div>
 
     <form method="GET" action="{{ url('my/partial-pay-bookings') }}">

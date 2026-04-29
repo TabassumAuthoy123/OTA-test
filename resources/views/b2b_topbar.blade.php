@@ -80,7 +80,7 @@
         <a href="{{ url('/home') }}" class="tb-btn {{ $currentRoute == 'home' ? 'active' : '' }}">
             <i class="fas fa-plane"></i> Flight Search
         </a>
-        <a href="#" class="tb-btn {{ $currentRoute == 'MyTourBookings' ? 'active' : '' }}">
+        <a href="{{ url('my/tour-bookings') }}" class="tb-btn {{ in_array($currentRoute, ['MyTourBookings','MyTourApproved','MyTourPending']) ? 'active' : '' }}">
             <i class="fas fa-umbrella-beach"></i> Tours Search
         </a>
         <a href="{{ url('my/visa-applications') }}" class="tb-btn {{ $currentRoute == 'MyVisaApplications' ? 'active' : '' }}">

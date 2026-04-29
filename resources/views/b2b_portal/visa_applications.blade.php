@@ -21,9 +21,15 @@
         <h5><i class="fas fa-passport me-2"></i>Visa Application List</h5>
         <small style="opacity:.7;">Dashboard &rsaquo; Visa Application List</small>
       </div>
-      <a href="{{ url('my/visa-applications/create') }}" class="btn btn-warning btn-sm fw-bold">
-        <i class="fas fa-plus me-1"></i> New Application
-      </a>
+      <div style="display:flex;gap:8px;">
+        <a href="{{ url(request()->path()) }}?{{ http_build_query(array_merge(request()->except('page'), ['export'=>'excel'])) }}"
+           style="background:#1d7a4b;color:#fff;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;text-decoration:none;">
+          <i class="fas fa-file-excel me-1"></i> Export
+        </a>
+        <a href="{{ url('my/visa-applications/create') }}" class="btn btn-warning btn-sm fw-bold">
+          <i class="fas fa-plus me-1"></i> New Application
+        </a>
+      </div>
     </div>
     <form method="GET" action="{{ url('my/visa-applications') }}">
       <div class="b2b-filters">
