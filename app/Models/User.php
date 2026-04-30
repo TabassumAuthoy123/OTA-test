@@ -30,6 +30,7 @@ class User extends Authenticatable
         'status',
         'user_type',
         'search_status',
+        'two_factor_enabled',
         'booking_status',
         'ticket_status'
     ];

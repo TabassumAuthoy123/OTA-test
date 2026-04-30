@@ -84,6 +84,28 @@
             color: rgba(255, 255, 255, 0.3);
         }
 
+        .b2c-pw-wrap {
+            position: relative;
+        }
+        .b2c-pw-wrap input {
+            padding-right: 44px !important;
+        }
+        .b2c-pw-eye {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: rgba(255,255,255,.45);
+            font-size: 15px;
+            padding: 2px;
+            transition: color .15s;
+            line-height: 1;
+        }
+        .b2c-pw-eye:hover { color: rgba(255,255,255,.85); }
+
         .b2c-auth-remember {
             display: flex;
             align-items: center;
@@ -174,7 +196,12 @@
 
                 <div class="b2c-auth-field">
                     <label>Password</label>
-                    <input type="password" name="password" placeholder="Enter your password" required>
+                    <div class="b2c-pw-wrap">
+                        <input type="password" name="password" id="b2cPwInput" placeholder="Enter your password" required>
+                        <button type="button" class="b2c-pw-eye" onclick="toggleB2cPw()" id="b2cPwEye" title="Show/hide password">
+                            <i class="fas fa-eye" id="b2cPwIcon"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="b2c-auth-remember">
@@ -193,4 +220,20 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+function toggleB2cPw() {
+    var inp  = document.getElementById('b2cPwInput');
+    var icon = document.getElementById('b2cPwIcon');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        inp.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+</script>
 @endsection

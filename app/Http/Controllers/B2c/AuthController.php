@@ -16,8 +16,8 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
-        if (Auth::check() && Auth::user()->user_type == UserType::B2C->value) {
-            return redirect()->route('b2c.account');
+        if (Auth::check()) {
+            return redirect($this->redirectAfterLogin());
         }
         return view('b2c.auth.login');
     }
@@ -32,15 +32,9 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (
-            Auth::attempt([
-                'email' => $request->email,
-                'password' => $request->password,
-                'user_type' => UserType::B2C->value,
-            ], $request->remember)
-        ) {
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('b2c.account'));
+            return redirect($this->redirectAfterLogin());
         }
 
         return back()->withErrors([
@@ -48,13 +42,21 @@ class AuthController extends Controller
         ])->withInput();
     }
 
+    private function redirectAfterLogin(): string
+    {
+        $type = Auth::user()->user_type;
+        if ($type == UserType::B2C->value) return route('b2c.account');
+        if ($type == UserType::B2B->value) return route('home');
+        return url('/home');
+    }
+
     /**
      * Show customer registration form
      */
     public function showRegister()
     {
-        if (Auth::check() && Auth::user()->user_type == UserType::B2C->value) {
-            return redirect()->route('b2c.account');
+        if (Auth::check()) {
+            return redirect($this->redirectAfterLogin());
         }
         return view('b2c.auth.register');
     }

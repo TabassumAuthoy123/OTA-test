@@ -1266,11 +1266,11 @@
         }
 
         function liveSearchpassenger() {
-            var searchKeyword = $("#search_keyword").val();
+            var searchKeyword = $("#search_keyword").val().trim();
 
-            if (searchKeyword && searchKeyword != '' && searchKeyword != null) {
+            if (searchKeyword.length >= 4) {
                 var formData = new FormData();
-                formData.append("search_keyword", $("#search_keyword").val());
+                formData.append("search_keyword", searchKeyword);
 
                 $.ajax({
                     data: formData,
@@ -1282,12 +1282,9 @@
                     success: function (data) {
                         $('.live_search_box').removeClass('d-none');
                         $('.live_search_box').html(data.searchResults);
-                        // renderLazyImage();
                     },
-                    error: function (data) {
-                        toastr.options.positionClass = 'toast-bottom-right';
-                        toastr.options.timeOut = 1000;
-                        toastr.error("Something Went Wrong");
+                    error: function () {
+                        $('.live_search_box').addClass('d-none');
                     }
                 });
             } else {

@@ -112,7 +112,7 @@
   <div class="b2b-sidebar-inner">
 
     {{-- Logo --}}
-    <a href="{{ url('/home') }}" class="b2b-logo">
+    <a href="{{ url('my/dashboard') }}" class="b2b-logo">
         @if($companyProfile && $companyProfile->logo && file_exists(public_path($companyProfile->logo)))
             <img src="{{ url($companyProfile->logo) }}" alt="logo">
         @else
@@ -134,8 +134,8 @@
       <ul>
 
         {{-- 1. Dashboard --}}
-        <li class="b2b-nav-item {{ $currentRoute == 'home' ? 'active' : '' }}">
-          <a href="{{ url('/home') }}">
+        <li class="b2b-nav-item {{ $currentRoute == 'MyDashboard' ? 'active' : '' }}">
+          <a href="{{ url('my/dashboard') }}">
             <i class="fas fa-th-large ni"></i> Dashboard
           </a>
         </li>

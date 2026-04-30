@@ -5,9 +5,163 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use App\Models\CompanyProfile;
+use App\Models\User;
 
 class B2bAgentController extends Controller
 {
+    // ── B2B Agent Dashboard ───────────────────────────────────────────────────
+
+    public function agentDashboard()
+    {
+        $uid = Auth::id();
+
+        $total     = DB::table('flight_bookings')->where('booked_by', $uid)->count();
+        $issued    = DB::table('flight_bookings')->where('booked_by', $uid)->where('status', 2)->count();
+        $pending   = DB::table('flight_bookings')->where('booked_by', $uid)->where('status', 0)->count();
+        $cancelled = DB::table('flight_bookings')->where('booked_by', $uid)->whereIn('status', [3, 4])->count();
+
+        $fulfillmentRate  = $total > 0 ? round(($issued    / $total) * 100, 1) : 0;
+        $pendingWorkload  = $total > 0 ? round(($pending   / $total) * 100, 1) : 0;
+        $cancellationRate = $total > 0 ? round(($cancelled / $total) * 100, 1) : 0;
+
+        $monthly = DB::table('flight_bookings')
+            ->where('booked_by', $uid)
+            ->where('created_at', '>=', Carbon::now()->subMonths(6))
+            ->select(DB::raw("DATE_FORMAT(created_at,'%Y-%m') as month"), DB::raw('COUNT(*) as bookings'), DB::raw('SUM(CASE WHEN status=2 THEN 1 ELSE 0 END) as issued'), DB::raw('SUM(CASE WHEN status IN(3,4) THEN 1 ELSE 0 END) as cancelled'))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        return view('b2b_portal.b2b_dashboard', compact('total', 'issued', 'pending', 'cancelled', 'fulfillmentRate', 'pendingWorkload', 'cancellationRate', 'monthly'));
+    }
+
+    // ── My Account ────────────────────────────────────────────────────────────
+
+    public function myAccount()
+    {
+        $user           = Auth::user();
+        $companyProfile = CompanyProfile::where('user_id', $user->id)->first();
+        return view('b2b_portal.my_account', compact('user', 'companyProfile'));
+    }
+
+    public function updateProfileAjax(Request $request)
+    {
+        $request->validate([
+            'name'  => 'required|string|max:100',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user  = User::find(Auth::id());
+        $image = $user->image;
+
+        if ($request->hasFile('photo')) {
+            $file      = $request->file('photo');
+            $fileName  = Str::random(5) . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('userImages/'), $fileName);
+            if ($image && file_exists(public_path($image))) {
+                unlink(public_path($image));
+            }
+            $image = 'userImages/' . $fileName;
+        }
+
+        $user->update([
+            'name'               => $request->name,
+            'phone'              => $request->phone,
+            'image'              => $image,
+            'two_factor_enabled' => $request->boolean('two_factor_enabled'),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Profile updated successfully.', 'name' => $user->name, 'phone' => $user->phone, 'two_factor_enabled' => $user->two_factor_enabled, 'image' => $image ? asset($image) : null]);
+    }
+
+    public function changePasswordAjax(Request $request)
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:6',
+        ]);
+
+        if (!Hash::check($request->old_password, Auth::user()->password)) {
+            return response()->json(['success' => false, 'message' => 'Current password is incorrect.'], 422);
+        }
+
+        User::where('id', Auth::id())->update(['password' => Hash::make($request->new_password)]);
+
+        return response()->json(['success' => true, 'message' => 'Password changed successfully.']);
+    }
+
+    // ── Tour Search ───────────────────────────────────────────────────────────
+
+    public function tourSearch(Request $request)
+    {
+        $countries = DB::table('tour_packages')->where('status', 1)->distinct()->orderBy('country')->pluck('country');
+        $visaTypes = ['tourist', 'business', 'student', 'pilgrimage', 'medical'];
+
+        $packages = collect();
+        $searched = false;
+
+        if ($request->isMethod('get') && ($request->filled('country') || $request->filled('visa_type') || $request->filled('start_date'))) {
+            $searched = true;
+            $q = DB::table('tour_packages')->where('status', 1);
+
+            if ($request->filled('country') && $request->country !== 'all') {
+                $q->where('country', $request->country);
+            }
+            if ($request->filled('visa_type') && $request->visa_type !== 'all') {
+                $q->where('visa_type', $request->visa_type);
+            }
+            if ($request->filled('start_date')) {
+                $q->where(function ($w) use ($request) {
+                    $w->whereNull('end_date')->orWhere('end_date', '>=', $request->start_date);
+                });
+            }
+            if ($request->filled('end_date')) {
+                $q->where(function ($w) use ($request) {
+                    $w->whereNull('start_date')->orWhere('start_date', '<=', $request->end_date);
+                });
+            }
+
+            $packages = $q->orderBy('price')->get();
+        } else {
+            $packages = DB::table('tour_packages')->where('status', 1)->orderBy('price')->get();
+        }
+
+        return view('b2b_portal.tour_search', compact('countries', 'visaTypes', 'packages', 'searched'));
+    }
+
+    // ── Visa Search ───────────────────────────────────────────────────────────
+
+    public function visaSearch(Request $request)
+    {
+        // Build country list from tour_packages destinations + visa_applications destinations
+        $fromTours = DB::table('tour_packages')->whereNotNull('country')->where('status', 1)->distinct()->pluck('country');
+        $fromVisa  = DB::table('visa_applications')->whereNotNull('destination_country')->distinct()->pluck('destination_country');
+        $countries = $fromTours->merge($fromVisa)->unique()->sort()->values();
+
+        // If both empty, use a sensible default list
+        if ($countries->isEmpty()) {
+            $countries = collect(['Bangladesh', 'India', 'Thailand', 'Malaysia', 'Singapore', 'Saudi Arabia', 'UAE', 'Qatar', 'Nepal', 'UK', 'USA', 'Canada', 'Australia']);
+        }
+
+        $results  = collect();
+        $searched = false;
+
+        if ($request->filled('country')) {
+            $searched = true;
+            $results  = DB::table('visa_applications')
+                ->where('destination_country', $request->country)
+                ->select('visa_type', DB::raw('COUNT(*) as total'), DB::raw('SUM(CASE WHEN status="approved" THEN 1 ELSE 0 END) as approved'), DB::raw('SUM(CASE WHEN status="pending" THEN 1 ELSE 0 END) as pending'), DB::raw('SUM(CASE WHEN status="rejected" THEN 1 ELSE 0 END) as rejected'))
+                ->groupBy('visa_type')
+                ->get();
+        }
+
+        return view('b2b_portal.visa_search', compact('countries', 'results', 'searched'));
+    }
+
     // ── Tour Bookings ────────────────────────────────────────────────────────
 
     public function tourBookings(Request $request)

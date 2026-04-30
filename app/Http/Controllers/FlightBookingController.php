@@ -85,7 +85,7 @@ class FlightBookingController extends Controller
             'titles.*' => 'required|string|in:Mr,Mrs,Ms,Mstr,Miss',
             'dob' => 'required|array|min:1',
             'dob.*' => 'required|date',
-            'traveller_contact' => 'required|string|max:20',
+            'traveller_contact' => 'required|string|max:50',
             'traveller_email' => 'required|email|max:255',
         ]);
 

@@ -210,6 +210,12 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
 
 
     // B2B user own pages (no CheckUserType — accessible by B2B agents)
+    Route::get('my/dashboard', [\App\Http\Controllers\B2bAgentController::class, 'agentDashboard'])->name('MyDashboard');
+    Route::get('my/account', [\App\Http\Controllers\B2bAgentController::class, 'myAccount'])->name('MyAccount');
+    Route::post('my/account/update-profile', [\App\Http\Controllers\B2bAgentController::class, 'updateProfileAjax'])->name('MyUpdateProfile');
+    Route::post('my/account/change-password', [\App\Http\Controllers\B2bAgentController::class, 'changePasswordAjax'])->name('MyChangePassword');
+    Route::get('tours-search', [\App\Http\Controllers\B2bAgentController::class, 'tourSearch'])->name('TourSearch');
+    Route::get('visa-search', [\App\Http\Controllers\B2bAgentController::class, 'visaSearch'])->name('VisaSearch');
     Route::get('my/upcoming-flights', [HomeController::class, 'myUpcomingFlights'])->name('MyUpcomingFlights');
     Route::get('my/partial-pay-bookings', [HomeController::class, 'myPartialPayBookings'])->name('MyPartialPayBookings');
 

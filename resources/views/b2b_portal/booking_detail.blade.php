@@ -61,7 +61,7 @@
     elseif (str_contains($stLower,'hold')||str_contains($stLower,'pending')) $stClass = 'st-hold';
     else $stClass = 'st-success';
   }
-  $jt = (int)($booking->journey_type ?? 1);
+  $jt = (int)($booking->flight_type ?? $booking->journey_type ?? 1);
   $jtText = $jt === 2 ? 'Round Trip' : ($jt === 3 ? 'Multi City' : 'One Way');
   $depCode = strtoupper(substr($booking->departure_location ?? '', 0, 3));
   $arrCode = strtoupper(substr($booking->arrival_location ?? '', 0, 3));
@@ -133,25 +133,25 @@
               <tbody>
                 @forelse($segments as $s)
                 <tr>
-                  <td style="font-weight:700;">{{ $s->flight_number ?? 'N/A' }}</td>
+                  <td style="font-weight:700;">{{ ($s->carrier_marketing_code ?? '') . ($s->carrier_marketing_flight_number ?? '') ?: 'N/A' }}</td>
                   <td>
-                    <span class="airline-badge">{{ strtoupper(substr($s->airline_code ?? $s->airline ?? '', 0, 2)) }}</span>
-                    <div style="font-size:11px;color:#666;margin-top:3px;">{{ $s->airline ?? $s->airline_name ?? '' }}</div>
+                    <span class="airline-badge">{{ strtoupper($s->carrier_marketing_code ?? '??') }}</span>
                   </td>
-                  <td style="text-align:left;">{{ $s->origin ?? $s->departure_location ?? 'N/A' }}</td>
-                  <td style="text-align:left;">{{ $s->destination ?? $s->arrival_location ?? 'N/A' }}</td>
-                  <td>{{ $s->class ?? $s->cabin_class ?? 'Economy' }}</td>
-                  <td>{{ $s->baggage ?? 'N/A' }}</td>
+                  <td style="text-align:left;">{{ $s->departure_airport_code ?? $s->departure_city_code ?? 'N/A' }}</td>
+                  <td style="text-align:left;">{{ $s->arrival_airport_code ?? $s->arrival_city_code ?? 'N/A' }}</td>
+                  <td>{{ $s->cabin_code ?: ($s->booking_code ?: 'Economy') }}</td>
+                  <td>{{ $s->baggage_allowance ?: 'N/A' }}</td>
                   <td>
-                    {{ $s->departure_date ? date('d-M-Y', strtotime($s->departure_date)) : 'N/A' }}
+                    {{ $booking->departure_date ? date('d-M-Y', strtotime($booking->departure_date)) : 'N/A' }}
                     @if(!empty($s->departure_time))
-                      <div style="font-size:11px;color:#666;">{{ date('h:i A', strtotime($s->departure_time)) }}</div>
+                      <div style="font-size:11px;color:#666;">{{ date('h:i A', strtotime(preg_replace('/\+.*/', '', $s->departure_time))) }}</div>
                     @endif
                   </td>
                   <td>
-                    {{ $s->arrival_date ? date('d-M-Y', strtotime($s->arrival_date)) : 'N/A' }}
                     @if(!empty($s->arrival_time))
-                      <div style="font-size:11px;color:#666;">{{ date('h:i A', strtotime($s->arrival_time)) }}</div>
+                      {{ date('h:i A', strtotime(preg_replace('/\+.*/', '', $s->arrival_time))) }}
+                    @else
+                      N/A
                     @endif
                   </td>
                 </tr>
@@ -175,8 +175,8 @@
               </tr></thead>
               <tbody>
                 <tr>
-                  <td>৳ {{ number_format($booking->base_fare ?? ($booking->total_fare ?? 0) * 0.85, 2) }}</td>
-                  <td>৳ {{ number_format($booking->tax ?? ($booking->total_fare ?? 0) * 0.15, 2) }}</td>
+                  <td>৳ {{ number_format($booking->base_fare_amount ?? ($booking->total_fare ?? 0) * 0.85, 2) }}</td>
+                  <td>৳ {{ number_format($booking->total_tax_amount ?? ($booking->total_fare ?? 0) * 0.15, 2) }}</td>
                   <td>৳ {{ number_format($booking->discount ?? 0, 2) }}</td>
                   <td>৳ {{ number_format($booking->ait ?? 0, 2) }}</td>
                   <td style="font-weight:700;color:#0f1f3d;">৳ {{ number_format($booking->total_fare ?? 0, 2) }}</td>
@@ -228,7 +228,7 @@
             <div class="qi-row">
               <span class="qi-label">Ticket issue last Date</span>
               <span class="qi-val" style="font-size:12px;">
-                {{ $booking->last_ticket_date ? date('d-M-Y', strtotime($booking->last_ticket_date)) : 'Still Not Available' }}
+                {{ $booking->last_ticket_datetime ? date('d-M-Y H:i', strtotime($booking->last_ticket_datetime)) : 'Still Not Available' }}
               </span>
             </div>
 
