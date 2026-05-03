@@ -3,6 +3,30 @@
         sidebar toggle<span></span>
     </div>
     <div class="d-none" id="typed-strings"></div>
+
+    {{-- Admin Global Search --}}
+    @if(Auth::user()->user_type == 0 || Auth::user()->user_type == 1)
+    <div class="flex-grow-1 mx-3" style="max-width:520px;">
+        <form method="GET" action="{{ route('AdminGlobalSearch') }}" class="d-flex align-items-center"
+              style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:6px;overflow:hidden;transition:border-color .15s;"
+              onmouseover="this.style.borderColor='rgba(255,255,255,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.2)'">
+            <span style="padding:0 10px;color:rgba(255,255,255,.5);font-size:13px;flex-shrink:0;">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" name="q"
+                   value="{{ request()->routeIs('AdminGlobalSearch') ? request('q') : '' }}"
+                   placeholder="PNR / Ticket NO / Booking Ref / Name / Agent ID / Passport"
+                   autocomplete="off"
+                   style="flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:13px;padding:8px 0;min-width:0;">
+            <input type="text" name="q" style="display:none">{{-- prevent duplicate --}}
+            <button type="submit"
+                    style="background:#1a3a6b;color:#fff;border:none;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap;">
+                Search
+            </button>
+        </form>
+    </div>
+    @endif
+
     <div class="navbar-icon d-flex">
         <ul class="navbar-nav flex-row align-items-center">
             @if(Auth::user()->user_type == 0 || Auth::user()->user_type == 1)

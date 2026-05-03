@@ -149,6 +149,9 @@ Route::post('sslcommerz/ipn', [PaymentController::class, 'ipn'])->name('payment.
 Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // Admin global search (accessible by admin/superadmin + B2B)
+    Route::get('admin/search', [\App\Http\Controllers\AdminGlobalSearchController::class, 'search'])->name('AdminGlobalSearch');
     Route::get('/live/city/airport/search', [HomeController::class, 'liveCityAirportSearch'])->name('LiveCityAirportSearch');
     Route::get('/live/airline/search', [HomeController::class, 'liveAirlineSearch'])->name('LiveAirlineSearch');
     Route::post('/passenger/live/search', [HomeController::class, 'passengerLiveSearch'])->name('PassengerLiveSearch');
