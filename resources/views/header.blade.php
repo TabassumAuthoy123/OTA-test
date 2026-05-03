@@ -18,7 +18,6 @@
                    placeholder="PNR / Ticket NO / Booking Ref / Name / Agent ID / Passport"
                    autocomplete="off"
                    style="flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:13px;padding:8px 0;min-width:0;">
-            <input type="text" name="q" style="display:none">{{-- prevent duplicate --}}
             <button type="submit"
                     style="background:#1a3a6b;color:#fff;border:none;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap;">
                 Search
