@@ -397,6 +397,15 @@ class PaymentController extends Controller
             'updated_at' => Carbon::now(),
         ]);
 
+        // Ledger: credit topup
+        \App\Models\LedgerEntry::credit(
+            $user->id,
+            $rechargeInfo->recharge_amount,
+            'Top-up approved (Ref: ' . ($rechargeInfo->transaction_id ?? $slug) . ')',
+            null,
+            $rechargeInfo->transaction_id ?? $slug
+        );
+
         // Send recharge approved email
         if ($user) {
             EmailHelper::send($user->email, new RechargeStatusEmail([

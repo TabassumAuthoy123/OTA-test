@@ -115,6 +115,22 @@
             margin-top: 1px;
         }
 
+        .pax-age-notes {
+            padding: 10px 0 4px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .pax-age-notes p {
+            font-size: 11px;
+            color: #888;
+            margin: 0 0 6px;
+            line-height: 1.5;
+        }
+
+        .pax-age-notes p:last-child {
+            margin-bottom: 0;
+        }
+
         .pax-controls {
             display: flex;
             align-items: center;
@@ -448,7 +464,7 @@
                                                             <div class="pax-row">
                                                                 <div class="pax-info">
                                                                     <span class="pax-label">Adults</span>
-                                                                    <span class="pax-desc">12 years and above</span>
+                                                                    <span class="pax-desc">Aged 12+</span>
                                                                 </div>
                                                                 <div class="pax-controls">
                                                                     <button type="button" class="pax-btn pax-minus"
@@ -469,7 +485,7 @@
                                                             <div class="pax-row">
                                                                 <div class="pax-info">
                                                                     <span class="pax-label">Children</span>
-                                                                    <span class="pax-desc">2–11 years</span>
+                                                                    <span class="pax-desc">Aged 2 to 11</span>
                                                                 </div>
                                                                 <div class="pax-controls">
                                                                     <button type="button" class="pax-btn pax-minus"
@@ -493,7 +509,7 @@
                                                             <div class="pax-row">
                                                                 <div class="pax-info">
                                                                     <span class="pax-label">Infant</span>
-                                                                    <span class="pax-desc">Below 2 years</span>
+                                                                    <span class="pax-desc">Under 2 years</span>
                                                                 </div>
                                                                 <div class="pax-controls">
                                                                     <button type="button" class="pax-btn pax-minus"
@@ -509,6 +525,11 @@
                                                                 </div>
                                                                 <input hidden name="infant_members" id="infant_input_one"
                                                                     value="0" />
+                                                            </div>
+                                                            {{-- Age notes --}}
+                                                            <div class="pax-age-notes">
+                                                                <p>Your age at time of travel must be valid for the age category booked. Airlines have restrictions on under 12s travelling alone.</p>
+                                                                <p>Age limits and policies for travelling with children may vary so please check with the airline before booking.</p>
                                                             </div>
                                                             {{-- Class Selection --}}
                                                             <div class="pax-class-row">

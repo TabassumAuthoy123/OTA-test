@@ -175,6 +175,7 @@
                     </div>
                     <button class="sort-btn active" onclick="sortFlights('price')">💰 Cheapest</button>
                     <button class="sort-btn" onclick="sortFlights('duration')">⏱ Fastest</button>
+                    <button class="sort-btn" id="directBtn" onclick="filterDirect(this)">✈ Direct Flights</button>
                 </div>
 
                 <div id="flightResults">
@@ -202,7 +203,7 @@
                     @endphp
 
                     @if($show)
-                    <div class="flight-card" data-price="{{ $totalPrice }}" data-duration="{{ $durationMin }}">
+                    <div class="flight-card" data-price="{{ $totalPrice }}" data-duration="{{ $durationMin }}" data-stops="{{ $stops }}">
                         <div class="fc-airline">
                             <img src="{{ url('airlines_logo') }}/{{ strtolower($data['operating_carrier_code']) }}.png"
                                  alt="{{ $data['operating_carrier_code'] }}"
@@ -298,7 +299,12 @@ function toggleDetails(index) {
     $('#details-' + index).toggleClass('show');
 }
 
+var _directFilterActive = false;
+
 function sortFlights(by) {
+    _directFilterActive = false;
+    $('.flight-card').show();
+    $('#visibleCount').text($('.flight-card:visible').length);
     var cards = $('.flight-card').toArray();
     cards.sort(function(a, b) {
         return parseFloat($(a).data(by)) - parseFloat($(b).data(by));
@@ -307,6 +313,20 @@ function sortFlights(by) {
     $.each(cards, function(i, card) { container.append(card); });
     $('.sort-btn').removeClass('active');
     event.target.classList.add('active');
+}
+
+function filterDirect(btn) {
+    _directFilterActive = !_directFilterActive;
+    $('.sort-btn').removeClass('active');
+    if (_directFilterActive) {
+        $(btn).addClass('active');
+        $('.flight-card').each(function() {
+            $(this).toggle(parseInt($(this).data('stops')) === 0);
+        });
+    } else {
+        $('.flight-card').show();
+    }
+    $('#visibleCount').text($('.flight-card:visible').length);
 }
 </script>
 @endsection

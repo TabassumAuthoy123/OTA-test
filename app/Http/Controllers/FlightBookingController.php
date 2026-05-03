@@ -32,6 +32,7 @@ use App\Enums\UserType;
 use App\Helpers\EmailHelper;
 use App\Mail\BookingConfirmationEmail;
 use App\Mail\TicketIssuedEmail;
+use App\Models\LedgerEntry;
 
 class FlightBookingController extends Controller
 {
@@ -394,8 +395,34 @@ class FlightBookingController extends Controller
             // Deduct B2B user balance
             if (Auth::user()->user_type == UserType::B2B->value) {
                 $user = User::where('id', Auth::user()->id)->first();
-                $user->balance = $user->balance - ($base_fare_amount - (($base_fare_amount * Auth::user()->comission) / 100));
+                $commissionPct  = (float) ($user->comission ?? 0);
+                $commissionAmt  = round(($base_fare_amount * $commissionPct) / 100, 2);
+                $payable        = round($base_fare_amount - $commissionAmt, 2);
+                $user->balance  = $user->balance - $payable;
                 $user->save();
+
+                // Ledger: debit payable amount
+                LedgerEntry::debit(
+                    $user->id,
+                    $payable,
+                    'Ticket issued: ' . $flightBookingInfo->booking_no . ' (fare ৳' . number_format($base_fare_amount) . ', commission ' . $commissionPct . '%)',
+                    $flightBookingInfo->id,
+                    $flightBookingInfo->booking_no
+                );
+
+                // Ledger: credit commission earned
+                if ($commissionAmt > 0) {
+                    LedgerEntry::credit(
+                        $user->id,
+                        $commissionAmt,
+                        'Commission earned on ' . $flightBookingInfo->booking_no . ' (' . $commissionPct . '%)',
+                        $flightBookingInfo->id,
+                        $flightBookingInfo->booking_no
+                    );
+                }
+
+                // Update b2b_comission on booking record
+                $flightBookingInfo->b2b_comission = $commissionPct;
             }
 
             // Append FH to ticket numbers

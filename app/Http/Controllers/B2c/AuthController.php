@@ -7,6 +7,8 @@ use App\Enums\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Helpers\EmailHelper;
+use App\Mail\WelcomeEmail;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -82,6 +84,8 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        EmailHelper::send($user->email, new WelcomeEmail($user));
 
         return redirect()->route('b2c.home')
             ->with('success', 'Welcome! Your account has been created successfully.');

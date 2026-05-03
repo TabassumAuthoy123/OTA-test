@@ -53,5 +53,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'comission' => 'decimal:2',
+        'balance'   => 'decimal:2',
     ];
+
+    public function ledgerEntries()
+    {
+        return $this->hasMany(LedgerEntry::class, 'party_id');
+    }
 }

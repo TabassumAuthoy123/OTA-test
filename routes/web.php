@@ -225,6 +225,14 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
     Route::get('my/bookings/approved', [\App\Http\Controllers\B2bAgentController::class, 'myApprovedBookings'])->name('MyApprovedBookings');
     Route::get('my/bookings/{id}', [\App\Http\Controllers\B2bAgentController::class, 'bookingDetail'])->name('MyBookingDetail');
 
+    // B2B Ledger
+    Route::get('my/ledger', [\App\Http\Controllers\LedgerController::class, 'myLedger'])->name('MyLedger');
+
+    // Ancillary (B2B agent side)
+    Route::get('ancillary/options', [\App\Http\Controllers\AncillaryController::class, 'getOptions'])->name('AncillaryOptions');
+    Route::post('ancillary/add', [\App\Http\Controllers\AncillaryController::class, 'addToBooking'])->name('AncillaryAddToBooking');
+    Route::delete('ancillary/{id}', [\App\Http\Controllers\AncillaryController::class, 'removeFromBooking'])->name('AncillaryRemove');
+
     // B2B Reissued
     Route::get('my/reissue/new', [\App\Http\Controllers\B2bAgentController::class, 'reissueNew'])->name('MyReissueNew');
     Route::get('my/reissue/in-process', [\App\Http\Controllers\B2bAgentController::class, 'reissueInProcess'])->name('MyReissueInProcess');
@@ -418,6 +426,19 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         Route::post('rules/commission/store', [\App\Http\Controllers\RulesEngineController::class, 'storeCommission'])->name('CommissionRuleStore');
         Route::get('rules/commission/{id}', [\App\Http\Controllers\RulesEngineController::class, 'getCommission'])->name('CommissionRuleGet');
         Route::delete('rules/commission/{id}', [\App\Http\Controllers\RulesEngineController::class, 'deleteCommission'])->name('CommissionRuleDelete');
+        Route::post('rules/commission/set-agent', [\App\Http\Controllers\RulesEngineController::class, 'setAgentCommission'])->name('SetAgentCommission');
+        Route::post('rules/commission/set-global', [\App\Http\Controllers\RulesEngineController::class, 'setGlobalCommission'])->name('SetGlobalCommission');
+
+        // Admin Ancillary Management
+        Route::get('admin/ancillaries', [\App\Http\Controllers\AncillaryController::class, 'adminIndex'])->name('AdminAncillaries');
+        Route::post('admin/ancillaries/store', [\App\Http\Controllers\AncillaryController::class, 'adminStore'])->name('AdminAncillaryStore');
+        Route::get('admin/ancillaries/{id}', [\App\Http\Controllers\AncillaryController::class, 'adminGet'])->name('AdminAncillaryGet');
+        Route::delete('admin/ancillaries/{id}', [\App\Http\Controllers\AncillaryController::class, 'adminDelete'])->name('AdminAncillaryDelete');
+
+        // Admin Ledger
+        Route::get('admin/ledger', [\App\Http\Controllers\LedgerController::class, 'adminSummary'])->name('AdminLedger');
+        Route::get('admin/ledger/{userId}', [\App\Http\Controllers\LedgerController::class, 'adminDetail'])->name('AdminLedgerDetail');
+        Route::post('admin/ledger/entry', [\App\Http\Controllers\LedgerController::class, 'adminAddEntry'])->name('AdminLedgerEntry');
 
         // Markup Rules
         Route::get('rules/markup/list', [\App\Http\Controllers\RulesEngineController::class, 'markupRules'])->name('MarkupRulesList');

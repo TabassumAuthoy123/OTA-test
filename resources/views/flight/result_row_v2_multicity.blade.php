@@ -180,9 +180,10 @@
                                     foreach ($fareComponents[$chosenFareCompIdx]['segments'] as $segIdx => $segRef) {
                                         if ($segIdx == 0) {
                                             if (isset($segRef['segment']['seatsAvailable'])) {
-                                                echo "Seat: " . $segRef['segment']['seatsAvailable'];
+                                                $seatsM = (int)$segRef['segment']['seatsAvailable'];
+                                                echo ($seatsM > 0 && $seatsM <= 5) ? '<span style="color:#dc3545;font-weight:700">Limited</span>' : 'Available';
                                             } else {
-                                                echo "Seat: N/A";
+                                                echo "Available";
                                             }
                                             break;
                                         }

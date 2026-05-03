@@ -188,6 +188,47 @@
 
       </div>
 
+      {{-- ANCILLARY SECTION --}}
+      @php $ancillaries = \App\Models\BookingAncillary::where('flight_booking_id', $booking->id)->get(); @endphp
+      <div class="col-12" style="border-top:1px solid #e9ecef;">
+        <div class="b2b-section">
+          <div class="b2b-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Ancillary Services (Baggage &amp; Meal)</span>
+            <button type="button" class="btn-export" style="background:#f0a500;font-size:12px;" data-bs-toggle="modal" data-bs-target="#ancModal">
+              <i class="fas fa-plus"></i> Add Ancillary
+            </button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="b2b-detail-tbl">
+              <thead><tr>
+                <th>Type</th><th>Name</th><th>Pax</th><th>Qty</th>
+                <th>Unit Price</th><th>Total</th><th>Status</th><th>Action</th>
+              </tr></thead>
+              <tbody>
+                @forelse($ancillaries as $anc)
+                <tr>
+                  <td><span class="status-badge" style="background:#cce5ff;color:#004085;">{{ strtoupper($anc->type) }}</span></td>
+                  <td>{{ $anc->name }}</td>
+                  <td>Pax {{ $anc->pax_index + 1 }}</td>
+                  <td>{{ $anc->qty }}</td>
+                  <td>৳ {{ number_format($anc->unit_price, 2) }}</td>
+                  <td style="font-weight:700;">৳ {{ number_format($anc->total_price, 2) }}</td>
+                  <td><span class="status-badge st-{{ $anc->status }}">{{ strtoupper($anc->status) }}</span></td>
+                  <td>
+                    <button class="btn-eye" style="background:#dc3545;" onclick="removeAncillary({{ $anc->id }})" title="Remove">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="8" class="text-center text-muted py-3">No ancillary services added yet.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       {{-- RIGHT: Quick Info + Actions --}}
       <div class="col-lg-4" style="padding:16px;">
         <div class="quick-info-card">
@@ -318,4 +359,139 @@
     </div>
   </div>
 </div></div>
+
+{{-- Ancillary Add Modal --}}
+<div class="modal fade" id="ancModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#0f1f3d;color:#fff;">
+        <h5 class="modal-title">Add Ancillary Service</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Type</label>
+          <select id="ancType" class="form-select" onchange="loadAncOptions()">
+            <option value="baggage">Baggage</option>
+            <option value="meal">Meal</option>
+            <option value="seat">Seat</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Select Option (or enter custom below)</label>
+          <select id="ancOptionSelect" class="form-select" onchange="fillAncOption()">
+            <option value="">-- Loading... --</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Name <span class="text-danger">*</span></label>
+          <input type="text" id="ancName" class="form-control" placeholder="e.g. Extra 10kg Baggage" required>
+        </div>
+        <div class="row g-2">
+          <div class="col-4">
+            <label class="form-label">Qty</label>
+            <input type="number" id="ancQty" class="form-control" value="1" min="1" oninput="calcAncTotal()">
+          </div>
+          <div class="col-4">
+            <label class="form-label">Unit Price (৳)</label>
+            <input type="number" id="ancPrice" class="form-control" step="0.01" min="0" value="0" oninput="calcAncTotal()">
+          </div>
+          <div class="col-4">
+            <label class="form-label">Total (৳)</label>
+            <input type="text" id="ancTotal" class="form-control" readonly style="background:#f8f9fa;font-weight:700;">
+          </div>
+        </div>
+        <div class="mt-3">
+          <label class="form-label">Passenger</label>
+          <select id="ancPax" class="form-select">
+            @foreach($passengers as $pi => $p)
+              <option value="{{ $pi }}">Pax {{ $pi+1 }}: {{ $p->first_name }} {{ $p->last_name }}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="mt-3">
+          <label class="form-label">Notes</label>
+          <input type="text" id="ancNotes" class="form-control" placeholder="Optional">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="submitAncillary()">Add to Booking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BOOKING_ID = {{ $booking->id }};
+const AIRLINE    = '{{ $booking->governing_carriers ?? '' }}';
+const FROM_CODE  = '{{ $booking->departure_location ?? '' }}';
+const TO_CODE    = '{{ $booking->arrival_location ?? '' }}';
+
+function loadAncOptions() {
+    const type = document.getElementById('ancType').value;
+    fetch(`{{ url('ancillary/options') }}?type=${type}&airline_code=${AIRLINE}&route_from=${FROM_CODE}&route_to=${TO_CODE}`)
+        .then(r => r.json())
+        .then(data => {
+            const sel = document.getElementById('ancOptionSelect');
+            sel.innerHTML = '<option value="">-- Select option or type custom --</option>';
+            data.forEach(o => {
+                sel.innerHTML += `<option value="${o.id}" data-name="${o.name}" data-price="${o.price}">${o.name} — ৳${parseFloat(o.price).toFixed(2)}</option>`;
+            });
+        }).catch(() => {
+            document.getElementById('ancOptionSelect').innerHTML = '<option value="">-- No options found, enter custom --</option>';
+        });
+}
+
+function fillAncOption() {
+    const sel = document.getElementById('ancOptionSelect');
+    const opt = sel.options[sel.selectedIndex];
+    if (opt.value) {
+        document.getElementById('ancName').value  = opt.dataset.name;
+        document.getElementById('ancPrice').value = opt.dataset.price;
+        calcAncTotal();
+    }
+}
+
+function calcAncTotal() {
+    const qty   = parseFloat(document.getElementById('ancQty').value)   || 1;
+    const price = parseFloat(document.getElementById('ancPrice').value) || 0;
+    document.getElementById('ancTotal').value = (qty * price).toFixed(2);
+}
+
+function submitAncillary() {
+    const name = document.getElementById('ancName').value.trim();
+    if (!name) { alert('Please enter a name.'); return; }
+    const sel = document.getElementById('ancOptionSelect');
+    const payload = {
+        flight_booking_id:   BOOKING_ID,
+        ancillary_option_id: sel.value || null,
+        type:       document.getElementById('ancType').value,
+        name:       name,
+        pax_index:  document.getElementById('ancPax').value,
+        qty:        document.getElementById('ancQty').value,
+        unit_price: document.getElementById('ancPrice').value,
+        notes:      document.getElementById('ancNotes').value,
+    };
+    fetch('{{ route("AncillaryAddToBooking") }}', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+        body: JSON.stringify(payload),
+    }).then(r => r.json()).then(res => {
+        if (res.success) { location.reload(); }
+        else { alert(res.message || 'Failed.'); }
+    });
+}
+
+function removeAncillary(id) {
+    if (!confirm('Remove this ancillary?')) return;
+    fetch(`{{ url('ancillary') }}/${id}`, {
+        method: 'DELETE',
+        headers: {'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+    }).then(r => r.json()).then(res => { if (res.success) location.reload(); });
+}
+
+document.addEventListener('DOMContentLoaded', loadAncOptions);
+</script>
 @endsection

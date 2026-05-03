@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CommissionRule;
 use App\Models\MarkupRule;
 use App\Models\BlockingRule;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Brian2694\Toastr\Facades\Toastr;
 use Yajra\DataTables\DataTables;
@@ -86,6 +87,37 @@ class RulesEngineController extends Controller
     {
         CommissionRule::destroy($id);
         return response()->json(['success' => 'Rule deleted.']);
+    }
+
+    /**
+     * Set commission % for a single agent (updates users.comission directly).
+     */
+    public function setAgentCommission(Request $request)
+    {
+        $request->validate([
+            'agent_id'   => 'required|exists:users,id',
+            'commission' => 'required|numeric|min:0|max:100',
+        ]);
+
+        User::where('id', $request->agent_id)->update(['comission' => $request->commission]);
+
+        Toastr::success('Commission updated for agent.');
+        return back();
+    }
+
+    /**
+     * Bulk: set same commission % for ALL B2B agents.
+     */
+    public function setGlobalCommission(Request $request)
+    {
+        $request->validate([
+            'global_commission' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $count = User::where('user_type', 2)->update(['comission' => $request->global_commission]);
+
+        Toastr::success("Commission set to {$request->global_commission}% for {$count} agents.");
+        return back();
     }
 
     // ─── MARKUP RULES ───

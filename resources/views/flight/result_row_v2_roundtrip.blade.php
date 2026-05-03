@@ -106,10 +106,11 @@
                         foreach ($passengerData['passengerInfo']['fareComponents'][0]['segments'] as $itemIndex => $segment){
                             if($itemIndex == 0){ //only for the 1st segment
                                 if(isset($segment['segment']['seatsAvailable'])){
-                                    echo "Seat: ".$segment['segment']['seatsAvailable'];
+                                    $seats = (int)$segment['segment']['seatsAvailable'];
+                                    echo ($seats > 0 && $seats <= 5) ? '<span style="color:#dc3545;font-weight:700">Limited</span>' : 'Available';
                                 }
                                 else{
-                                    echo "Seat: N/A";
+                                    echo "Available";
                                 }
                             }
                         }
@@ -215,10 +216,11 @@
                         foreach ($passengerData['passengerInfo']['fareComponents'][1]['segments'] as $itemIndex2 => $segment){
                             if($itemIndex2 == 0){ //only for the 1st segment of roundtrip
                                 if(isset($segment['segment']['seatsAvailable'])){
-                                    echo ", Seat: ".$segment['segment']['seatsAvailable'];
+                                    $seats2 = (int)$segment['segment']['seatsAvailable'];
+                                    echo ', ' . (($seats2 > 0 && $seats2 <= 5) ? '<span style="color:#dc3545;font-weight:700">Limited</span>' : 'Available');
                                 }
                                 else{
-                                    echo ", Seat: N/A";
+                                    echo ", Available";
                                 }
                             }
                         }
