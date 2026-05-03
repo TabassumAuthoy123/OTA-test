@@ -224,7 +224,14 @@
           </a>
         </li>
 
-        {{-- 9. Invoice --}}
+        {{-- 9. Ledger --}}
+        <li class="b2b-nav-item {{ $currentRoute=='MyLedger'?'active':'' }}">
+          <a href="{{ route('MyLedger') }}">
+            <i class="fas fa-book ni"></i> My Ledger
+          </a>
+        </li>
+
+        {{-- 10. Invoice --}}
         <li class="b2b-nav-item {{ $currentRoute=='FlightBookingReport'?'active':'' }}">
           <a href="{{ url('flight/booking/report') }}">
             <i class="fas fa-file-invoice ni"></i> Invoice
