@@ -93,29 +93,16 @@
                     </div>
                 </div>
 
-                {{-- Login / Account button — always visible on sm+ --}}
-                @auth
-                    @if(auth()->user()->user_type == 3)
-                        {{-- B2C customer --}}
-                        <a href="{{ url('/my-account') }}" class="ft-login-pill">
-                            <i class="fas fa-user" style="font-size:.75rem;"></i> My Account
-                        </a>
-                    @elseif(in_array(auth()->user()->user_type, [0, 1]))
-                        {{-- Admin browsing B2C --}}
-                        <a href="{{ url('/home') }}" class="ft-login-pill">
-                            <i class="fas fa-tachometer-alt" style="font-size:.75rem;"></i> Dashboard
-                        </a>
-                    @else
-                        {{-- B2B user --}}
-                        <a href="{{ route('home') }}" class="ft-login-pill">
-                            <i class="fas fa-user" style="font-size:.75rem;"></i> Portal
-                        </a>
-                    @endif
+                {{-- Login / Account button --}}
+                @if(Auth::check() && Auth::user()->user_type == 3)
+                    <a href="{{ url('/my-account') }}" class="ft-login-pill">
+                        <i class="fas fa-user" style="font-size:.75rem;"></i> My Account
+                    </a>
                 @else
                     <a href="{{ route('b2c.login') }}" class="ft-login-pill">
                         <i class="fas fa-sign-in-alt" style="font-size:.75rem;"></i> Login
                     </a>
-                @endauth
+                @endif
 
                 <button class="ft-menu-toggle d-xl-none" onclick="toggleFtMobile()" aria-label="Menu">
                     <i class="fas fa-bars"></i>
@@ -145,17 +132,11 @@
                 </a>
                 @endforeach
             </div>
-            @auth
-                @if(auth()->user()->user_type == 3)
-                    <a href="{{ url('/my-account') }}" class="ft-mobile-link">👤 My Account</a>
-                @elseif(in_array(auth()->user()->user_type, [0, 1]))
-                    <a href="{{ url('/home') }}" class="ft-mobile-link">⚙️ Dashboard</a>
-                @else
-                    <a href="{{ route('home') }}" class="ft-mobile-link">👤 Portal</a>
-                @endif
+            @if(Auth::check() && Auth::user()->user_type == 3)
+                <a href="{{ url('/my-account') }}" class="ft-mobile-link">👤 My Account</a>
             @else
                 <a href="{{ route('b2c.login') }}" class="ft-mobile-link">🔑 Login</a>
-            @endauth
+            @endif
         </div>
     </div>
 </nav>
