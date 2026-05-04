@@ -11,6 +11,16 @@
         ->orderByDesc('id')->first();
     $annText  = $navAnn ? '<strong>'.e($navAnn->title).':</strong> '.e($navAnn->message) : 'Welcome to FaithTrip!! ✈ &nbsp; Your Trusted IATA-Certified Travel Agency &nbsp; ✈ &nbsp; Book Flights, Tours, Visa &amp; More';
     $socialLinks = \Illuminate\Support\Facades\DB::table('social_media_links')->orderBy('name')->get();
+    $allSocialNames = ['facebook','twitter','instagram','youtube','pinterest','tiktok'];
+    $navSocials = $socialLinks->filter(fn($s) => in_array(strtolower($s->name), $allSocialNames));
+    $socialIconMap = [
+        'facebook'  => ['icon'=>'fa-facebook-f',  'color'=>'#1877F2'],
+        'twitter'   => ['icon'=>'fa-twitter',      'color'=>'#1DA1F2'],
+        'instagram' => ['icon'=>'fa-instagram',    'color'=>'#E1306C'],
+        'youtube'   => ['icon'=>'fa-youtube',      'color'=>'#FF0000'],
+        'pinterest' => ['icon'=>'fa-pinterest',    'color'=>'#E60023'],
+        'tiktok'    => ['icon'=>'fa-tiktok',       'color'=>'#000000'],
+    ];
 @endphp
 
 {{-- ── Announcement Bar (marquee) ── --}}
@@ -56,15 +66,16 @@
             {{-- Right Side --}}
             <div class="ft-nav-right">
 
-                {{-- Hotline (1 or 2 numbers) --}}
+                {{-- Hotline (2 numbers stacked) --}}
                 @if($hotlineNum)
                 <div class="ft-hotline d-none d-xl-flex">
                     <span>Hotline:</span>
-                    <a href="tel:{{ preg_replace('/\s+/','',$hotlineNum) }}" class="ft-hotline-number">{{ $hotlineNum }}</a>
-                    @if($hotlineNum2)
-                    <span class="ft-hotline-sep">/</span>
-                    <a href="tel:{{ preg_replace('/\s+/','',$hotlineNum2) }}" class="ft-hotline-number">{{ $hotlineNum2 }}</a>
-                    @endif
+                    <div class="ft-hotline-numbers">
+                        <a href="tel:{{ preg_replace('/\s+/','',$hotlineNum) }}" class="ft-hotline-number">{{ $hotlineNum }}</a>
+                        @if($hotlineNum2)
+                        <a href="tel:{{ preg_replace('/\s+/','',$hotlineNum2) }}" class="ft-hotline-number">{{ $hotlineNum2 }}</a>
+                        @endif
+                    </div>
                 </div>
                 @endif
 
@@ -82,40 +93,27 @@
                     </div>
                 </div>
 
-                {{-- Social icons (desktop) --}}
-                <div class="ft-nav-social d-none d-xl-flex">
-                    @php
-                        $allSocialNames = ['facebook','twitter','instagram','youtube','pinterest','tiktok'];
-                        $navSocials = $socialLinks->filter(fn($s) => in_array(strtolower($s->name), $allSocialNames));
-                        $socialIconMap = [
-                            'facebook'  => ['icon'=>'fa-facebook-f',  'color'=>'#1877F2'],
-                            'twitter'   => ['icon'=>'fa-twitter',      'color'=>'#1DA1F2'],
-                            'instagram' => ['icon'=>'fa-instagram',    'color'=>'#E1306C'],
-                            'youtube'   => ['icon'=>'fa-youtube',      'color'=>'#FF0000'],
-                            'pinterest' => ['icon'=>'fa-pinterest',    'color'=>'#E60023'],
-                            'tiktok'    => ['icon'=>'fa-tiktok',       'color'=>'#000000'],
-                        ];
-                    @endphp
-                    @foreach($navSocials as $ns)
-                    @php
-                        $nsKey = strtolower($ns->name);
-                        $nsInfo = $socialIconMap[$nsKey] ?? ['icon'=>'fa-globe','color'=>'#555'];
-                    @endphp
-                    <a href="{{ $ns->link ?? '#' }}" target="_blank" class="ft-nav-social-link" title="{{ $ns->name }}" data-sc="{{ $nsInfo['color'] }}">
-                        <i class="fab {{ $nsInfo['icon'] }}"></i>
-                    </a>
-                    @endforeach
-                </div>
-
+                {{-- Login / Account button — always visible on sm+ --}}
                 @auth
                     @if(auth()->user()->user_type == 3)
-                        <a href="{{ url('/my-account') }}" class="ft-login-pill d-none d-sm-inline-flex">
-                            <i class="fas fa-user" style="font-size:.75rem;"></i> Account
+                        {{-- B2C customer --}}
+                        <a href="{{ url('/my-account') }}" class="ft-login-pill">
+                            <i class="fas fa-user" style="font-size:.75rem;"></i> My Account
+                        </a>
+                    @elseif(in_array(auth()->user()->user_type, [0, 1]))
+                        {{-- Admin browsing B2C --}}
+                        <a href="{{ url('/home') }}" class="ft-login-pill">
+                            <i class="fas fa-tachometer-alt" style="font-size:.75rem;"></i> Dashboard
+                        </a>
+                    @else
+                        {{-- B2B user --}}
+                        <a href="{{ route('home') }}" class="ft-login-pill">
+                            <i class="fas fa-user" style="font-size:.75rem;"></i> Portal
                         </a>
                     @endif
                 @else
-                    <a href="{{ route('b2c.login') }}" class="ft-login-pill d-none d-sm-inline-flex">
-                        Login
+                    <a href="{{ route('b2c.login') }}" class="ft-login-pill">
+                        <i class="fas fa-sign-in-alt" style="font-size:.75rem;"></i> Login
                     </a>
                 @endauth
 
@@ -147,28 +145,31 @@
                 </a>
                 @endforeach
             </div>
-            @guest
+            @auth
+                @if(auth()->user()->user_type == 3)
+                    <a href="{{ url('/my-account') }}" class="ft-mobile-link">👤 My Account</a>
+                @elseif(in_array(auth()->user()->user_type, [0, 1]))
+                    <a href="{{ url('/home') }}" class="ft-mobile-link">⚙️ Dashboard</a>
+                @else
+                    <a href="{{ route('home') }}" class="ft-mobile-link">👤 Portal</a>
+                @endif
+            @else
                 <a href="{{ route('b2c.login') }}" class="ft-mobile-link">🔑 Login</a>
-            @endguest
+            @endauth
         </div>
     </div>
 </nav>
 
 <style>
-.ft-hotline-sep { color: rgba(255,255,255,.45); margin: 0 3px; font-size: .8rem; }
+.ft-hotline-numbers { display: flex; flex-direction: column; gap: 1px; }
+.ft-hotline-numbers .ft-hotline-number { line-height: 1.3; }
 
-/* Currency dropdown */
-.ft-currency-wrap { position: relative; align-items: center; }
-.ft-currency-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
-    border-radius: 20px; padding: 5px 12px; cursor: pointer;
-    font-size: .82rem; font-weight: 600; color: #fff;
-    transition: background .15s;
-}
-.ft-currency-btn:hover { background: rgba(255,255,255,.22); }
-.ft-curr-arrow { font-size: 7px; margin-left: 2px; transition: transform .2s; }
+/* Currency dropdown wrapper + arrow */
+.ft-currency-wrap { position: relative; display: inline-flex; align-items: center; }
+.ft-curr-arrow { font-size: 7px; margin-left: 3px; transition: transform .2s; }
 .ft-currency-wrap.open .ft-curr-arrow { transform: rotate(180deg); }
+
+/* Dropdown panel */
 .ft-currency-dropdown {
     display: none; position: absolute; top: calc(100% + 8px); right: 0;
     background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
