@@ -56,22 +56,28 @@
 
 /* ── Login Pill Button ── */
 .ft-login-pill {
-    background: linear-gradient(135deg, #F5A623 0%, #e8940f 100%);
+    background: linear-gradient(135deg, #F5A623 0%, #e8940f 100%) !important;
     color: #0D1B5E !important;
-    border: none;
+    border: none !important;
     border-radius: 22px;
-    padding: 8px 22px;
-    font-size: .88rem;
+    padding: 9px 24px;
+    font-size: .9rem;
     font-weight: 800;
     text-decoration: none !important;
     transition: all .2s;
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     gap: 6px;
     white-space: nowrap;
-    box-shadow: 0 3px 12px rgba(245,166,35,.45);
+    box-shadow: 0 3px 14px rgba(245,166,35,.55);
+    letter-spacing: .2px;
 }
-.ft-login-pill:hover { background: linear-gradient(135deg, #ffb733 0%, #F5A623 100%); box-shadow: 0 5px 18px rgba(245,166,35,.55); transform: translateY(-1px); color: #0D1B5E !important; }
+.ft-login-pill:hover {
+    background: linear-gradient(135deg, #ffb733 0%, #F5A623 100%) !important;
+    box-shadow: 0 6px 20px rgba(245,166,35,.65);
+    transform: translateY(-1px);
+    color: #0D1B5E !important;
+}
 
 /* ── Navbar Social Icons ── */
 .ft-nav-social { display: flex; align-items: center; gap: 4px; }
