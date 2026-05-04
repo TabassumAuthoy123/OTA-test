@@ -2,12 +2,60 @@
 
 @section('title', 'Sign In')
 
+@section('styles')
+<style>
+.ft-auth-card { max-width: 960px; min-height: 560px; }
+
+/* expanded contact section */
+.ft-auth-contact { display: flex; flex-direction: column; gap: 9px; }
+.ft-auth-contact-item { display: flex; flex-direction: column; gap: 2px; }
+.ft-auth-contact-item .label {
+    font-size: .63rem; font-weight: 700; letter-spacing: 1.2px;
+    color: rgba(255,255,255,.5); text-transform: uppercase;
+}
+.ft-auth-contact-item .value {
+    font-size: .83rem; font-weight: 600; color: #fff; text-decoration: none; line-height: 1.5;
+}
+.ft-auth-contact-item .value:hover { color: #F5A623; }
+.ft-auth-contact-item .value-sm {
+    font-size: .76rem; font-weight: 500; color: rgba(255,255,255,.85); text-decoration: none; line-height: 1.5; display: block;
+}
+.ft-auth-contact-item .value-sm:hover { color: #F5A623; }
+.ft-auth-contact-phones { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.ft-auth-social-row { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 2px; }
+.ft-auth-social-icon {
+    width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center;
+    justify-content: center; font-size: .78rem; text-decoration: none;
+    background: rgba(255,255,255,.12); color: #fff; transition: background .15s, transform .15s;
+}
+.ft-auth-social-icon:hover { background: rgba(255,255,255,.28); transform: scale(1.1); }
+.ft-auth-address { font-size: .76rem; color: rgba(255,255,255,.72); line-height: 1.5; }
+</style>
+@endsection
+
 @section('content')
 @php
     use App\Models\CmsSiteSetting;
-    $ls = CmsSiteSetting::allAsArray();
-    $lsPhone = $ls['footer_phone'] ?? '';
-    $lsEmail = $ls['footer_email'] ?? 'info@faithtrip.net';
+    use Illuminate\Support\Facades\DB;
+
+    $ls       = CmsSiteSetting::allAsArray();
+    $lsPhone  = $ls['footer_phone']   ?? '';
+    $lsPhone2 = $ls['footer_phone_2'] ?? '';
+    $lsEmail  = $ls['footer_email']   ?? 'info@faithtrip.net';
+    $lsEmail2 = $ls['footer_email_2'] ?? '';
+    $lsEmail3 = $ls['footer_email_3'] ?? '';
+    $lsEmail4 = $ls['footer_email_4'] ?? '';
+    $lsAddr   = $ls['footer_address'] ?? '';
+
+    $loginSocials = DB::table('social_media_links')->orderBy('name')->get();
+    $socialIconMap = [
+        'facebook'  => ['icon' => 'fa-facebook-f',  'color' => '#1877F2'],
+        'twitter'   => ['icon' => 'fa-twitter',      'color' => '#1DA1F2'],
+        'instagram' => ['icon' => 'fa-instagram',    'color' => '#E1306C'],
+        'youtube'   => ['icon' => 'fa-youtube',      'color' => '#FF0000'],
+        'pinterest' => ['icon' => 'fa-pinterest',    'color' => '#E60023'],
+        'tiktok'    => ['icon' => 'fa-tiktok',       'color' => '#ffffff'],
+    ];
 @endphp
 
 <div class="ft-auth-card">
@@ -31,16 +79,57 @@
         </div>
 
         <div class="ft-auth-contact">
+
+            {{-- Hotlines --}}
             @if($lsPhone)
             <div class="ft-auth-contact-item">
                 <span class="label">Hotline</span>
-                <a href="tel:{{ preg_replace('/\s+/','',$lsPhone) }}" class="value">{{ $lsPhone }}</a>
+                <div class="ft-auth-contact-phones">
+                    <a href="tel:{{ preg_replace('/\s+/','',$lsPhone) }}" class="value">{{ $lsPhone }}</a>
+                    @if($lsPhone2)
+                    <a href="tel:{{ preg_replace('/\s+/','',$lsPhone2) }}" class="value">{{ $lsPhone2 }}</a>
+                    @endif
+                </div>
             </div>
             @endif
+
+            {{-- Emails --}}
             <div class="ft-auth-contact-item">
                 <span class="label">Email</span>
-                <a href="mailto:{{ $lsEmail }}" class="value">{{ $lsEmail }}</a>
+                @foreach(array_filter([$lsEmail,$lsEmail2,$lsEmail3,$lsEmail4]) as $em)
+                <a href="mailto:{{ $em }}" class="value-sm">{{ $em }}</a>
+                @endforeach
             </div>
+
+            {{-- Social icons --}}
+            @if($loginSocials->isNotEmpty())
+            <div class="ft-auth-contact-item">
+                <span class="label">Follow Us</span>
+                <div class="ft-auth-social-row">
+                    @foreach($loginSocials as $ls_soc)
+                    @php
+                        $socKey  = strtolower($ls_soc->name);
+                        $socInfo = $socialIconMap[$socKey] ?? ['icon'=>'fa-globe','color'=>'#fff'];
+                    @endphp
+                    <a href="{{ $ls_soc->link ?? '#' }}" target="_blank"
+                       class="ft-auth-social-icon"
+                       title="{{ $ls_soc->name }}"
+                       data-bg="{{ $socInfo['color'] }}">
+                        <i class="fab {{ $socInfo['icon'] }}"></i>
+                    </a>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- Address --}}
+            @if($lsAddr)
+            <div class="ft-auth-contact-item">
+                <span class="label">Office</span>
+                <span class="ft-auth-address">{{ $lsAddr }}</span>
+            </div>
+            @endif
+
         </div>
     </div>
 
@@ -126,5 +215,9 @@ function ftTogglePw() {
     if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fas fa-eye-slash'; }
     else                         { inp.type = 'password'; icon.className = 'fas fa-eye'; }
 }
+// Apply social icon bg colors from data-bg
+document.querySelectorAll('.ft-auth-social-icon[data-bg]').forEach(function(el){
+    el.style.backgroundColor = el.dataset.bg;
+});
 </script>
 @endsection

@@ -1,7 +1,8 @@
 @php
     use App\Models\CmsSiteSetting;
     $navSettings = CmsSiteSetting::allAsArray();
-    $hotlineNum  = $navSettings['footer_phone'] ?? '';
+    $hotlineNum  = $navSettings['footer_phone']   ?? '';
+    $hotlineNum2 = $navSettings['footer_phone_2'] ?? '';
     $navAnn = \Illuminate\Support\Facades\DB::table('announcements')
         ->where('is_active', 1)
         ->whereIn('target', ['all', 'b2c'])
@@ -54,30 +55,54 @@
 
             {{-- Right Side --}}
             <div class="ft-nav-right">
+
+                {{-- Hotline (1 or 2 numbers) --}}
                 @if($hotlineNum)
                 <div class="ft-hotline d-none d-xl-flex">
                     <span>Hotline:</span>
                     <a href="tel:{{ preg_replace('/\s+/','',$hotlineNum) }}" class="ft-hotline-number">{{ $hotlineNum }}</a>
+                    @if($hotlineNum2)
+                    <span class="ft-hotline-sep">/</span>
+                    <a href="tel:{{ preg_replace('/\s+/','',$hotlineNum2) }}" class="ft-hotline-number">{{ $hotlineNum2 }}</a>
+                    @endif
                 </div>
                 @endif
 
-                <span class="ft-currency-btn d-none d-lg-inline-flex">
-                    BDT (৳) <i class="fas fa-chevron-down" style="font-size:8px;margin-left:3px;"></i>
-                </span>
+                {{-- Currency Dropdown --}}
+                <div class="ft-currency-wrap d-none d-lg-flex" id="ftCurrencyWrap">
+                    <button class="ft-currency-btn" onclick="ftToggleCurrency(event)" id="ftCurrencyBtn" type="button">
+                        <span id="ftCurrencyLabel">BDT (৳)</span>
+                        <i class="fas fa-chevron-down ft-curr-arrow"></i>
+                    </button>
+                    <div class="ft-currency-dropdown" id="ftCurrencyDropdown">
+                        <div class="ft-currency-option" data-code="USD" data-label="USD ($)"    onclick="ftSelectCurrency(this)">USD ($)</div>
+                        <div class="ft-currency-option" data-code="BDT" data-label="BDT (৳)"   onclick="ftSelectCurrency(this)">BDT (৳)</div>
+                        <div class="ft-currency-option" data-code="GBP" data-label="GBP (£)"   onclick="ftSelectCurrency(this)">GBP (£)</div>
+                        <div class="ft-currency-option" data-code="MYR" data-label="MYR (RM)"  onclick="ftSelectCurrency(this)">MYR (RM)</div>
+                    </div>
+                </div>
 
                 {{-- Social icons (desktop) --}}
                 <div class="ft-nav-social d-none d-xl-flex">
                     @php
-                        $navSocials = $socialLinks->filter(fn($s) => in_array(strtolower($s->name), ['facebook','twitter','instagram','youtube']));
+                        $allSocialNames = ['facebook','twitter','instagram','youtube','pinterest','tiktok'];
+                        $navSocials = $socialLinks->filter(fn($s) => in_array(strtolower($s->name), $allSocialNames));
+                        $socialIconMap = [
+                            'facebook'  => ['icon'=>'fa-facebook-f',  'color'=>'#1877F2'],
+                            'twitter'   => ['icon'=>'fa-twitter',      'color'=>'#1DA1F2'],
+                            'instagram' => ['icon'=>'fa-instagram',    'color'=>'#E1306C'],
+                            'youtube'   => ['icon'=>'fa-youtube',      'color'=>'#FF0000'],
+                            'pinterest' => ['icon'=>'fa-pinterest',    'color'=>'#E60023'],
+                            'tiktok'    => ['icon'=>'fa-tiktok',       'color'=>'#000000'],
+                        ];
                     @endphp
                     @foreach($navSocials as $ns)
                     @php
-                        $nsN = strtolower($ns->name);
-                        $nsIcon = $nsN === 'facebook' ? 'fa-facebook-f' : ($nsN === 'twitter' ? 'fa-twitter' : ($nsN === 'instagram' ? 'fa-instagram' : ($nsN === 'youtube' ? 'fa-youtube' : 'fa-globe')));
-                        $nsColor = $nsN === 'facebook' ? '#1877F2' : ($nsN === 'twitter' ? '#1DA1F2' : ($nsN === 'instagram' ? '#E1306C' : ($nsN === 'youtube' ? '#FF0000' : '#555')));
+                        $nsKey = strtolower($ns->name);
+                        $nsInfo = $socialIconMap[$nsKey] ?? ['icon'=>'fa-globe','color'=>'#555'];
                     @endphp
-                    <a href="{{ $ns->link ?? '#' }}" target="_blank" class="ft-nav-social-link" title="{{ $ns->name }}" style="--sc:{{ $nsColor }};">
-                        <i class="fab {{ $nsIcon }}"></i>
+                    <a href="{{ $ns->link ?? '#' }}" target="_blank" class="ft-nav-social-link" title="{{ $ns->name }}" data-sc="{{ $nsInfo['color'] }}">
+                        <i class="fab {{ $nsInfo['icon'] }}"></i>
                     </a>
                     @endforeach
                 </div>
@@ -112,13 +137,14 @@
             <a href="#" class="ft-mobile-link">🏥 Medical</a>
             {{-- Mobile social --}}
             <div style="display:flex;gap:14px;padding:10px 8px 6px;border-top:1px solid #f0f0f0;margin-top:4px;">
-                @foreach($socialLinks->whereIn('name',['Facebook','Twitter','Instagram','YouTube']) as $ms)
+                @foreach($navSocials as $ms)
                 @php
-                    $msN = strtolower($ms->name);
-                    $msIcon = $msN === 'facebook' ? 'fa-facebook-f' : ($msN === 'twitter' ? 'fa-twitter' : ($msN === 'instagram' ? 'fa-instagram' : 'fa-youtube'));
-                    $msColor = $msN === 'facebook' ? '#1877F2' : ($msN === 'twitter' ? '#1DA1F2' : ($msN === 'instagram' ? '#E1306C' : '#FF0000'));
+                    $msKey  = strtolower($ms->name);
+                    $msInfo = $socialIconMap[$msKey] ?? ['icon'=>'fa-globe','color'=>'#555'];
                 @endphp
-                <a href="{{ $ms->link ?? '#' }}" target="_blank" style="color:{{ $msColor }};font-size:1.1rem;"><i class="fab {{ $msIcon }}"></i></a>
+                <a href="{{ $ms->link ?? '#' }}" target="_blank" class="ft-mob-social-link" data-color="{{ $msInfo['color'] }}" style="font-size:1.1rem;" title="{{ $ms->name }}">
+                    <i class="fab {{ $msInfo['icon'] }}"></i>
+                </a>
                 @endforeach
             </div>
             @guest
@@ -128,9 +154,79 @@
     </div>
 </nav>
 
+<style>
+.ft-hotline-sep { color: rgba(255,255,255,.45); margin: 0 3px; font-size: .8rem; }
+
+/* Currency dropdown */
+.ft-currency-wrap { position: relative; align-items: center; }
+.ft-currency-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+    border-radius: 20px; padding: 5px 12px; cursor: pointer;
+    font-size: .82rem; font-weight: 600; color: #fff;
+    transition: background .15s;
+}
+.ft-currency-btn:hover { background: rgba(255,255,255,.22); }
+.ft-curr-arrow { font-size: 7px; margin-left: 2px; transition: transform .2s; }
+.ft-currency-wrap.open .ft-curr-arrow { transform: rotate(180deg); }
+.ft-currency-dropdown {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0;
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.13); min-width: 130px; z-index: 9999; overflow: hidden;
+}
+.ft-currency-wrap.open .ft-currency-dropdown { display: block; }
+.ft-currency-option {
+    padding: 10px 16px; font-size: .87rem; font-weight: 500;
+    color: #333; cursor: pointer; transition: background .1s;
+}
+.ft-currency-option:hover { background: #f5f7ff; }
+.ft-currency-option.active { background: #EEF1FF; color: #0D1B5E; font-weight: 700; }
+</style>
+
 <script>
 function toggleFtMobile() {
     var m = document.getElementById('ftMobileMenu');
     if (m) m.classList.toggle('open');
 }
+
+// ── Currency dropdown ──
+function ftToggleCurrency(e) {
+    e.stopPropagation();
+    document.getElementById('ftCurrencyWrap').classList.toggle('open');
+}
+function ftSelectCurrency(el) {
+    var code  = el.dataset.code;
+    var label = el.dataset.label;
+    document.getElementById('ftCurrencyLabel').textContent = label;
+    document.getElementById('ftCurrencyWrap').classList.remove('open');
+    localStorage.setItem('ft_currency', code);
+    document.querySelectorAll('.ft-currency-option').forEach(function(o){
+        o.classList.toggle('active', o.dataset.code === code);
+    });
+}
+document.addEventListener('click', function(e) {
+    var wrap = document.getElementById('ftCurrencyWrap');
+    if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
+// Apply data-sc (CSS custom prop) and data-color to social links
+document.querySelectorAll('[data-sc]').forEach(function(el){
+    el.style.setProperty('--sc', el.dataset.sc);
+});
+document.querySelectorAll('.ft-mob-social-link[data-color]').forEach(function(el){
+    el.style.color = el.dataset.color;
+});
+
+// init from localStorage
+(function() {
+    var saved = localStorage.getItem('ft_currency');
+    if (!saved) { saved = 'BDT'; }
+    var labels = { USD:'USD ($)', BDT:'BDT (৳)', GBP:'GBP (£)', MYR:'MYR (RM)' };
+    if (labels[saved]) {
+        var lbl = document.getElementById('ftCurrencyLabel');
+        if (lbl) lbl.textContent = labels[saved];
+    }
+    document.querySelectorAll('.ft-currency-option').forEach(function(o){
+        o.classList.toggle('active', o.dataset.code === saved);
+    });
+})();
 </script>

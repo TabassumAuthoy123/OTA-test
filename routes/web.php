@@ -65,6 +65,10 @@ Route::post('/customer/login', [B2cAuthController::class, 'login'])->name('b2c.l
 Route::get('/customer/register', [B2cAuthController::class, 'showRegister'])->name('b2c.register');
 Route::post('/customer/register', [B2cAuthController::class, 'register'])->name('b2c.register.submit');
 Route::post('/customer/logout', [B2cAuthController::class, 'logout'])->name('b2c.logout');
+Route::get('/customer/forgot-password', [B2cAuthController::class, 'showForgotPassword'])->name('b2c.password.request');
+Route::post('/customer/forgot-password', [B2cAuthController::class, 'sendOtp'])->name('b2c.password.send-otp');
+Route::get('/customer/verify-otp', [B2cAuthController::class, 'showVerifyOtp'])->name('b2c.verify.otp');
+Route::post('/customer/reset-password', [B2cAuthController::class, 'resetPassword'])->name('b2c.password.reset');
 
 // B2C Flight Search (Public - no auth required for search)
 Route::post('/flights/search', [B2cFlightSearchController::class, 'search'])->name('b2c.flights.search');
