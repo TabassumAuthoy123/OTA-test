@@ -285,7 +285,7 @@
                     </ul>
                 </li>
                 <li
-                    class="@if(in_array($currentRoute, ['ViewSmsGateways', 'ViewEmailConfig', 'SearchResultsViewConfig', 'PricingConfig', 'RulesEngine'])) mm-active @endif">
+                    class="@if(in_array($currentRoute, ['ViewSmsGateways', 'ViewEmailConfig', 'SearchResultsViewConfig', 'PricingConfig', 'RulesEngine', 'AdminNotificationLogs'])) mm-active @endif">
                     <a class="has-arrow material-ripple" href="javascript:void(0);">
                         <i class="typcn typcn-cog-outline"></i> Application Setting
                     </a>
@@ -313,6 +313,11 @@
                         <li class="@if($currentRoute == 'ViewSmsGateways') mm-active @endif">
                             <a class="text-capitalize" href="{{url('setup/sms/gateways')}}">
                                 <i class="typcn typcn-message"></i> SMS Gateway
+                            </a>
+                        </li>
+                        <li class="@if($currentRoute == 'AdminNotificationLogs') mm-active @endif">
+                            <a class="text-capitalize" href="{{ route('AdminNotificationLogs') }}">
+                                <i class="typcn typcn-bell"></i> Notification Logs
                             </a>
                         </li>
                     </ul>

@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\EmailHelper;
+use App\Mail\DepartureReminderAgent;
+use App\Mail\DepartureReminderPassenger;
 use App\Models\Config;
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateSmsGatewayRequest;
 use App\Http\Requests\UpdateEmailConfigRequest;
+use App\Models\FlightNotificationLog;
 use App\Models\SmsGateway;
 use App\Models\EmailConfigure;
 use Illuminate\Support\Facades\DB;
@@ -143,6 +147,69 @@ class SystemController extends Controller
             'updated_at' => Carbon::now()
         ]);
         return response()->json(['success' => 'Updated Successfully.']);
+    }
+
+    public function testSendEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $testData = [
+            'booking_id'         => 0,
+            'booking_no'         => 'TEST-001',
+            'pnr'                => 'TESTPNR',
+            'airlines_pnr'       => 'AIRPNR',
+            'traveller_name'     => 'Test Passenger',
+            'departure_location' => 'DAC',
+            'arrival_location'   => 'DXB',
+            'departure_date'     => now()->addHours(10)->format('d M Y, h:i A'),
+            'governing_carriers' => 'Test Airline',
+            'contact'            => '+8801700000000',
+            'total_fare'         => 25000,
+            'passenger_names'    => 'Test Passenger',
+            'agent_name'         => auth()->user()->name,
+            'agent_email'        => $request->email,
+            'agent_code'         => 'B2B-001',
+        ];
+
+        $type = $request->input('type', 'passenger');
+        $mailable = $type === 'agent'
+            ? new DepartureReminderAgent($testData)
+            : new DepartureReminderPassenger($testData);
+
+        $ok = EmailHelper::send($request->email, $mailable);
+
+        return response()->json([
+            'success' => $ok,
+            'message' => $ok
+                ? "Test email sent to {$request->email}"
+                : 'Failed to send. Check Mail Server Config and laravel.log.',
+        ]);
+    }
+
+    public function notificationLogs(Request $request)
+    {
+        $query = FlightNotificationLog::with('booking')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('booking_no')) {
+            $query->whereHas('booking', fn($q) => $q->where('booking_no', 'like', '%' . $request->booking_no . '%'));
+        }
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $logs  = $query->paginate(50)->withQueryString();
+        $total = FlightNotificationLog::count();
+        $sent  = FlightNotificationLog::where('status', 'sent')->count();
+        $failed = FlightNotificationLog::where('status', 'failed')->count();
+
+        return view('system.notification_logs', compact('logs', 'total', 'sent', 'failed'));
     }
 
 }

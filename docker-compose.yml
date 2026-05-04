@@ -64,6 +64,28 @@ services:
     networks:
       - otaplatform
 
+  # Laravel Scheduler — runs php artisan schedule:run every minute
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: otaplatform_scheduler
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - /var/www/vendor
+    environment:
+      - APP_ENV=local
+      - APP_KEY=${APP_KEY}
+    command: >
+      sh -c "while true; do php artisan schedule:run --no-interaction >> /dev/null 2>&1; sleep 60; done"
+    depends_on:
+      - app
+      - mysql
+    networks:
+      - otaplatform
+
 networks:
   otaplatform:
     driver: bridge

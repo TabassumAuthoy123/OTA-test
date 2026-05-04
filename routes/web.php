@@ -577,6 +577,10 @@ Route::group(['middleware' => ['auth', 'CheckUserStatus']], function () {
         Route::put('configuration/airlines/{id}', [\App\Http\Controllers\ConfigurationController::class, 'updateAirline'])->name('ConfigUpdateAirline');
         Route::delete('configuration/airlines/{id}', [\App\Http\Controllers\ConfigurationController::class, 'deleteAirline'])->name('ConfigDeleteAirline');
 
+        // Notification Logs
+        Route::get('admin/notification-logs', [SystemController::class, 'notificationLogs'])->name('AdminNotificationLogs');
+        Route::post('admin/notification-logs/test-send', [SystemController::class, 'testSendEmail'])->name('AdminTestSendEmail');
+
         // Tracking
         Route::get('configuration/tracking', [\App\Http\Controllers\ConfigurationController::class, 'tracking'])->name('ConfigTracking');
         Route::post('configuration/tracking/{type}/update', [\App\Http\Controllers\ConfigurationController::class, 'updateTrackingByType'])->name('ConfigUpdateTrackingByType');

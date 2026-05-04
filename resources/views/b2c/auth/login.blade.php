@@ -1,239 +1,130 @@
-@extends('b2c.layouts.master')
+@extends('b2c.layouts.auth')
 
 @section('title', 'Sign In')
 
-@section('styles')
-    <style>
-        .b2c-auth-page {
-            min-height: 100vh;
-            background: var(--b2c-gradient-hero);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 100px 20px 60px;
-        }
-
-        .b2c-auth-card {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--b2c-radius-xl);
-            padding: 48px 40px;
-            width: 100%;
-            max-width: 460px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .b2c-auth-logo {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .b2c-auth-logo i {
-            font-size: 2rem;
-            color: var(--b2c-cta);
-            margin-bottom: 8px;
-        }
-
-        .b2c-auth-logo h2 {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .b2c-auth-logo p {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .b2c-auth-field {
-            margin-bottom: 20px;
-        }
-
-        .b2c-auth-field label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--b2c-accent-light);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .b2c-auth-field input {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--b2c-radius-md);
-            color: #fff;
-            font-size: 0.95rem;
-            font-family: var(--font-body);
-            transition: var(--b2c-transition);
-            outline: none;
-        }
-
-        .b2c-auth-field input:focus {
-            border-color: var(--b2c-accent);
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-        }
-
-        .b2c-auth-field input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .b2c-pw-wrap {
-            position: relative;
-        }
-        .b2c-pw-wrap input {
-            padding-right: 44px !important;
-        }
-        .b2c-pw-eye {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: rgba(255,255,255,.45);
-            font-size: 15px;
-            padding: 2px;
-            transition: color .15s;
-            line-height: 1;
-        }
-        .b2c-pw-eye:hover { color: rgba(255,255,255,.85); }
-
-        .b2c-auth-remember {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .b2c-auth-remember label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .b2c-auth-submit {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: var(--b2c-radius-md);
-            background: linear-gradient(135deg, var(--b2c-cta), #F97316);
-            color: var(--b2c-primary);
-            font-family: var(--font-heading);
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--b2c-transition);
-        }
-
-        .b2c-auth-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--b2c-cta-glow);
-        }
-
-        .b2c-auth-links {
-            text-align: center;
-            margin-top: 24px;
-        }
-
-        .b2c-auth-links a {
-            color: var(--b2c-accent-light);
-            font-size: 0.9rem;
-            text-decoration: none;
-        }
-
-        .b2c-auth-links a:hover {
-            text-decoration: underline;
-        }
-
-        .b2c-auth-error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #FCA5A5;
-            padding: 12px 16px;
-            border-radius: var(--b2c-radius-sm);
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-        }
-    </style>
-@endsection
-
 @section('content')
-    <div class="b2c-auth-page">
-        <div class="b2c-auth-card">
-            <div class="b2c-auth-logo">
-                <i class="fas fa-plane-departure"></i>
-                <h2>Welcome Back</h2>
-                <p>Sign in to manage your bookings</p>
+@php
+    use App\Models\CmsSiteSetting;
+    $ls = CmsSiteSetting::allAsArray();
+    $lsPhone = $ls['footer_phone'] ?? '';
+    $lsEmail = $ls['footer_email'] ?? 'info@faithtrip.net';
+@endphp
+
+<div class="ft-auth-card">
+
+    {{-- ── Left Panel ── --}}
+    <div class="ft-auth-left">
+        <a href="{{ url('/') }}" class="ft-auth-left-logo">
+            <svg width="38" height="38" viewBox="0 0 42 42" fill="none">
+                <circle cx="21" cy="21" r="21" fill="#0D1B5E"/>
+                <path d="M7 30 Q21 17 35 30" stroke="#C62828" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+                <polygon points="31,8 37,13 30,15" fill="#F5A623"/>
+                <text x="9" y="20.5" font-family="Arial,sans-serif" font-weight="700" font-size="7.5" fill="white">Faith</text>
+                <text x="9" y="29.5" font-family="Arial,sans-serif" font-weight="700" font-size="7.5" fill="#F5A623">Trip</text>
+            </svg>
+            <span class="faith">Faith</span><span class="trip">Trip</span>
+        </a>
+
+        <div class="ft-auth-left-body">
+            <h2>Your journeys,<br><span>one account</span></h2>
+            <p>Manage bookings, track trips, and access member-only deals — all in one secure place.</p>
+        </div>
+
+        <div class="ft-auth-contact">
+            @if($lsPhone)
+            <div class="ft-auth-contact-item">
+                <span class="label">Hotline</span>
+                <a href="tel:{{ preg_replace('/\s+/','',$lsPhone) }}" class="value">{{ $lsPhone }}</a>
             </div>
+            @endif
+            <div class="ft-auth-contact-item">
+                <span class="label">Email</span>
+                <a href="mailto:{{ $lsEmail }}" class="value">{{ $lsEmail }}</a>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Right Panel ── --}}
+    <div class="ft-auth-right">
+        <div class="ft-auth-right-top">
+            <a href="{{ url('/') }}" class="ft-auth-back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <span class="ft-auth-secure-badge">
+                <i class="fas fa-shield-alt"></i> Secure login
+            </span>
+        </div>
+
+        <div class="ft-auth-right-body">
+            <h3>Welcome back</h3>
+            <p class="sub">Log in to continue planning your next trip.</p>
 
             @if($errors->any())
-                <div class="b2c-auth-error">
-                    @foreach($errors->all() as $error)
-                        <div>{{ $error }}</div>
-                    @endforeach
-                </div>
+            <div class="ft-auth-error">
+                @foreach($errors->all() as $err)<div>{{ $err }}</div>@endforeach
+            </div>
+            @endif
+
+            @if(session('status'))
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;padding:10px 14px;border-radius:8px;font-size:.84rem;margin-bottom:16px;">
+                {{ session('status') }}
+            </div>
             @endif
 
             <form method="POST" action="{{ route('b2c.login.submit') }}">
                 @csrf
 
-                <div class="b2c-auth-field">
-                    <label>Email Address</label>
-                    <input type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required
-                        autofocus>
+                <div class="ft-auth-form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}"
+                           placeholder="you@email.com" required autofocus>
                 </div>
 
-                <div class="b2c-auth-field">
-                    <label>Password</label>
-                    <div class="b2c-pw-wrap">
-                        <input type="password" name="password" id="b2cPwInput" placeholder="Enter your password" required>
-                        <button type="button" class="b2c-pw-eye" onclick="toggleB2cPw()" id="b2cPwEye" title="Show/hide password">
-                            <i class="fas fa-eye" id="b2cPwIcon"></i>
+                <div class="ft-auth-form-group">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <label for="password" style="margin:0;">Password</label>
+                        @if(Route::has('b2c.password.request'))
+                        <a href="{{ route('b2c.password.request') }}" class="ft-forgot-link">Forgot password?</a>
+                        @endif
+                    </div>
+                    <div class="ft-pw-wrap">
+                        <input type="password" id="password" name="password"
+                               placeholder="Enter your password" required>
+                        <button type="button" class="ft-pw-eye" onclick="ftTogglePw()" title="Show/hide">
+                            <i class="fas fa-eye" id="ftPwIcon"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="b2c-auth-remember">
+                <div class="ft-auth-row">
                     <label>
                         <input type="checkbox" name="remember"> Remember me
                     </label>
                 </div>
 
-                <button type="submit" class="b2c-auth-submit">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
+                <button type="submit" class="ft-auth-submit">Log In</button>
             </form>
 
-            <div class="b2c-auth-links">
-                Don't have an account? <a href="{{ route('b2c.register') }}">Create Account</a>
+            <div class="ft-auth-switch">
+                New to FaithTrip? <a href="{{ route('b2c.register') }}">Create an account</a>
             </div>
         </div>
     </div>
+
+</div>
+
+<div class="ft-auth-foot">
+    &copy; {{ date('Y') }} FaithTrip. All rights reserved.
+</div>
 @endsection
 
 @section('scripts')
 <script>
-function toggleB2cPw() {
-    var inp  = document.getElementById('b2cPwInput');
-    var icon = document.getElementById('b2cPwIcon');
-    if (inp.type === 'password') {
-        inp.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        inp.type = 'password';
-        icon.className = 'fas fa-eye';
-    }
+function ftTogglePw() {
+    var inp  = document.getElementById('password');
+    var icon = document.getElementById('ftPwIcon');
+    if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+    else                         { inp.type = 'password'; icon.className = 'fas fa-eye'; }
 }
 </script>
 @endsection

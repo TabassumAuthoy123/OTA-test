@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Check every hour for flights departing in ~10h and send reminders
+        $schedule->command('reminders:departure')->hourly()->withoutOverlapping();
     }
 
     /**
