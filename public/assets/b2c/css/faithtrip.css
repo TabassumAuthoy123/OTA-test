@@ -56,22 +56,22 @@
 
 /* ── Login Pill Button ── */
 .ft-login-pill {
-    background: #0D1B5E;
-    color: #fff !important;
+    background: linear-gradient(135deg, #F5A623 0%, #e8940f 100%);
+    color: #0D1B5E !important;
     border: none;
     border-radius: 22px;
     padding: 8px 22px;
     font-size: .88rem;
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none !important;
     transition: all .2s;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(13,27,94,.25);
+    box-shadow: 0 3px 12px rgba(245,166,35,.45);
 }
-.ft-login-pill:hover { background: #1A3A8F; box-shadow: 0 4px 16px rgba(13,27,94,.35); transform: translateY(-1px); }
+.ft-login-pill:hover { background: linear-gradient(135deg, #ffb733 0%, #F5A623 100%); box-shadow: 0 5px 18px rgba(245,166,35,.55); transform: translateY(-1px); color: #0D1B5E !important; }
 
 /* ── Navbar Social Icons ── */
 .ft-nav-social { display: flex; align-items: center; gap: 4px; }
@@ -146,20 +146,20 @@
 .ft-hotline-number { font-weight: 700; color: #0D1B5E; text-decoration: none !important; font-size: 0.88rem; }
 .ft-hotline-number:hover { color: #F5A623; }
 .ft-currency-btn {
-    border: 1.5px solid #ddd;
+    border: 2px solid #0D1B5E;
     border-radius: 20px;
-    padding: 5px 12px;
+    padding: 5px 13px;
     font-size: 0.82rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #0D1B5E;
-    background: #fff;
+    background: #eef1fb;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
 }
-.ft-currency-btn:hover { border-color: #0D1B5E; }
+.ft-currency-btn:hover { background: #0D1B5E; color: #fff; border-color: #0D1B5E; }
 .ft-login-btn {
     background: #0D1B5E;
     color: #fff !important;
